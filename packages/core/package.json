@@ -1,0 +1,68 @@
+{
+  "name": "@0gent/core",
+  "version": "0.1.0",
+  "description": "Decentralized infrastructure for autonomous AI agents on 0G Chain",
+  "type": "module",
+  "bin": {
+    "0gent": "./dist/cli.js"
+  },
+  "main": "./dist/sdk.js",
+  "types": "./dist/sdk.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/sdk.js",
+      "types": "./dist/sdk.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "0g",
+    "0g-chain",
+    "ai",
+    "agent",
+    "agentic",
+    "x402",
+    "infrastructure",
+    "phone",
+    "email",
+    "wallet",
+    "crypto"
+  ],
+  "author": "0GENT <hello@0gent.xyz>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martinvibes/0gent.git",
+    "directory": "packages/core"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@0gfoundation/0g-ts-sdk": "^1.2.1",
+    "bip39": "^3.1.0",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "ethers": "^6.13.0",
+    "inquirer": "^9.2.15",
+    "ora": "^8.0.1",
+    "qrcode-terminal": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^22.0.0",
+    "@types/qrcode-terminal": "^0.12.2",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.3"
+  }
+}
