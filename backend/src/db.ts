@@ -43,10 +43,33 @@ export function initDatabase(): void {
       local_part TEXT UNIQUE NOT NULL,
       owner TEXT NOT NULL,
       resource_id INTEGER,
+      cf_routing_rule_id TEXT,
       created_at TEXT NOT NULL,
       active INTEGER DEFAULT 1
     );
     CREATE INDEX IF NOT EXISTS idx_email_owner ON email_inboxes(owner);
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS email_messages (
+      id TEXT PRIMARY KEY,
+      inbox_id TEXT NOT NULL,
+      direction TEXT NOT NULL CHECK(direction IN ('inbound', 'outbound')),
+      from_address TEXT NOT NULL,
+      to_address TEXT NOT NULL,
+      subject TEXT NOT NULL DEFAULT '',
+      body_text TEXT NOT NULL DEFAULT '',
+      body_html TEXT,
+      thread_id TEXT,
+      message_id TEXT,
+      in_reply_to TEXT,
+      provider_id TEXT,
+      timestamp TEXT NOT NULL,
+      FOREIGN KEY (inbox_id) REFERENCES email_inboxes(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_email_msg_inbox ON email_messages(inbox_id);
+    CREATE INDEX IF NOT EXISTS idx_email_msg_thread ON email_messages(thread_id);
+    CREATE INDEX IF NOT EXISTS idx_email_msg_ts ON email_messages(timestamp DESC);
   `);
 
   db.exec(`

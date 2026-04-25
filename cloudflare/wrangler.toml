@@ -1,0 +1,6 @@
+name = "0gent-email-worker"
+main = "email-worker.js"
+compatibility_date = "2026-04-25"
+
+# Set these via:  wrangler secret put BACKEND_URL  /  wrangler secret put WEBHOOK_SECRET
+# (or in the dashboard: Workers → settings → variables)

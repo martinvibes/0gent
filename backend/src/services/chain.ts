@@ -13,6 +13,8 @@ const REGISTRY_ABI = [
   "function getAgentResourceIds(address agent) external view returns (uint256[])",
   "function getResource(uint256 resourceId) external view returns (tuple(uint256 id, uint8 resourceType, uint8 status, string providerRef, uint256 createdAt, uint256 expiresAt))",
   "function getAgentResourceCount(address agent) external view returns (uint256)",
+  "event ResourceRegistered(address indexed agent, uint256 indexed resourceId, uint8 resourceType, string providerRef, uint256 expiresAt)",
+  "event ResourceDeactivated(uint256 indexed resourceId)",
 ];
 
 const IDENTITY_ABI = [

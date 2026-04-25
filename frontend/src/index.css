@@ -79,9 +79,11 @@ body::after {
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
 @keyframes fadeIn { from{opacity:0;transform:translateX(-4px)} to{opacity:1;transform:translateX(0)} }
+@keyframes eqBar { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
 .pulse { animation: pulse 2s ease-in-out infinite; }
 .blink { animation: blink 0.6s step-end infinite; }
 .fade-in { animation: fadeIn 0.25s ease-out; }
+.wave-bar { transform-origin: bottom; }
 
 /* ─── Reveal ─── */
 .reveal { opacity:0; transform:translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }

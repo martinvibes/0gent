@@ -16,6 +16,7 @@
     "express": "^4.21.2",
     "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
+    "resend": "^6.12.2",
     "telnyx": "^5.25.0",
     "uuid": "^11.0.5"
   },

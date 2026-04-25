@@ -25,10 +25,16 @@ export const config = {
   telnyxApiKey: optional("TELNYX_API_KEY", ""),
   telnyxMessagingProfileId: optional("TELNYX_MESSAGING_PROFILE_ID", ""),
 
-  // Cloudflare (Email)
+  // Cloudflare (Email Routing — inbound)
   cloudflareApiToken: optional("CLOUDFLARE_API_TOKEN", ""),
   cloudflareZoneId: optional("CLOUDFLARE_ZONE_ID", ""),
+  cloudflareInboundDestination: optional("CLOUDFLARE_INBOUND_DESTINATION", ""),
   emailDomain: optional("EMAIL_DOMAIN", "0gent.xyz"),
+  emailWebhookSecret: optional("EMAIL_WEBHOOK_SECRET", ""),
+
+  // Resend (outbound)
+  resendApiKey: optional("RESEND_API_KEY", ""),
+  resendFromName: optional("RESEND_FROM_NAME", "0GENT Agent"),
 
   // Hetzner (Compute)
   hcloudToken: optional("HCLOUD_TOKEN", ""),
@@ -42,6 +48,8 @@ export const config = {
   pricePhoneProvision: optional("PRICE_PHONE", "0.5"),
   priceSmsSend: optional("PRICE_SMS", "0.01"),
   priceEmailProvision: optional("PRICE_EMAIL", "0.2"),
+  priceEmailSend: optional("PRICE_EMAIL_SEND", "0.08"),
+  priceEmailRead: optional("PRICE_EMAIL_READ", "0.02"),
   priceComputeProvision: optional("PRICE_COMPUTE", "1.0"),
   priceDomainRegister: optional("PRICE_DOMAIN", "2.0"),
   priceIdentityMint: optional("PRICE_IDENTITY_MINT", "0.1"),
