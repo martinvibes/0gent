@@ -259,6 +259,35 @@ export interface InboundEmailPayload {
   receivedAt?: string;
 }
 
+/**
+ * Strip HTML to readable plaintext. Used when senders (e.g. Gmail) supply
+ * an HTML-only body. Cheap regex pass — good enough for a hackathon-grade
+ * agent inbox. Strip styles/scripts, convert breaks to newlines, decode
+ * the most common entities, collapse whitespace.
+ */
+export function htmlToText(html: string): string {
+  if (!html) return "";
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<\/div>/gi, "\n")
+    .replace(/<\/li>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&[a-z]+;/gi, "")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 export function handleInboundEmail(payload: InboundEmailPayload): { stored: boolean; inboxId?: string } {
   const inbox = getInboxByAddress(payload.to.toLowerCase());
   if (!inbox) {
@@ -269,6 +298,13 @@ export function handleInboundEmail(payload: InboundEmailPayload): { stored: bool
   const id = uuid();
   const now = payload.receivedAt || new Date().toISOString();
   const subject = payload.subject || "(no subject)";
+
+  // Derive plaintext from HTML when senders supply HTML-only (common for Gmail)
+  const bodyText = payload.text && payload.text.trim().length > 0
+    ? payload.text
+    : payload.html
+      ? htmlToText(payload.html)
+      : "";
 
   // Reuse thread if Re: prefix matches an existing subject
   let threadId: string | null = null;
@@ -293,7 +329,7 @@ export function handleInboundEmail(payload: InboundEmailPayload): { stored: bool
     payload.from,
     payload.to,
     subject,
-    payload.text || "",
+    bodyText,
     payload.html || null,
     threadId,
     payload.messageId || null,
