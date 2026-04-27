@@ -127,6 +127,8 @@ function normalizeInbound(body: any): emailService.InboundEmailPayload | null {
     messageId: data.message_id || data.messageId || data["Message-Id"] || undefined,
     inReplyTo: data.in_reply_to || data.inReplyTo || data["In-Reply-To"] || undefined,
     receivedAt: data.received_at || data.created_at || data.date || new Date().toISOString(),
+    // Resend includes email_id in webhook metadata; the body is fetched via Resend API
+    emailId: data.email_id || data.emailId || undefined,
   };
 }
 
@@ -157,7 +159,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
       return;
     }
 
-    const result = emailService.handleInboundEmail(payload);
+    const result = await emailService.handleInboundEmail(payload);
     res.json(result);
   } catch (err: any) {
     console.error("[email/webhook]", err);

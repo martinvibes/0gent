@@ -257,6 +257,32 @@ export interface InboundEmailPayload {
   messageId?: string;
   inReplyTo?: string;
   receivedAt?: string;
+  /** Resend email_id — used to fetch the body via Resend's API
+   *  when the webhook payload omits the body content. */
+  emailId?: string;
+}
+
+/**
+ * Fetch an email's full content from Resend's API.
+ * Resend's `email.received` webhook only sends metadata, not the body;
+ * we have to follow up with this call to retrieve text/html.
+ */
+async function fetchResendEmail(emailId: string): Promise<{ text: string; html: string } | null> {
+  if (!config.resendApiKey) return null;
+  try {
+    const res = await fetch(`https://api.resend.com/emails/${emailId}`, {
+      headers: { Authorization: `Bearer ${config.resendApiKey}` },
+    });
+    if (!res.ok) {
+      console.warn(`[email] Resend GET /emails/${emailId} failed: ${res.status}`);
+      return null;
+    }
+    const data = (await res.json()) as { text?: string; html?: string };
+    return { text: data.text || "", html: data.html || "" };
+  } catch (err: any) {
+    console.warn(`[email] Resend body fetch error: ${err.message}`);
+    return null;
+  }
 }
 
 /**
@@ -288,7 +314,9 @@ export function htmlToText(html: string): string {
     .trim();
 }
 
-export function handleInboundEmail(payload: InboundEmailPayload): { stored: boolean; inboxId?: string } {
+export async function handleInboundEmail(
+  payload: InboundEmailPayload
+): Promise<{ stored: boolean; inboxId?: string }> {
   const inbox = getInboxByAddress(payload.to.toLowerCase());
   if (!inbox) {
     console.warn(`[email] Inbound email to unknown address: ${payload.to}`);
@@ -299,12 +327,24 @@ export function handleInboundEmail(payload: InboundEmailPayload): { stored: bool
   const now = payload.receivedAt || new Date().toISOString();
   const subject = payload.subject || "(no subject)";
 
-  // Derive plaintext from HTML when senders supply HTML-only (common for Gmail)
-  const bodyText = payload.text && payload.text.trim().length > 0
-    ? payload.text
-    : payload.html
-      ? htmlToText(payload.html)
-      : "";
+  // Resolve body in this priority order:
+  //   1. payload.text (plain text supplied directly)
+  //   2. payload.html → strip to text
+  //   3. Resend `email.received` webhook only has metadata; fetch via API
+  let bodyText = payload.text && payload.text.trim().length > 0 ? payload.text : "";
+  let bodyHtml = payload.html || "";
+
+  if (!bodyText && !bodyHtml && payload.emailId) {
+    const fetched = await fetchResendEmail(payload.emailId);
+    if (fetched) {
+      bodyText = fetched.text;
+      bodyHtml = fetched.html;
+    }
+  }
+
+  if (!bodyText.trim() && bodyHtml) {
+    bodyText = htmlToText(bodyHtml);
+  }
 
   // Reuse thread if Re: prefix matches an existing subject
   let threadId: string | null = null;
@@ -330,7 +370,7 @@ export function handleInboundEmail(payload: InboundEmailPayload): { stored: bool
     payload.to,
     subject,
     bodyText,
-    payload.html || null,
+    bodyHtml || null,
     threadId,
     payload.messageId || null,
     payload.inReplyTo || null,
