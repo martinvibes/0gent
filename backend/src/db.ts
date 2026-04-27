@@ -2,7 +2,10 @@ import Database from "better-sqlite3";
 import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
 
-const DATA_DIR = join(process.cwd(), "data");
+// Configurable data directory:
+//   DATA_DIR env var if set (e.g. /app/data on Railway with a Volume mounted there)
+//   otherwise <cwd>/data (local dev default).
+const DATA_DIR = process.env.DATA_DIR || join(process.cwd(), "data");
 if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
 
 export const db: Database.Database = new Database(join(DATA_DIR, "0gent.db"));
