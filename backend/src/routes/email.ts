@@ -85,20 +85,75 @@ router.get(
   }
 );
 
-// ─── Inbound webhook (Cloudflare Worker → us) ───
-// This endpoint is FREE (not x402-gated). It must be authenticated by the
-// EMAIL_WEBHOOK_SECRET header so only your Worker can post here.
+// ─── Inbound webhook normalizer ───
+//
+// Accepts payloads from any of:
+//   - Cloudflare Email Worker (uses our explicit shape)
+//   - Resend Inbound  (event-wrapped: { type: "email.received", data: {...} })
+//   - SES SNS / generic mailparser shapes
+//
+// Just digs through the JSON for the fields we need. If the inbound provider
+// doesn't match a known shape, returns 400.
+function normalizeInbound(body: any): emailService.InboundEmailPayload | null {
+  if (!body || typeof body !== "object") return null;
+
+  // Resend inbound: { type: "email.received", data: { from, to, subject, ... } }
+  // Could also wrap as { event, payload } depending on version.
+  const data = body.data || body.payload || body;
+
+  // ── from ──
+  let from: string | undefined;
+  if (typeof data.from === "string") from = data.from;
+  else if (data.from?.email) from = data.from.email;
+  else if (Array.isArray(data.from) && data.from[0]?.address) from = data.from[0].address;
+
+  // ── to ──
+  let to: string | undefined;
+  if (typeof data.to === "string") to = data.to;
+  else if (Array.isArray(data.to)) {
+    const first = data.to[0];
+    to = typeof first === "string" ? first : first?.email || first?.address;
+  } else if (data.to?.email) to = data.to.email;
+  else if (data.envelope?.to?.[0]) to = data.envelope.to[0];
+
+  if (!from || !to) return null;
+
+  return {
+    from: String(from).toLowerCase(),
+    to: String(to).toLowerCase(),
+    subject: data.subject || "",
+    text: data.text || data.body_plain || data["body-plain"] || "",
+    html: data.html || data.body_html || data["body-html"] || "",
+    messageId: data.message_id || data.messageId || data["Message-Id"] || undefined,
+    inReplyTo: data.in_reply_to || data.inReplyTo || data["In-Reply-To"] || undefined,
+    receivedAt: data.received_at || data.created_at || data.date || new Date().toISOString(),
+  };
+}
+
+// ─── Inbound webhook (Cloudflare Worker / Resend / generic) ───
+//
+// Authentication options (any one works):
+//   1. X-0GENT-Webhook-Secret header matches EMAIL_WEBHOOK_SECRET
+//   2. ?secret=<value> query param matches EMAIL_WEBHOOK_SECRET (for providers
+//      that don't let you set custom headers, e.g. Resend free tier)
+//
+// Both Cloudflare Worker and Resend dashboard support setting a header, so
+// option 1 is preferred. Query string is a fallback.
 router.post("/webhook", async (req: Request, res: Response) => {
   try {
-    const secret = req.header("X-0GENT-Webhook-Secret") || "";
-    if (!config.emailWebhookSecret || secret !== config.emailWebhookSecret) {
+    const headerSecret = req.header("X-0GENT-Webhook-Secret") || "";
+    const querySecret = String(req.query.secret || "");
+    const presented = headerSecret || querySecret;
+
+    if (!config.emailWebhookSecret || presented !== config.emailWebhookSecret) {
       res.status(401).json({ error: "Unauthorized webhook" });
       return;
     }
 
-    const payload = req.body as emailService.InboundEmailPayload;
-    if (!payload?.from || !payload?.to) {
-      res.status(400).json({ error: "from and to are required" });
+    const payload = normalizeInbound(req.body);
+    if (!payload) {
+      console.warn("[email/webhook] could not extract from/to from payload:", JSON.stringify(req.body).slice(0, 400));
+      res.status(400).json({ error: "Could not extract from/to from payload" });
       return;
     }
 
