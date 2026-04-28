@@ -9,7 +9,7 @@
  * await z.emailCreate('support-bot')
  * await z.emailSend(inboxId, 'user@example.com', 'Hi', 'Hello from your AI agent')
  */
-import { Wallet, JsonRpcProvider, formatEther } from 'ethers';
+import { Wallet, JsonRpcProvider, formatEther, isAddress } from 'ethers';
 import { paidRequest, PaidResponse } from './pay.js';
 import {
   getProvider,
@@ -126,6 +126,14 @@ export interface BalanceInfo {
   address: string;
   balance0G: string;
   balanceWei: string;
+}
+
+export interface GeneratedWallet {
+  name: string;
+  address: string;
+  mnemonic: string;
+  privateKey: string;
+  createdAt: string;
 }
 
 export interface MemoryEntry {
@@ -317,9 +325,51 @@ export class ZeroGent {
   // ─── Wallet / balance ───
 
   async balance(): Promise<BalanceInfo> {
-    const bal = await this.provider.getBalance(this.address);
+    return ZeroGent.balanceOf(this.address, { provider: this.provider });
+  }
+
+  async walletBalance(address: string): Promise<BalanceInfo> {
+    return ZeroGent.balanceOf(address, { provider: this.provider });
+  }
+
+  /**
+   * Generate a fresh BIP-39 HD wallet locally. No network call, no server roundtrip,
+   * key material never leaves the caller's machine. Returns the mnemonic + private
+   * key once — caller is responsible for storing them safely.
+   *
+   * Use this on the frontend ("Create your agent's wallet") and in scripts that
+   * provision a new agent on the fly.
+   */
+  static createWallet(name?: string): GeneratedWallet {
+    const w = Wallet.createRandom();
     return {
-      address: this.address,
+      name: name?.trim() || `agent-${Math.random().toString(36).slice(2, 8)}`,
+      address: w.address,
+      mnemonic: w.mnemonic?.phrase ?? '',
+      privateKey: w.privateKey,
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Read 0G balance for any address. No instance required — useful for the
+   * frontend's "your wallet has X 0G" display before there's a signer.
+   */
+  static async balanceOf(
+    address: string,
+    opts?: { rpcUrl?: string; chainId?: number; provider?: JsonRpcProvider }
+  ): Promise<BalanceInfo> {
+    if (!isAddress(address)) throw new Error(`Invalid address: ${address}`);
+    const cfg = load();
+    const provider =
+      opts?.provider ||
+      new JsonRpcProvider(opts?.rpcUrl || cfg.rpcUrl, {
+        chainId: opts?.chainId || cfg.chainId,
+        name: '0g-chain',
+      });
+    const bal = await provider.getBalance(address);
+    return {
+      address,
       balance0G: formatEther(bal),
       balanceWei: bal.toString(),
     };

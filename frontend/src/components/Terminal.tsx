@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { apiCall, getLogs, subscribe, summary, type RequestLog } from '../lib/api';
+import { useWallet } from '../lib/walletContext';
+import { shortAddress } from '../lib/wallet';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Color tokens (0G purple palette)
@@ -22,10 +24,26 @@ const BORDER = 'rgba(183,95,255,0.12)';
 //  Simulated commands (purely cosmetic — running these doesn't pay anything)
 //  Free commands like `health` and `pricing` actually hit the live backend.
 // ─────────────────────────────────────────────────────────────────────────────
-type Line = { type: 'cmd' | 'out' | 'ok' | 'err' | 'dim'; text: string };
+type CardRow = { label: string; value: string; valueColor?: string; mono?: boolean };
+type Card = {
+  payment: 'free' | string; // 'free' or '0.5 0G' etc
+  status: number;
+  icon?: string; // emoji
+  title?: string;
+  titleSize?: 'lg' | 'md';
+  rows?: CardRow[];
+  badge?: { text: string; kind: 'ok' | 'info' | 'warn' | 'err' };
+  note?: string;
+};
+type Line =
+  | { type: 'cmd' | 'out' | 'ok' | 'err' | 'dim'; text: string }
+  | { type: 'card'; card: Card };
 
-const SIM: Record<string, Line[]> = {
+const SIM: Record<string, Array<Line>> = {
   'help': [
+    { type: 'out', text: 'wallet                         Show your wallet    free' },
+    { type: 'out', text: 'health                         API status          free' },
+    { type: 'out', text: 'pricing                        Service prices      free' },
     { type: 'out', text: 'phone search --country US      Search numbers      free' },
     { type: 'out', text: 'phone provision                Provision phone     0.5 0G' },
     { type: 'out', text: 'phone sms <id>                 Send SMS            0.01 0G' },
@@ -34,8 +52,6 @@ const SIM: Record<string, Line[]> = {
     { type: 'out', text: 'email read <id>                Read inbox          0.02 0G' },
     { type: 'out', text: 'identity mint                  Mint Agent NFT      0.1 0G' },
     { type: 'out', text: 'memory set <key> <value>       Write to 0G Storage free' },
-    { type: 'out', text: 'health                         API status          free' },
-    { type: 'out', text: 'pricing                        Service prices      free' },
   ],
   'phone search --country US': [
     { type: 'out', text: '+1 (415) 555-0142    San Francisco    local' },
@@ -82,6 +98,7 @@ const SIM: Record<string, Line[]> = {
 const CHIPS = [
   'health',
   'pricing',
+  'wallet',
   'phone provision',
   'email create --name agent',
   'identity mint',
@@ -275,39 +292,56 @@ function ShellTab({
   busy: boolean;
   onChip: (s: string) => void;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
-  }, [lines]);
+  const [gutterLines, setGutterLines] = useState(20);
 
-  // Number of lines for the gutter
-  const total = Math.max(15, lines.length + 4);
+  // Recompute gutter length to fit the body's actual rendered height.
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    // Each gutter row is 22px high; pad enough to fill the body height.
+    const n = Math.max(20, Math.ceil(el.scrollHeight / 22) + 2);
+    if (n !== gutterLines) setGutterLines(n);
+    // Auto-scroll to bottom on content change
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [lines, gutterLines]);
 
   return (
-    <div style={{ display: 'flex', minHeight: 360 }}>
-      {/* Line number gutter */}
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {/* Single scroll container: gutter + body share one scroll, page layout never grows */}
       <div
+        ref={scrollRef}
         style={{
-          width: 44,
-          padding: '14px 0',
-          textAlign: 'right',
-          fontFamily: 'JetBrains Mono, monospace',
-          fontSize: 11,
-          color: 'rgba(254,254,254,0.18)',
-          userSelect: 'none',
-          borderRight: `1px solid ${W08}`,
-          background: 'rgba(0,0,0,0.2)',
+          display: 'flex',
+          height: 380,
+          overflowY: 'auto',
+          background: 'transparent',
         }}
       >
-        {Array.from({ length: total }, (_, i) => (
-          <div key={i} style={{ paddingRight: 12, lineHeight: '22px', height: 22 }}>
-            {i + 1}
-          </div>
-        ))}
-      </div>
+        {/* Line number gutter (scrolls with body since they share parent) */}
+        <div
+          style={{
+            width: 44,
+            padding: '14px 0',
+            textAlign: 'right',
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: 11,
+            color: 'rgba(254,254,254,0.18)',
+            userSelect: 'none',
+            borderRight: `1px solid ${W08}`,
+            background: 'rgba(0,0,0,0.2)',
+            flexShrink: 0,
+          }}
+        >
+          {Array.from({ length: gutterLines }, (_, i) => (
+            <div key={i} style={{ paddingRight: 12, lineHeight: '22px', height: 22 }}>
+              {i + 1}
+            </div>
+          ))}
+        </div>
 
-      {/* Body + input */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Body + input */}
         <div
           ref={bodyRef}
           style={{
@@ -317,11 +351,13 @@ function ShellTab({
             fontSize: 13,
             lineHeight: '22px',
             color: TEXT,
-            overflowY: 'auto',
-            maxHeight: 360,
+            minHeight: '100%',
           }}
         >
           {lines.map((l, i) => {
+            if (l.type === 'card') {
+              return <CardOutput key={i} card={l.card} />;
+            }
             if (l.type === 'cmd') {
               return (
                 <div key={i} style={{ color: '#fff', marginBottom: 2 }}>
@@ -391,52 +427,52 @@ function ShellTab({
             {busy && <span className="blink" style={{ display: 'inline-block', width: 8, height: 16, background: LILAC }} />}
           </div>
         </div>
+      </div>
 
-        {/* Suggestion chips */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 6,
-            padding: '10px 18px 14px',
-            borderTop: `1px solid ${W08}`,
-          }}
-        >
-          {CHIPS.map(s => (
-            <button
-              key={s}
-              onClick={() => onChip(s)}
-              disabled={busy}
-              style={{
-                fontFamily: 'JetBrains Mono, monospace',
-                fontSize: 11,
-                padding: '5px 12px',
-                background: 'rgba(146,0,225,0.06)',
-                border: `1px solid ${BORDER}`,
-                color: 'rgba(254,254,254,0.55)',
-                cursor: busy ? 'not-allowed' : 'pointer',
-                opacity: busy ? 0.4 : 1,
-                transition: 'all 0.15s',
-                borderRadius: 0,
-              }}
-              onMouseEnter={e => {
-                if (busy) return;
-                const el = e.currentTarget;
-                el.style.borderColor = LILAC;
-                el.style.color = LILAC;
-                el.style.background = 'rgba(146,0,225,0.14)';
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget;
-                el.style.borderColor = BORDER;
-                el.style.color = 'rgba(254,254,254,0.55)';
-                el.style.background = 'rgba(146,0,225,0.06)';
-              }}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
+      {/* Suggestion chips — outside scroll container so they stay anchored */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 6,
+          padding: '10px 18px 14px',
+          borderTop: `1px solid ${W08}`,
+        }}
+      >
+        {CHIPS.map(s => (
+          <button
+            key={s}
+            onClick={() => onChip(s)}
+            disabled={busy}
+            style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 11,
+              padding: '5px 12px',
+              background: 'rgba(146,0,225,0.06)',
+              border: `1px solid ${BORDER}`,
+              color: 'rgba(254,254,254,0.55)',
+              cursor: busy ? 'not-allowed' : 'pointer',
+              opacity: busy ? 0.4 : 1,
+              transition: 'all 0.15s',
+              borderRadius: 0,
+            }}
+            onMouseEnter={e => {
+              if (busy) return;
+              const el = e.currentTarget;
+              el.style.borderColor = LILAC;
+              el.style.color = LILAC;
+              el.style.background = 'rgba(146,0,225,0.14)';
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget;
+              el.style.borderColor = BORDER;
+              el.style.color = 'rgba(254,254,254,0.55)';
+              el.style.background = 'rgba(146,0,225,0.06)';
+            }}
+          >
+            {s}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -564,12 +600,138 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+//  CardOutput — AgentOS-style payment+response card with key-value rows
+// ─────────────────────────────────────────────────────────────────────────────
+
+function CardOutput({ card }: { card: Card }) {
+  const isPaid = card.payment !== 'free';
+  const okStatus = card.status >= 200 && card.status < 400;
+
+  const badgeColors = {
+    ok:   { fg: GREEN,  bg: 'rgba(63,185,80,0.10)',  border: 'rgba(63,185,80,0.5)' },
+    info: { fg: LILAC,  bg: 'rgba(146,0,225,0.14)', border: 'rgba(183,95,255,0.5)' },
+    warn: { fg: YELLOW, bg: 'rgba(254,188,46,0.10)', border: 'rgba(254,188,46,0.5)' },
+    err:  { fg: RED,    bg: 'rgba(248,81,73,0.10)',  border: 'rgba(248,81,73,0.5)' },
+  };
+
+  return (
+    <div className="fade-in" style={{ margin: '8px 0 14px', maxWidth: 580 }}>
+      {/* status header */}
+      <div style={{
+        fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+        marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+      }}>
+        {isPaid ? (
+          <>
+            <span style={{ color: RED, fontWeight: 700 }}>402</span>
+            <span style={{ color: FAINT }}>·</span>
+            <span style={{ color: TEXT }}>{card.payment}</span>
+            <span style={{ color: FAINT }}>→</span>
+            <span style={{ color: 'rgba(254,254,254,0.5)' }}>paid</span>
+            <span style={{ color: okStatus ? GREEN : RED, fontWeight: 700 }}>
+              {card.status} {okStatus ? 'OK' : ''}
+            </span>
+          </>
+        ) : (
+          <>
+            <span style={{ color: 'rgba(254,254,254,0.5)' }}>free</span>
+            <span style={{ color: FAINT }}>·</span>
+            <span style={{ color: okStatus ? GREEN : RED, fontWeight: 700 }}>
+              {card.status} {okStatus ? 'OK' : ''}
+            </span>
+          </>
+        )}
+      </div>
+
+      {/* card body */}
+      <div style={{
+        border: `1px solid ${W12}`,
+        background: 'rgba(0,0,0,0.35)',
+        padding: '18px 20px',
+      }}>
+        {card.title && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            marginBottom: card.rows && card.rows.length ? 16 : 0,
+          }}>
+            {card.icon && (
+              <span style={{ fontSize: card.titleSize === 'lg' ? 22 : 18 }}>{card.icon}</span>
+            )}
+            <span style={{
+              color: TEXT,
+              fontFamily: 'JetBrains Mono, monospace',
+              fontWeight: 700,
+              fontSize: card.titleSize === 'lg' ? 18 : 14,
+              letterSpacing: '-0.005em',
+            }}>{card.title}</span>
+          </div>
+        )}
+
+        {card.rows && card.rows.length > 0 && (
+          <div style={{ display: 'grid', gap: 8 }}>
+            {card.rows.map((r, i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '120px 1fr',
+                  gap: 14,
+                  alignItems: 'baseline',
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: 12,
+                }}
+              >
+                <span style={{ color: FAINT, letterSpacing: '0.02em' }}>{r.label}</span>
+                <span style={{
+                  color: r.valueColor || TEXT,
+                  fontFamily: r.mono === false ? 'inherit' : 'JetBrains Mono, monospace',
+                  wordBreak: 'break-all',
+                }}>{r.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {card.note && (
+          <div style={{
+            marginTop: 12,
+            paddingTop: 12,
+            borderTop: `1px solid ${W08}`,
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: 11,
+            color: FAINT,
+            lineHeight: 1.6,
+          }}>{card.note}</div>
+        )}
+
+        {card.badge && (
+          <div style={{ marginTop: 16 }}>
+            <span style={{
+              display: 'inline-block',
+              padding: '4px 12px',
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              color: badgeColors[card.badge.kind].fg,
+              background: badgeColors[card.badge.kind].bg,
+              border: `1px solid ${badgeColors[card.badge.kind].border}`,
+            }}>{card.badge.text}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 //  Main Terminal
 // ─────────────────────────────────────────────────────────────────────────────
 
 type TabKey = 'shell' | 'logs' | 'network';
 
 export function Terminal() {
+  const wallet = useWallet();
   const [tab, setTab] = useState<TabKey>('shell');
   const [connected, setConnected] = useState(false);
   const [lines, setLines] = useState<Line[]>([
@@ -618,15 +780,40 @@ export function Terminal() {
       if (status === 200 && d) {
         setLines(p => [
           ...p,
-          { type: 'ok', text: `${d.service} v${d.version}` },
-          { type: 'out', text: `  chain        0G Chain (${d.chain.chainId})` },
-          { type: 'out', text: `  rpc          ${d.chain.rpc}` },
-          { type: 'out', text: `  payment      ${d.contracts.payment}` },
-          { type: 'out', text: `  registry     ${d.contracts.registry}` },
-          { type: 'out', text: `  identity     ${d.contracts.identity}` },
+          {
+            type: 'card',
+            card: {
+              payment: 'free',
+              status,
+              icon: '🟢',
+              title: `${d.service} · v${d.version}`,
+              titleSize: 'lg',
+              rows: [
+                { label: 'chain',    value: `0G Chain · ${d.chain.chainId}`, valueColor: LILAC },
+                { label: 'rpc',      value: d.chain.rpc },
+                { label: 'payment',  value: d.contracts.payment },
+                { label: 'registry', value: d.contracts.registry },
+                { label: 'identity', value: d.contracts.identity },
+              ],
+              badge: { text: 'ONLINE', kind: 'ok' },
+            },
+          },
         ]);
       } else {
-        setLines(p => [...p, { type: 'err', text: 'API unreachable' }]);
+        setLines(p => [
+          ...p,
+          {
+            type: 'card',
+            card: {
+              payment: 'free',
+              status: status || 0,
+              icon: '⚠️',
+              title: 'API unreachable',
+              note: status ? `received ${status}` : 'no response — check network',
+              badge: { text: 'OFFLINE', kind: 'err' },
+            },
+          },
+        ]);
       }
       setBusy(false);
       return;
@@ -634,21 +821,86 @@ export function Terminal() {
 
     if (cmd === 'pricing') {
       setBusy(true);
-      await apiCall('GET', '/pricing');
-      const items: [string, string][] = [
-        ['phone provision', '0.5 0G / mo'],
-        ['sms send', '0.01 0G'],
-        ['email inbox', '0.2 0G / mo'],
-        ['email send', '0.08 0G'],
-        ['email read', '0.02 0G'],
-        ['identity mint', '0.1 0G'],
-        ['memory r/w', 'free'],
-      ];
+      const { status, data } = await apiCall('GET', '/pricing');
+      const d = data as any;
+      if (status === 200 && d?.services) {
+        const fmt = (v: any) => (typeof v === 'string' ? v : `${v} 0G`);
+        const rows: CardRow[] = [
+          { label: 'identity mint',  value: fmt(d.services.identity?.mint),    valueColor: LILAC },
+          { label: 'phone provision',value: fmt(d.services.phone?.provision),  valueColor: LILAC },
+          { label: 'sms send',       value: fmt(d.services.phone?.sms),        valueColor: LILAC },
+          { label: 'email inbox',    value: fmt(d.services.email?.provision),  valueColor: LILAC },
+          { label: 'email send',     value: fmt(d.services.email?.send),       valueColor: LILAC },
+          { label: 'email read',     value: fmt(d.services.email?.read),       valueColor: LILAC },
+          { label: 'memory r/w',     value: fmt(d.services.memory?.read),      valueColor: GREEN },
+        ];
+        setLines(p => [
+          ...p,
+          {
+            type: 'card',
+            card: {
+              payment: 'free',
+              status,
+              icon: '💰',
+              title: `Service prices · paid in ${d.currency || '0G'}`,
+              titleSize: 'lg',
+              rows,
+              note: `network: ${d.network || `0G Chain ${d.chain?.chainId || 16602}`}`,
+            },
+          },
+        ]);
+      } else {
+        setLines(p => [...p, { type: 'err', text: 'pricing unavailable' }]);
+      }
+      setBusy(false);
+      return;
+    }
+
+    // Wallet — uses the unlocked wallet from the page's WalletProvider
+    if (cmd === 'wallet') {
+      if (wallet.state.kind === 'none') {
+        setLines(p => [
+          ...p,
+          {
+            type: 'card',
+            card: {
+              payment: 'free',
+              status: 200,
+              icon: '👛',
+              title: 'No wallet yet',
+              note: 'scroll up to "Create your agent\'s wallet" — generates locally, server never touches your keys',
+              badge: { text: 'NONE', kind: 'warn' },
+            },
+          },
+        ]);
+        setBusy(false);
+        return;
+      }
+      const addr =
+        wallet.state.kind === 'unlocked' ? wallet.state.wallet.address : wallet.state.stored.address;
+      const name =
+        wallet.state.kind === 'unlocked' ? wallet.state.wallet.name : wallet.state.stored.name;
       setLines(p => [
         ...p,
-        { type: 'out', text: 'service              cost' },
-        { type: 'out', text: '─────────────────  ──────────' },
-        ...items.map(([k, v]) => ({ type: 'out' as const, text: `  ${k.padEnd(18)} ${v}` })),
+        {
+          type: 'card',
+          card: {
+            payment: 'free',
+            status: 200,
+            icon: wallet.state.kind === 'unlocked' ? '🟢' : '🔒',
+            title: `${name} · ${shortAddress(addr)}`,
+            titleSize: 'lg',
+            rows: [
+              { label: 'address', value: addr },
+              { label: 'balance', value: wallet.balance ? `${Number(wallet.balance.zg).toFixed(4)} 0G` : '…', valueColor: LILAC },
+              { label: 'chain',   value: '0G Chain · 16602' },
+              { label: 'storage', value: 'browser localStorage · AES-256-GCM' },
+            ],
+            badge: wallet.state.kind === 'unlocked'
+              ? { text: 'ACTIVE', kind: 'ok' }
+              : { text: 'LOCKED', kind: 'warn' },
+          },
+        },
       ]);
       setBusy(false);
       return;

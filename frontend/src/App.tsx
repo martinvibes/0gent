@@ -6,6 +6,8 @@ import { Features } from './components/Features';
 import { HowItWorks } from './components/HowItWorks';
 import { ZGIntegration } from './components/ZGIntegration';
 import { Footer } from './components/Footer';
+import { WalletPanel } from './components/WalletPanel';
+import { WalletProvider } from './lib/walletContext';
 
 function App() {
   // Scroll reveal
@@ -19,15 +21,16 @@ function App() {
   }, []);
 
   return (
-    <>
+    <WalletProvider>
       <Nav />
       <Hero />
+      <div className="reveal"><WalletPanel /></div>
       <Terminal />
       <div className="reveal"><Features /></div>
       <div className="reveal"><HowItWorks /></div>
       <div className="reveal"><ZGIntegration /></div>
       <Footer />
-    </>
+    </WalletProvider>
   );
 }
 

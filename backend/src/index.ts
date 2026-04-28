@@ -11,6 +11,7 @@ import domainRouter from "./routes/domain";
 import identityRouter from "./routes/identity";
 import memoryRouter from "./routes/memory";
 import pricingRouter from "./routes/pricing";
+import walletRouter from "./routes/wallet";
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use("/compute", computeRouter);
 app.use("/domain", domainRouter);
 app.use("/identity", identityRouter);
 app.use("/memory", memoryRouter);
+app.use("/wallet", walletRouter);
 
 // Root → quick info
 app.get("/", (_req, res) => {
