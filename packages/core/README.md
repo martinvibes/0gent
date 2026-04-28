@@ -1,227 +1,214 @@
 # @0gent/core
 
-> Decentralized infrastructure for autonomous AI agents on 0G Chain
+> Real phone numbers, email inboxes, and on-chain identity for AI agents.
+> Your agent pays per-use with **0G tokens**. No accounts, no API keys, no humans in the loop.
 
 [![npm](https://img.shields.io/npm/v/@0gent/core.svg)](https://npmjs.com/package/@0gent/core)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![0G Chain](https://img.shields.io/badge/chain-0G-9200E1.svg)](https://0g.ai)
 
-Give your AI agent a phone number, email inbox, on-chain identity, and
-self-custodial wallet — all paid per-call with 0G tokens via x402.
-**No accounts. No API keys. Wallet = identity.**
+---
+
+## In 30 seconds
+
+Your agent has a **wallet**. The wallet pays for things — phone numbers, email
+inboxes, identity NFTs, persistent memory — by signing transactions on **0G Chain**.
+Our backend provisions the real resource *only after* on-chain payment is verified.
+Resources are owned by the wallet, recorded on-chain, **forever**.
+
+Three rules:
+
+1. **Wallet = identity.** No accounts. No passwords. No "log in".
+2. **Payments are native 0G.** Free testnet faucet — you can demo end-to-end without spending real money.
+3. **Your keys never leave your machine.** The server has *no way* to spend your funds. Ever.
+
+---
+
+## 4-command demo
 
 ```bash
 npm i -g @0gent/core
 
-0gent setup                     # create + encrypt an HD wallet
-0gent identity mint             # mint your Agent Identity NFT (0.1 0G)
-0gent provision phone           # real phone number on 0G Chain (0.5 0G)
-0gent email create --name bot   # real email inbox (0.2 0G)
-0gent list                      # all your on-chain resources
+0gent setup                       # creates + encrypts a fresh wallet
+0gent wallet fund                 # shows QR + opens the testnet faucet
+0gent identity mint               # mint your Agent NFT (0.1 0G)
+0gent email create --name scout   # claim scout@0gent.xyz (0.2 0G)
 ```
 
----
-
-## What it does
-
-Every 0GENT resource lives behind an **HTTP 402 paywall on 0G Chain**.
-
-1. Agent calls `POST /phone/provision`
-2. Server replies `402 Payment Required` with a nonce + amount
-3. CLI (or SDK) signs a 0G token transfer to `ZeroGentPayment.pay(nonce, "phone")`
-4. Backend verifies the on-chain tx, provisions the real-world resource,
-   and records ownership on `AgentRegistry`
-
-Your wallet signs → your wallet owns. Forever. No migrations. No account recovery.
-Your wallet _is_ your agent's identity on the network.
-
----
-
-## Install
-
-```bash
-npm i -g @0gent/core
-```
-
-Or run once without install:
-
-```bash
-npx @0gent/core setup
-```
+That's it. You now have a real `<name>@0gent.xyz` email address, owned by your
+wallet, recorded on-chain. You can `0gent email send …` and `0gent email read …`.
 
 Requires **Node.js ≥ 18**.
 
 ---
 
-## Quick start
+## What your agent gets
 
-```bash
-# 1. One-time interactive setup
-$ 0gent setup
-  ✓ Wallet ready
-  Address       0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18
-  API           https://api.0gent.xyz
+| Capability | Command | Cost |
+|---|---|---|
+| 🪪 On-chain identity NFT | `0gent identity mint` | 0.1 0G |
+| 📧 Real email inbox | `0gent provision email --name <n>` | 0.2 0G |
+| 📨 Send email | `0gent email send <id>` | 0.08 0G |
+| 📥 Read inbox | `0gent email read <id>` | 0.02 0G |
+| 📞 Real phone number (US) | `0gent provision phone` | 0.5 0G |
+| 💬 Send SMS | `0gent phone sms <id>` | 0.01 0G |
+| 🧠 Persistent memory | `0gent memory set/get <key>` | free |
+| 💰 Wallet ops | `0gent wallet *` | free |
 
-# 2. Fund your wallet from the testnet faucet
-$ 0gent wallet fund
-  <QR code>
-  › Watching for incoming 0G tokens...
-  ✓ Received 0.1 0G
-
-# 3. Mint your on-chain identity (one per wallet, forever)
-$ 0gent identity mint
-  [x402] Paying 0.1 0G on 0G Chain...
-  [x402] Waiting for confirmation (0x1008d79a...)
-  ✓ Agent Identity minted
-  Token ID      #1
-  Metadata      0g://0x73fa973e2552bf9feb58dc47269c760c1ee8e83230296d309af8784b512b949f
-  Tx            https://chainscan-galileo.0g.ai/tx/0x1008d79a...
-
-# 4. Get a real phone number
-$ 0gent provision phone
-  [x402] Paying 0.5 0G on 0G Chain...
-  ✓ Phone number provisioned
-  Number        +1 (415) 555-0142
-  Resource ID   3
-  Expires       May 24, 2026
-
-# 5. Send SMS from your agent
-$ 0gent phone sms <phoneId> --to +15551234567 --body "hi from the machine"
-  ✓ SMS sent
-
-# 6. Get a real email address
-$ 0gent email create --name scout
-  ✓ Email inbox provisioned
-  Address       scout@0gent.xyz
-
-# 7. See all your resources on-chain
-$ 0gent list
-  Agent #1  │  0x742d35…bD18  │  14.2000 0G
-
-  ┌─────────┬───────────────────┬──────────┬─────────────┐
-  │ Type    │ Resource          │ Status   │ Expires     │
-  ├─────────┼───────────────────┼──────────┼─────────────┤
-  │ 📞 phone│ +1 (415) 555-0142 │ ✓ active │ May 24, 2026│
-  │ 📧 email│ scout@0gent.xyz   │ ✓ active │ May 24, 2026│
-  └─────────┴───────────────────┴──────────┴─────────────┘
-```
+Get free testnet 0G at **https://faucet.0g.ai**.
 
 ---
 
-## Use as a library
+## Use from code
 
-Everything the CLI can do, you can do from code:
+Everything the CLI does, the SDK does — type-safe, no extra deps.
+
+### Generate a fresh wallet (no network, no server call)
 
 ```ts
 import { ZeroGent } from '@0gent/core'
 
+const wallet = ZeroGent.createWallet('my-agent')
+// { name, address, mnemonic, privateKey, createdAt }
+```
+
+### Use the wallet
+
+```ts
 const z = new ZeroGent({
-  privateKey: process.env.AGENT_PK,  // or omit to use `0gent setup` vault
-  api: 'https://api.0gent.xyz',
-  autoPay: true,                      // auto-sign x402 challenges
-  onPaymentStatus: (msg) => console.log('[pay]', msg),
+  privateKey: wallet.privateKey,
+  onPaymentStatus: (msg) => console.log('[pay]', msg), // optional
 })
 
 // Free
-const available = await z.phoneSearch('US')
-const health    = await z.health()
+await z.health()                                            // chain status
+await z.balance()                                           // your 0G balance
 
-// Paid — triggers x402 flow, signs 0G payment on-chain, retries
-const identity  = await z.identityMint('support-bot')
-const phone     = await z.phoneProvision('US', '415')
-const email     = await z.emailCreate('support', z.address)
+// Paid — SDK auto-signs the on-chain x402 payment
+const id = await z.identityMint('support-bot')              // 0.1 0G
+const inbox = await z.emailCreate('support')                // 0.2 0G
+await z.emailSend(inbox.id,
+  'user@example.com', 'Receipt', 'Thanks!'                  // 0.08 0G
+)
+const messages = await z.emailRead(inbox.id)                // 0.02 0G
 
-await z.phoneSms(phone.id, '+15551234567', 'Your order has shipped')
-await z.emailSend(email.id, 'user@example.com', 'Receipt', 'Thank you for your order')
+// 0G Storage (free)
+await z.memory.set('last_conv', { user: 'alice' })
+const m = await z.memory.get('last_conv')
 
-// Memory on 0G Storage
-await z.memory.set('last_conversation', { user: 'alice', resolved: true })
-const memory = await z.memory.get('last_conversation')
-
-// Read your agent's on-chain state
-const resources = await z.listResources()   // from AgentRegistry
+// On-chain reads (free)
+const resources = await z.listResources()
 const { balance0G } = await z.balance()
 ```
 
 ---
 
-## All commands
+## How a paid call actually works
 
-| Command | What it does | Cost |
-|---------|--------------|------|
-| `0gent setup` | Interactive wallet creation + config | Free |
-| `0gent wallet create --name <label>` | New HD wallet (encrypted locally) | Free |
-| `0gent wallet list` | List all wallets | Free |
-| `0gent wallet show` | Show default wallet + balance | Free |
-| `0gent wallet fund` | QR + watcher for incoming 0G | Free |
-| `0gent wallet export` | Reveal mnemonic | Free |
-| `0gent wallet use <id>` | Set default wallet | Free |
-| `0gent identity mint` | Mint ERC-721 Agent Identity | 0.1 0G |
-| `0gent identity show` | Show Agent Identity | Free |
-| `0gent phone search` | Search available numbers | Free |
-| `0gent provision phone` | Provision a real phone number | 0.5 0G |
-| `0gent phone sms <id>` | Send SMS | 0.01 0G |
-| `0gent phone logs <id>` | Read SMS history | Free |
-| `0gent provision email` | Provision email inbox | 0.2 0G |
-| `0gent email send <id>` | Send email | 0.08 0G |
-| `0gent email read <id>` | Read inbox | 0.02 0G |
-| `0gent email threads <id>` | List threads | 0.02 0G |
-| `0gent memory set <k> <v>` | Store on 0G Storage | Free |
-| `0gent memory get <k>` | Read from 0G Storage | Free |
-| `0gent memory list` | List memory keys | Free |
-| `0gent list` | All on-chain resources | Free |
-| `0gent balance` | Wallet balance | Free |
-| `0gent pricing` | Live service prices | Free |
-| `0gent health` | API + chain status | Free |
-| `0gent doctor` | Diagnose setup | Free |
-| `0gent skill` | Print the LLM skill catalog | Free |
+```text
+1. Agent       z.emailCreate('support')
+                     │
+2. Server      ▶ 402 Payment Required: 0.2 0G to ZeroGentPayment.pay(nonce, "email")
+                     │
+3. SDK         ▶ signs tx on 0G Chain, broadcasts, waits for confirmation
+                     │
+4. Server      ▶ reads PaymentReceived event for that nonce → verified
+                     │
+5. Server      ▶ provisions support@0gent.xyz via Cloudflare Email Routing
+                     │
+6. Server      ▶ registers ownership on AgentRegistry contract
+                     │
+7. Agent       ◀ { id, address, owner, resourceId, registeredAt }
+```
+
+Three contracts on **0G Chain testnet (chain 16602)**:
+
+- `ZeroGentPayment` — receives payments, nonce replay-protected
+- `AgentRegistry` — tracks resource ownership per wallet
+- `ZeroGentIdentity` — ERC-721 Agent NFT, metadata on 0G Storage
 
 ---
 
 ## Security model
 
-- **Keys never leave your machine.** `0gent setup` creates a BIP-39 HD wallet locally. The mnemonic is encrypted with `AES-256-GCM` using a key derived via `scrypt` from your passphrase.
-- **Server-side:** only the wallet address is ever stored. No private keys, no passphrases, no passwords.
-- **Automation-friendly:** set `OGENT_WALLET_PASSPHRASE` to let the CLI sign without prompting (CI, cron, agent runtimes).
-- **Pre-flight balance check** before every paid request — you never waste gas on a request the network can't afford.
-- **Nonce replay protection** enforced on-chain in `ZeroGentPayment.sol`.
+| Question | Answer |
+|---|---|
+| Where are my keys stored? | Locally at `~/.0gent/` (or browser localStorage), encrypted with **AES-256-GCM**, key derived via scrypt/PBKDF2 from your passphrase. |
+| Can the 0gent server spend my funds? | **No.** It only ever sees your public address. Every payment is signed locally. |
+| Can I run my own backend? | Yes. Pass `api: 'https://your-backend'` to `ZeroGent` or set `OGENT_API`. |
+| Is this custodial? | **Non-custodial.** Lose your mnemonic = lose access. Like any self-custody wallet. |
+| Replay protection? | On-chain. Each x402 payment includes a unique nonce, enforced in `ZeroGentPayment.sol`. |
 
 ---
 
-## Under the hood
+## All commands
 
-**Blockchain:** 0G Chain (EVM L1) — testnet chain ID `16602`, mainnet `16661`.
+| Command | What it does |
+|---|---|
+| `0gent setup` | One-time interactive wallet + config setup |
+| `0gent wallet create [--name X]` | Create a new wallet locally |
+| `0gent wallet list` / `show` / `use` | Manage multiple wallets |
+| `0gent wallet fund` | QR code + faucet link |
+| `0gent wallet export` | Reveal mnemonic |
+| `0gent identity mint` | Mint your Agent NFT |
+| `0gent identity show` | Show your Agent NFT |
+| `0gent provision email --name X` | Real `X@0gent.xyz` inbox |
+| `0gent email send <id>` | Send email |
+| `0gent email read <id>` | Read inbox |
+| `0gent email threads <id>` | List threads |
+| `0gent provision phone` | Real US phone number |
+| `0gent phone search` | Search available numbers |
+| `0gent phone sms <id>` | Send SMS |
+| `0gent phone logs <id>` | SMS history |
+| `0gent memory set/get/list` | 0G Storage memory |
+| `0gent list` | All your on-chain resources |
+| `0gent balance` | Your 0G balance |
+| `0gent pricing` | Live service prices |
+| `0gent health` | API + chain status |
+| `0gent doctor` | Diagnose setup issues |
+| `0gent skill` | LLM-readable catalog of all endpoints |
 
-**Three contracts:**
-- `ZeroGentPayment` — Receives x402 payments, nonce-based replay protection
-- `AgentRegistry` — Tracks resource ownership per agent wallet
-- `ZeroGentIdentity` — ERC-721 agent identity NFT, metadata on 0G Storage
+---
 
-**Payment token:** native **0G**. No USDC dependency.
+## FAQ
 
-**Storage:** agent memory + identity metadata persisted to **0G Storage** via `@0gfoundation/0g-ts-sdk`. Every memory key is a merkle-verifiable blob.
+**Is this real or a simulation?**
+Real. Real on-chain payments. Real emails delivered. Real numbers. Just on testnet, where 0G has no dollar value.
 
-**Providers wrapped:** Telnyx (phone + SMS), Cloudflare Email Routing (email), Hetzner Cloud (compute, _stretch_), Namecheap (domains, _stretch_).
+**What if I lose my mnemonic?**
+You lose access — same as MetaMask, same as any self-custody wallet. Save the mnemonic to a password manager when `0gent setup` shows it. There is no reset.
+
+**Can I use this on 0G mainnet?**
+Mainnet contracts coming soon. Testnet (chain 16602) for now.
+
+**My agent is a Python script — can I use this?**
+The CLI is Node-based, but every paid action is just an HTTP request + an EVM signature. The skill catalog at `https://api.0gent.xyz/skill.md` documents the raw HTTP API. Any language with `eth_signTransaction` works.
+
+**How does the server verify my payment?**
+By reading `PaymentReceived` events from `ZeroGentPayment` on-chain, matching the nonce you signed against the request. No cookies, no API keys, no sessions.
+
+**Why not USDC?**
+0G mainnet doesn't have USDC. Native 0G is the on-chain unit, so there's no bridging step.
 
 ---
 
 ## Environment variables
 
-| Variable | Purpose |
-|----------|---------|
-| `OGENT_API` | Override API endpoint |
-| `OGENT_CONFIG_DIR` | Override config/wallet location (default: `~/.0gent`) |
-| `OGENT_WALLET_PASSPHRASE` | Let the CLI sign without prompting |
+| Variable | Purpose | Default |
+|---|---|---|
+| `OGENT_API` | Override API endpoint | `https://api.0gent.xyz` |
+| `OGENT_CONFIG_DIR` | Override wallet/config location | `~/.0gent` |
+| `OGENT_WALLET_PASSPHRASE` | Skip the passphrase prompt (for CI / agent runtimes) | — |
 
 ---
 
 ## Links
 
-- 🌐 Site: https://0gent.xyz
-- 📘 skill.md: https://api.0gent.xyz/skill.md (the LLM-readable endpoint catalog)
-- 📦 GitHub: https://github.com/martinvibes/0gent
-- 🔗 0G Chain Explorer: https://chainscan-galileo.0g.ai
-- 💧 0G Testnet Faucet: https://faucet.0g.ai
+- 🌐 Website — https://0gent.xyz
+- 📘 LLM endpoint catalog — https://api.0gent.xyz/skill.md
+- 📦 Source — https://github.com/martinvibes/0gent
+- 🔗 0G testnet explorer — https://chainscan-galileo.0g.ai
+- 💧 Free testnet 0G — https://faucet.0g.ai
 - 🏆 Built for the [0G APAC Hackathon](https://www.hackquest.io/hackathons/0G-APAC-Hackathon)
 
 ---
