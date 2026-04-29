@@ -72,16 +72,16 @@ export function Hero() {
 
         {/* Buttons */}
         <div style={{ display:'flex', gap:14, justifyContent:'center', marginBottom:56, pointerEvents: 'auto' }}>
-          <a href="#terminal" style={{
+          <a href="#wallet" style={{
             display:'inline-flex', alignItems:'center', gap:8, height:48, padding:'0 28px',
             background:'#9200E1', color:'#fff', fontSize:14, fontWeight:500, borderRadius:100,
             transition:'all 0.2s', border:'none', textDecoration: 'none'
           }}>Get Started →</a>
-          <a href="https://github.com" target="_blank" style={{
+          <a href="https://github.com/martinvibes/0gent" target="_blank" rel="noreferrer" style={{
             display:'inline-flex', alignItems:'center', gap:8, height:48, padding:'0 28px',
             background:'rgba(254,254,254,0.04)', color:'#fff', fontSize:14, fontWeight:500,
             borderRadius:100, border:'1px solid rgba(183,95,255,0.15)', transition:'all 0.2s', textDecoration: 'none'
-          }}>View Source</a>
+          }}>View Source ↗</a>
         </div>
 
         {/* Stats */}

@@ -49,7 +49,7 @@ const items: Item[] = [
 
 export function ZGIntegration() {
   return (
-    <section id="pricing" style={{ padding: '120px 0', borderTop: '1px solid rgba(183,95,255,0.1)', position: 'relative', overflow: 'hidden' }}>
+    <section id="stack" style={{ padding: '120px 0', borderTop: '1px solid rgba(183,95,255,0.1)', position: 'relative', overflow: 'hidden' }}>
       {/* subtle decorative grid in the background */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',

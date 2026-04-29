@@ -7,9 +7,13 @@ import { HowItWorks } from './components/HowItWorks';
 import { ZGIntegration } from './components/ZGIntegration';
 import { Footer } from './components/Footer';
 import { WalletPanel } from './components/WalletPanel';
+import { Logos } from './components/Logos';
 import { WalletProvider } from './lib/walletContext';
 
 function App() {
+  // Lightweight client-side route — `/logos` shows the logo gallery, everything else is the landing page.
+  const path = typeof window !== 'undefined' ? window.location.pathname : '/';
+
   // Scroll reveal
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -18,7 +22,11 @@ function App() {
     );
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [path]);
+
+  if (path === '/logos' || path === '/logos/') {
+    return <Logos />;
+  }
 
   return (
     <WalletProvider>
