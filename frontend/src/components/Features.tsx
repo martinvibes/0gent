@@ -32,19 +32,38 @@ const GlobeIcon = (
   </svg>
 );
 
+const SparkIcon = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const IdentityIcon = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <circle cx="12" cy="11" r="3" />
+    <path d="M7 17c1.2-2 3-3 5-3s3.8 1 5 3" />
+  </svg>
+);
+
 interface Feature {
   icon: ReactNode;
   title: string;
   desc: string;
   code: string;
   tag: string;
+  status: 'live' | 'dev';
 }
 
 const features: Feature[] = [
-  { icon: PhoneIcon,  title: 'Phone & SMS',     desc: 'Real phone numbers in 150+ countries. Send/receive SMS. Voice calls with TTS, recording, DTMF.', code: 'POST /phone/provision\n→ 402: pay 0.5 0G\n→ +1 (415) 555-0142', tag: 'Telnyx' },
-  { icon: EmailIcon,  title: 'Email Inboxes',   desc: 'Dedicated email addresses for agents. Send, receive, manage email programmatically.',           code: 'POST /email/provision\n→ 402: pay 0.2 0G\n→ scout@0gent.xyz',     tag: 'Cloudflare' },
-  { icon: ServerIcon, title: 'Compute (VPS)',   desc: 'Hardened VPS instances. SSH key-only, UFW firewall, Node.js 22 pre-installed.',                  code: 'POST /compute/provision\n→ 402: pay 1.0 0G\n→ 49.12.218.44 (cx22)', tag: 'Hetzner' },
-  { icon: GlobeIcon,  title: 'Domains',         desc: 'Register domains with full DNS control. .com, .dev, .ai — hundreds of TLDs.',                    code: 'POST /domain/register\n→ 402: pay 2.0 0G\n→ agent-alpha.dev',      tag: 'Namecheap' },
+  { icon: IdentityIcon, title: 'Agent Identity',     desc: 'On-chain ERC-721 NFT minted on 0G Chain, metadata pinned to 0G Storage. The token is the agent\'s permanent identity.', code: 'POST /identity/mint\n→ 402: pay 0.1 0G\n→ token #1 (your agent NFT)',   tag: '0G Chain · ERC-721',  status: 'live' },
+  { icon: EmailIcon,    title: 'Email Inboxes',      desc: 'Dedicated <name>@0gent.xyz inbox. Send via Resend. Inbound replies parsed by Cloudflare Worker, full thread preserved.', code: 'POST /email/provision\n→ 402: pay 0.2 0G\n→ scout@0gent.xyz',           tag: 'Cloudflare · Resend', status: 'live' },
+  { icon: SparkIcon,    title: 'AI Inference',       desc: 'Pay-per-call LLM inference via the 0G Compute Network. Real on-chain micropayments, returns OpenAI-format completions.', code: 'POST /compute/infer\n→ 402: pay 0.05 0G\n→ qwen-2.5-7b reply',          tag: '0G Compute Network', status: 'live' },
+  { icon: ServerIcon,   title: 'Memory (Storage)',   desc: 'Persistent agent memory backed by 0G Storage — write once, read forever, indexed by your wallet.',                       code: 'POST /memory/<wallet>\n→ free\n→ 0G Storage rootHash',                  tag: '0G Storage',          status: 'live' },
+  { icon: PhoneIcon,    title: 'Phone & SMS',        desc: 'Real phone numbers in 150+ countries. Send/receive SMS. Voice calls with TTS, recording, DTMF.',                          code: 'POST /phone/provision\n→ 402: pay 0.5 0G\n→ +1 (415) 555-0142',       tag: 'Telnyx',              status: 'dev'  },
+  { icon: GlobeIcon,    title: 'Domains',            desc: 'Register domains with full DNS control. .com, .dev, .ai — hundreds of TLDs.',                                              code: 'POST /domain/register\n→ 402: pay 2.0 0G\n→ agent-alpha.dev',           tag: 'Namecheap',           status: 'dev'  },
+  { icon: ServerIcon,   title: 'Compute VPS',        desc: 'Hardened VPS instances. SSH key-only, UFW firewall, Node.js 22 pre-installed. Wired to Hetzner Cloud, awaiting credit.',  code: 'POST /compute/provision\n→ 402: pay 1.0 0G\n→ 49.12.218.44 (cx22)',    tag: 'Hetzner',             status: 'dev'  },
 ];
 
 const S = {
@@ -53,7 +72,7 @@ const S = {
   label: { fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#B75FFF', marginBottom: 16, fontWeight: 500 },
   h2: { fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, maxWidth: 600, marginBottom: 20 },
   sub: { fontSize: 16, color: 'rgba(254,254,254,0.5)', maxWidth: 500, lineHeight: 1.7, marginBottom: 56 },
-  grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, background: 'rgba(183,95,255,0.06)' } as const,
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 2, background: 'rgba(183,95,255,0.06)' } as const,
   card: { background: '#050508', padding: 0, position: 'relative' as const, overflow: 'hidden' as const, transition: 'all 0.3s' },
   inner: { padding: 32, display: 'flex', flexDirection: 'column' as const, height: '100%' },
   iconBox: {
@@ -96,7 +115,22 @@ export function Features() {
               <div style={S.inner}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
                   <div className="feature-icon" style={S.iconBox}>{f.icon}</div>
-                  <h3 style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.02em' }}>{f.title}</h3>
+                  <h3 style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.02em', flex: 1 }}>{f.title}</h3>
+                  <span
+                    title={f.status === 'live' ? 'Live in production' : 'Code wired, awaiting external credentials'}
+                    style={{
+                      fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: 9,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      padding: '3px 7px',
+                      border: f.status === 'live' ? '1px solid rgba(80,220,140,0.35)' : '1px solid rgba(255,180,80,0.30)',
+                      color: f.status === 'live' ? '#7DEFB1' : '#FFC97A',
+                      background: f.status === 'live' ? 'rgba(80,220,140,0.06)' : 'rgba(255,180,80,0.05)',
+                    }}
+                  >
+                    {f.status === 'live' ? '● live' : '○ in dev'}
+                  </span>
                 </div>
                 <p style={{ fontSize: 13, color: 'rgba(254,254,254,0.5)', lineHeight: 1.7 }}>{f.desc}</p>
 

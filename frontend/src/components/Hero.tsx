@@ -67,7 +67,7 @@ export function Hero() {
         </h1>
 
         <p style={{ fontSize:17, color:'rgba(254,254,254,0.7)', maxWidth:520, margin:'0 auto 40px', lineHeight:1.7, pointerEvents: 'auto' }}>
-          Phone, email, compute, domains — paid with 0G tokens via x402. Your wallet is your identity. No API keys. No signup.
+          Identity, email, AI inference, memory — paid per call with 0G tokens via x402. Your wallet is your identity. No API keys. No signup.
         </p>
 
         {/* Buttons */}

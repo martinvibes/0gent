@@ -33,6 +33,13 @@ const PaymentIcon = (
   </svg>
 );
 
+const ComputeIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
 interface Item {
   title: string;
   desc: string;
@@ -41,10 +48,11 @@ interface Item {
 }
 
 const items: Item[] = [
-  { title: '0G Chain',       desc: 'Payments, resource registry, agent identity — all on-chain.',         detail: 'Chain ID 16661 / 16602',   icon: ChainIcon },
-  { title: '0G Storage',     desc: 'Agent memory, metadata, session state on decentralized storage.',     detail: '@0gfoundation/0g-ts-sdk',  icon: StorageIcon },
-  { title: 'Agent Identity', desc: 'One ERC-721 per agent. Metadata on 0G Storage. Permanent ID.',        detail: 'ZeroGentIdentity.sol',     icon: IdentityIcon },
-  { title: 'x402 Payments',  desc: 'HTTP 402 protocol for 0G Chain native token payments.',               detail: 'ZeroGentPayment.sol',      icon: PaymentIcon },
+  { title: '0G Chain',           desc: 'Payments, resource registry, agent identity — all on-chain.',           detail: 'Chain ID 16602 (testnet)',  icon: ChainIcon },
+  { title: '0G Storage',         desc: 'Agent memory, NFT metadata, session state on decentralized storage.',   detail: '@0glabs/0g-ts-sdk',         icon: StorageIcon },
+  { title: '0G Compute Network', desc: 'Pay-per-call AI inference via the 0G Compute serving network.',         detail: '@0glabs/0g-serving-broker', icon: ComputeIcon },
+  { title: 'Agent Identity',     desc: 'One ERC-721 per agent on 0G Chain. Metadata on 0G Storage. Permanent.', detail: 'ZeroGentIdentity.sol',      icon: IdentityIcon },
+  { title: 'x402 Payments',      desc: 'HTTP 402 protocol for 0G Chain native-token payments.',                 detail: 'ZeroGentPayment.sol',       icon: PaymentIcon },
 ];
 
 export function ZGIntegration() {
