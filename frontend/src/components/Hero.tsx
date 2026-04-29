@@ -3,7 +3,7 @@ import Orb from './Orb';
 export function Hero() {
   return (
     <section style={{
-      paddingTop:180, paddingBottom:100, position:'relative', textAlign:'center', overflow:'hidden',
+      paddingTop:180, paddingBottom:170, position:'relative', textAlign:'center', overflow:'hidden',
     }}>
       {/* Orb Background */}
       <div style={{

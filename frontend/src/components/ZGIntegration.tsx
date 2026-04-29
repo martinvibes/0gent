@@ -1,27 +1,144 @@
-const items = [
-  { title:'0G Chain', desc:'Payments, resource registry, agent identity — all on-chain.', detail:'Chain ID 16661 / 16602' },
-  { title:'0G Storage', desc:'Agent memory, metadata, session state on decentralized storage.', detail:'@0gfoundation/0g-ts-sdk' },
-  { title:'Agent Identity', desc:'One ERC-721 per agent. Metadata on 0G Storage. Permanent ID.', detail:'ZeroGentIdentity.sol' },
-  { title:'x402 Payments', desc:'HTTP 402 protocol for 0G Chain native token payments.', detail:'ZeroGentPayment.sol' },
+import type { ReactNode } from 'react';
+
+// ─── Icons (purple, consistent line weight) ───────────────────────────
+
+const ChainIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </svg>
+);
+
+const StorageIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <ellipse cx="12" cy="5" rx="9" ry="3" />
+    <path d="M3 5v6c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
+    <path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6" />
+  </svg>
+);
+
+const IdentityIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="8" r="4" />
+    <circle cx="12" cy="8" r="1.5" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const PaymentIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="6" width="18" height="13" rx="2" />
+    <line x1="3" y1="11" x2="21" y2="11" />
+    <line x1="7" y1="15" x2="11" y2="15" />
+  </svg>
+);
+
+interface Item {
+  title: string;
+  desc: string;
+  detail: string;
+  icon: ReactNode;
+}
+
+const items: Item[] = [
+  { title: '0G Chain',       desc: 'Payments, resource registry, agent identity — all on-chain.',         detail: 'Chain ID 16661 / 16602',   icon: ChainIcon },
+  { title: '0G Storage',     desc: 'Agent memory, metadata, session state on decentralized storage.',     detail: '@0gfoundation/0g-ts-sdk',  icon: StorageIcon },
+  { title: 'Agent Identity', desc: 'One ERC-721 per agent. Metadata on 0G Storage. Permanent ID.',        detail: 'ZeroGentIdentity.sol',     icon: IdentityIcon },
+  { title: 'x402 Payments',  desc: 'HTTP 402 protocol for 0G Chain native token payments.',               detail: 'ZeroGentPayment.sol',      icon: PaymentIcon },
 ];
 
 export function ZGIntegration() {
   return (
-    <section id="pricing" style={{ padding:'120px 0', borderTop:'1px solid rgba(183,95,255,0.1)' }}>
-      <div style={{ maxWidth:1100, margin:'0 auto', padding:'0 24px', textAlign:'center' }}>
-        <div style={{ fontSize:12, letterSpacing:'0.12em', textTransform:'uppercase', color:'#B75FFF', marginBottom:16, fontWeight:500 }}>Deep Integration</div>
-        <h2 style={{ fontSize:'min(48px, 4vw)', fontWeight:500, letterSpacing:'-0.03em', lineHeight:1.1, marginBottom:20 }}>4 Components. Native 0G.</h2>
-        <p style={{ fontSize:16, color:'rgba(254,254,254,0.5)', maxWidth:500, margin:'0 auto 56px', lineHeight:1.7 }}>
+    <section id="pricing" style={{ padding: '120px 0', borderTop: '1px solid rgba(183,95,255,0.1)', position: 'relative', overflow: 'hidden' }}>
+      {/* subtle decorative grid in the background */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        backgroundImage: 'linear-gradient(rgba(183,95,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(183,95,255,0.03) 1px, transparent 1px)',
+        backgroundSize: '80px 80px',
+        maskImage: 'radial-gradient(ellipse at center, black 0%, transparent 70%)',
+        WebkitMaskImage: 'radial-gradient(ellipse at center, black 0%, transparent 70%)',
+      }} />
+      {/* Subtle center glow (sits above the grid) */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        background: 'radial-gradient(ellipse 50% 40% at 50% 35%, rgba(146,0,225,0.08), transparent 70%)',
+      }} />
+
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', textAlign: 'center', position: 'relative' }}>
+        <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#B75FFF', marginBottom: 16, fontWeight: 500 }}>
+          Deep Integration
+        </div>
+        <h2 className="reveal-up" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 20 }}>
+          4 Components. Native 0G.
+        </h2>
+        <p className="reveal-up" style={{ fontSize: 16, color: 'rgba(254,254,254,0.5)', maxWidth: 500, margin: '0 auto 56px', lineHeight: 1.7 }}>
           Every core 0G component used where it matters most.
         </p>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:16, textAlign:'left' }}>
-          {items.map(it => (
-            <div key={it.title} className="card" style={{ padding:32 }}>
-              <div style={{ fontSize:10, letterSpacing:'0.1em', textTransform:'uppercase', color:'rgba(254,254,254,0.3)', marginBottom:12, fontWeight:500 }}>0G Component</div>
-              <h3 style={{ fontSize:18, fontWeight:600, letterSpacing:'-0.02em', marginBottom:8 }}>{it.title}</h3>
-              <p style={{ fontSize:14, color:'rgba(254,254,254,0.5)', lineHeight:1.6, marginBottom:16 }}>{it.desc}</p>
-              <div className="mono" style={{ fontSize:10, color:'rgba(254,254,254,0.2)' }}>{it.detail}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, textAlign: 'left' }}>
+          {items.map((it, i) => (
+            <div
+              key={it.title}
+              className="reveal-up zg-card"
+              style={{
+                background: 'linear-gradient(180deg, #0c0c14 0%, #08080d 100%)',
+                border: '1px solid rgba(183,95,255,0.10)',
+                borderRadius: 12,
+                padding: 28,
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease',
+                transitionDelay: `${i * 100}ms`,
+              }}
+            >
+              {/* subtle top-edge gradient accent that lights up on hover */}
+              <div className="zg-top-edge" style={{
+                position: 'absolute',
+                top: 0, left: 0, right: 0,
+                height: 1,
+                background: 'linear-gradient(90deg, transparent, rgba(183,95,255,0.5), transparent)',
+                opacity: 0.3,
+                transition: 'opacity 0.3s',
+              }} />
+
+              <div style={{
+                width: 44, height: 44,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginBottom: 20,
+                border: '1px solid rgba(183,95,255,0.18)',
+                background: 'linear-gradient(135deg, rgba(146,0,225,0.10) 0%, rgba(146,0,225,0.02) 100%)',
+                color: '#B75FFF',
+                borderRadius: 10,
+              }}>{it.icon}</div>
+
+              <div style={{
+                fontSize: 10, letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'rgba(254,254,254,0.3)',
+                marginBottom: 10, fontWeight: 500,
+              }}>0G Component</div>
+
+              <h3 style={{
+                fontSize: 18, fontWeight: 600,
+                letterSpacing: '-0.02em',
+                marginBottom: 10,
+              }}>{it.title}</h3>
+
+              <p style={{
+                fontSize: 13, color: 'rgba(254,254,254,0.5)',
+                lineHeight: 1.65, marginBottom: 18,
+              }}>{it.desc}</p>
+
+              <div style={{
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: 10,
+                color: 'rgba(183,95,255,0.55)',
+                paddingTop: 14,
+                borderTop: '1px solid rgba(183,95,255,0.08)',
+                wordBreak: 'break-all',
+              }}>{it.detail}</div>
             </div>
           ))}
         </div>

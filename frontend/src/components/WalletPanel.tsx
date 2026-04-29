@@ -2,154 +2,100 @@ import { useState, useEffect } from 'react';
 import { useWallet } from '../lib/walletContext';
 import { shortAddress, FAUCET_URL, EXPLORER_BASE } from '../lib/wallet';
 
-const PURPLE = '#9200E1';
+// ─── Tokens (matches Features.tsx vibe — quiet, minimal, subtle accent) ──
+
 const LILAC = '#B75FFF';
 const GREEN = '#3fb950';
 const RED = '#f85149';
-const TEXT = '#e6edf3';
-const DIM = 'rgba(254,254,254,0.55)';
-const FAINT = 'rgba(254,254,254,0.32)';
-const BORDER = 'rgba(183,95,255,0.18)';
-const BORDER_DIM = 'rgba(183,95,255,0.10)';
-const BG_CARD = 'rgba(146,0,225,0.04)';
-const BG_INNER = 'rgba(0,0,0,0.4)';
+const AMBER = '#febc2e';
+const TEXT = '#fefefe';
+const TEXT_DIM = 'rgba(254,254,254,0.7)';
+const TEXT_FAINT = 'rgba(254,254,254,0.45)';
+const TEXT_GHOST = 'rgba(254,254,254,0.25)';
+const BG_PAGE = '#08080d';
+const BG_CARD = '#050508';
+const BG_INPUT = 'rgba(0,0,0,0.45)';
+const BORDER = 'rgba(183,95,255,0.10)';
+const BORDER_HOVER = 'rgba(183,95,255,0.28)';
 
-// ─── outer section + card chrome ───────────────────────────────────────
+// ─── Section + heading wrappers (mirrors Features.tsx layout) ───────────
 
 const sectionStyle: React.CSSProperties = {
   position: 'relative',
-  padding: '80px 20px',
-  background: '#08080d',
+  padding: '120px 24px 80px',
+  background: BG_PAGE,
+  overflow: 'hidden',
 };
 
-function Card({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ maxWidth: 760, margin: '0 auto', position: 'relative' }}>
-      {/* Glow underlay */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: -80,
-          background: 'radial-gradient(ellipse at top, rgba(146,0,225,0.18) 0%, transparent 60%)',
-          pointerEvents: 'none',
-          filter: 'blur(40px)',
-        }}
-      />
-      <div
-        style={{
-          position: 'relative',
-          border: `1px solid ${BORDER}`,
-          background: BG_CARD,
-          backdropFilter: 'blur(8px)',
-          overflow: 'hidden',
-        }}
-      >
-        {/* top status bar — 3 dots like the terminal */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 14,
-          padding: '14px 22px',
-          borderBottom: `1px solid ${BORDER_DIM}`,
-          background: 'rgba(0,0,0,0.2)',
-        }}>
-          <div style={{ display: 'flex', gap: 5 }}>
-            <Dot color="#f85149" />
-            <Dot color="#febc2e" />
-            <Dot color="#3fb950" />
-          </div>
-          <span style={{
-            fontFamily: 'JetBrains Mono, monospace',
-            fontSize: 11,
-            color: FAINT,
-            letterSpacing: '0.04em',
-          }}>~/0gent/wallet</span>
-        </div>
+// Subtle bg glow div — placed top-left
+const sectionGlow: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  pointerEvents: 'none',
+  background: 'radial-gradient(ellipse 50% 40% at 20% 30%, rgba(146,0,225,0.07), transparent 70%)',
+};
 
-        <div style={{ padding: '34px 32px 32px' }}>{children}</div>
-      </div>
-    </div>
-  );
-}
+const containerStyle: React.CSSProperties = {
+  maxWidth: 1100,
+  margin: '0 auto',
+  position: 'relative',
+};
 
-function Dot({ color }: { color: string }) {
-  return (
-    <div style={{
-      width: 11, height: 11, borderRadius: 0,
-      border: `1px solid ${color}`,
-      background: `${color}33`,
-    }} />
-  );
-}
+const kickerStyle: React.CSSProperties = {
+  fontSize: 12,
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+  color: LILAC,
+  marginBottom: 16,
+  fontWeight: 500,
+};
 
-// ─── reusable bits ─────────────────────────────────────────────────────
+const h2Style: React.CSSProperties = {
+  fontSize: 'min(40px, 3.4vw)',
+  fontWeight: 500,
+  letterSpacing: '-0.03em',
+  lineHeight: 1.1,
+  maxWidth: 640,
+  margin: 0,
+  marginBottom: 16,
+  color: TEXT,
+};
 
-const pillStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 7,
-  padding: '4px 11px',
-  fontFamily: 'JetBrains Mono, monospace',
-  fontSize: 10,
-  fontWeight: 700,
-  letterSpacing: '0.06em',
-  textTransform: 'lowercase',
+const subStyle: React.CSSProperties = {
+  fontSize: 15,
+  color: 'rgba(254,254,254,0.5)',
+  maxWidth: 540,
+  lineHeight: 1.7,
+  margin: 0,
+  marginBottom: 48,
+};
+
+// ─── Card chrome — single thin border, no glow, no terminal dots ──────
+
+const cardStyle: React.CSSProperties = {
+  background: BG_CARD,
   border: `1px solid ${BORDER}`,
-  background: 'rgba(146,0,225,0.14)',
+  padding: '36px 36px 32px',
+  maxWidth: 640,
 };
 
-function StatusPill({ kind, label }: { kind: 'idle' | 'active' | 'locked' | 'warn'; label: string }) {
-  const colors = {
-    idle:   { dot: FAINT, text: DIM, border: BORDER_DIM, bg: 'rgba(146,0,225,0.06)' },
-    active: { dot: GREEN, text: GREEN, border: 'rgba(63,185,80,0.4)', bg: 'rgba(63,185,80,0.10)' },
-    locked: { dot: '#febc2e', text: '#febc2e', border: 'rgba(254,188,46,0.4)', bg: 'rgba(254,188,46,0.10)' },
-    warn:   { dot: RED, text: RED, border: 'rgba(248,81,73,0.4)', bg: 'rgba(248,81,73,0.10)' },
-  }[kind];
-  return (
-    <span style={{
-      ...pillStyle,
-      borderColor: colors.border, background: colors.bg, color: colors.text,
-    }}>
-      <span className="pulse" style={{
-        width: 7, height: 7, background: colors.dot, display: 'inline-block',
-      }} />
-      {label}
-    </span>
-  );
-}
-
-function H2({ children, kicker }: { children: React.ReactNode; kicker?: string }) {
-  return (
-    <div style={{ marginBottom: 20 }}>
-      {kicker && (
-        <div style={{
-          fontFamily: 'JetBrains Mono, monospace',
-          fontSize: 10, letterSpacing: '0.18em',
-          color: LILAC, textTransform: 'uppercase',
-          marginBottom: 8,
-        }}>{kicker}</div>
-      )}
-      <h2 style={{
-        margin: 0, color: TEXT,
-        fontSize: 28, fontWeight: 600, letterSpacing: '-0.02em',
-      }}>{children}</h2>
-    </div>
-  );
-}
+// ─── Form bits ────────────────────────────────────────────────────────
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
-  fontFamily: 'JetBrains Mono, monospace',
-  fontSize: 10,
-  color: FAINT,
-  marginBottom: 7,
+  fontSize: 11,
+  color: TEXT_FAINT,
+  marginBottom: 8,
+  letterSpacing: '0.06em',
   textTransform: 'uppercase',
-  letterSpacing: '0.12em',
+  fontWeight: 500,
 };
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '11px 14px',
-  background: BG_INNER,
-  border: `1px solid ${BORDER_DIM}`,
+  background: BG_INPUT,
+  border: `1px solid ${BORDER}`,
   color: TEXT,
   fontFamily: 'JetBrains Mono, monospace',
   fontSize: 13,
@@ -158,127 +104,147 @@ const inputStyle: React.CSSProperties = {
   transition: 'border-color 0.15s, background 0.15s',
 };
 
+// ─── Buttons ──────────────────────────────────────────────────────────
+
 const primaryBtn: React.CSSProperties = {
-  fontFamily: 'JetBrains Mono, monospace',
-  fontSize: 12,
-  fontWeight: 700,
-  padding: '11px 22px',
+  fontSize: 13,
+  fontWeight: 500,
+  padding: '12px 22px',
   border: `1px solid ${LILAC}`,
-  background: `linear-gradient(180deg, ${PURPLE} 0%, #6a00a8 100%)`,
-  color: '#fff',
+  background: 'linear-gradient(180deg, #9200E1 0%, #6a00a8 100%)',
+  color: TEXT,
   cursor: 'pointer',
-  letterSpacing: '0.06em',
-  textTransform: 'lowercase',
+  letterSpacing: '0.01em',
   borderRadius: 0,
-  transition: 'all 0.15s',
-  boxShadow: '0 0 24px rgba(146,0,225,0.25)',
+  transition: 'background 0.15s, border-color 0.15s, box-shadow 0.15s',
+  boxShadow: '0 0 0 transparent',
 };
+
+const PRIMARY_BTN_HOVER_BG = 'linear-gradient(180deg, #a30dff 0%, #7a13c0 100%)';
+const PRIMARY_BTN_HOVER_SHADOW = '0 0 24px rgba(146,0,225,0.35)';
 
 const ghostBtn: React.CSSProperties = {
-  fontFamily: 'JetBrains Mono, monospace',
-  fontSize: 11,
-  fontWeight: 600,
-  padding: '8px 14px',
-  border: `1px solid ${BORDER_DIM}`,
+  fontSize: 12,
+  fontWeight: 500,
+  padding: '9px 14px',
+  border: `1px solid ${BORDER}`,
   background: 'transparent',
-  color: DIM,
+  color: TEXT_DIM,
   cursor: 'pointer',
-  letterSpacing: '0.06em',
-  textTransform: 'lowercase',
   borderRadius: 0,
   transition: 'all 0.15s',
 };
 
-// ─── icons ─────────────────────────────────────────────────────────────
+// ─── Tiny helpers ─────────────────────────────────────────────────────
 
-function CopyIcon({ size = 13 }: { size?: number }) {
+function StatusTag({
+  kind,
+  children,
+}: {
+  kind: 'idle' | 'active' | 'locked' | 'warn';
+  children: React.ReactNode;
+}) {
+  const colors = {
+    idle:   { dot: TEXT_GHOST, fg: TEXT_FAINT },
+    active: { dot: GREEN, fg: GREEN },
+    locked: { dot: AMBER, fg: AMBER },
+    warn:   { dot: RED, fg: RED },
+  }[kind];
   return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <rect x="4" y="4" width="9" height="9" stroke="currentColor" strokeWidth="1.4" />
-      <path d="M3 11V3h8" stroke="currentColor" strokeWidth="1.4" />
-    </svg>
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 8,
+      fontSize: 11, color: colors.fg, fontFamily: 'JetBrains Mono, monospace',
+      letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 500,
+    }}>
+      <span style={{
+        width: 6, height: 6, borderRadius: '50%',
+        background: colors.dot, display: 'inline-block',
+      }} />
+      {children}
+    </span>
   );
 }
 
-function CheckIcon({ size = 13 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function ShieldIcon({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <path d="M8 1.5l5.5 2v4.2c0 3.4-2.3 6.1-5.5 6.8-3.2-.7-5.5-3.4-5.5-6.8V3.5l5.5-2z" stroke="currentColor" strokeWidth="1.4" />
-    </svg>
-  );
-}
-
-function KeyIcon({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <circle cx="5.5" cy="9.5" r="3" stroke="currentColor" strokeWidth="1.4" />
-      <path d="M8 9h6m-2 0v3m2-3v2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function GlobeIcon({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4" />
-      <path d="M2 8h12M8 2c2 1.8 3 4 3 6s-1 4.2-3 6c-2-1.8-3-4-3-6s1-4.2 3-6z" stroke="currentColor" strokeWidth="1.4" />
-    </svg>
-  );
-}
-
-// ─── CopyButton: shows ✓ for ~1.5s after copy ──────────────────────────
-
-function CopyButton({
-  text,
-  label = 'copy',
-  inline = false,
-  size,
-}: { text: string; label?: string; inline?: boolean; size?: 'sm' | 'md' }) {
+function CopyButton({ text, label = 'copy', size = 'sm' as 'sm' | 'md' }: { text: string; label?: string; size?: 'sm' | 'md' }) {
   const [copied, setCopied] = useState(false);
   useEffect(() => {
     if (!copied) return;
-    const id = setTimeout(() => setCopied(false), 1500);
+    const id = setTimeout(() => setCopied(false), 1400);
     return () => clearTimeout(id);
   }, [copied]);
 
-  const baseStyle: React.CSSProperties = inline
-    ? { ...ghostBtn, padding: size === 'sm' ? '4px 10px' : '6px 12px', fontSize: 10 }
-    : ghostBtn;
-
-  const finalStyle: React.CSSProperties = copied
-    ? { ...baseStyle, color: GREEN, borderColor: 'rgba(63,185,80,0.5)', background: 'rgba(63,185,80,0.08)' }
-    : baseStyle;
+  const base: React.CSSProperties = {
+    ...ghostBtn,
+    padding: size === 'sm' ? '5px 10px' : '8px 14px',
+    fontSize: size === 'sm' ? 11 : 12,
+    display: 'inline-flex', alignItems: 'center', gap: 6,
+  };
+  const styled: React.CSSProperties = copied
+    ? { ...base, color: GREEN, borderColor: 'rgba(63,185,80,0.3)' }
+    : base;
 
   return (
     <button
       type="button"
+      style={styled}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(text);
           setCopied(true);
-        } catch {
-          /* clipboard blocked, ignore */
-        }
+        } catch {}
       }}
-      style={{ ...finalStyle, display: 'inline-flex', alignItems: 'center', gap: 6 }}
     >
-      {copied ? <CheckIcon size={11} /> : <CopyIcon size={11} />}
-      {copied ? 'copied' : label}
+      {copied ? '✓ copied' : label}
     </button>
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────
-//  Main panel
-// ────────────────────────────────────────────────────────────────────────
+// ─── Tiny SVG icons (stroke-based, 12px) ──────────────────────────────
+
+const KeyIcon = (
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="6" cy="10" r="3" />
+    <path d="M9 9l5-5m-2 2l1.5 1.5M11 6l1.5 1.5" />
+  </svg>
+);
+
+const ShieldIcon = (
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8 1.5l5.5 2v4.2c0 3.4-2.3 6.1-5.5 6.8-3.2-.7-5.5-3.4-5.5-6.8V3.5l5.5-2z" />
+    <path d="M5.5 8l1.7 1.7L10.5 6.5" />
+  </svg>
+);
+
+const VaultIcon = (
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="3" width="12" height="10" rx="1" />
+    <circle cx="10" cy="8" r="1.6" />
+    <path d="M10 9.6V11" />
+  </svg>
+);
+
+const ZapIcon = (
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="9,1.5 3,9 7,9 6,14.5 13,7 9,7" />
+  </svg>
+);
+
+const WarnIcon = (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8 1.5l7 12.5H1z" />
+    <line x1="8" y1="6" x2="8" y2="9.5" />
+    <line x1="8" y1="11.5" x2="8" y2="11.7" />
+  </svg>
+);
+
+const trustPills: { label: string; icon: React.ReactNode }[] = [
+  { label: 'client-side BIP-39', icon: KeyIcon },
+  { label: 'AES-256-GCM',        icon: ShieldIcon },
+  { label: 'self-custody',       icon: VaultIcon },
+  { label: 'no signup',          icon: ZapIcon },
+];
+
+// ─── Main panel ────────────────────────────────────────────────────────
 
 export function WalletPanel() {
   const { state, balance, create, unlock, lock, forget, refreshBalance } = useWallet();
@@ -289,279 +255,325 @@ export function WalletPanel() {
   const [err, setErr] = useState('');
   const [justCreated, setJustCreated] = useState<{ mnemonic: string; address: string } | null>(null);
 
-  // ── No wallet → show create CTA ─────────────────────────────────────
+  // ── No wallet → create CTA ─────────────────────────────────────────
   if (state.kind === 'none') {
     return (
       <section id="wallet" style={sectionStyle}>
-        <Card>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
-            <StatusPill kind="idle" label="step 01 / generate" />
+        <div style={sectionGlow} />
+        <div style={containerStyle}>
+          <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+            <span className="step-badge">01</span>
+            <span style={kickerStyle}>get started</span>
           </div>
-
-          <H2 kicker="agent identity">Create your agent's wallet</H2>
-
-          <p style={{ color: DIM, fontSize: 14, lineHeight: 1.65, marginBottom: 22, maxWidth: 540 }}>
-            Generated entirely in your browser via BIP-39 HD derivation. The mnemonic and private key never
-            touch our servers. Encrypted with your passphrase and stored locally.
+          <h2 className="reveal-up" style={{ ...h2Style, transitionDelay: '60ms' }}>
+            Your agent's wallet, <span style={{ color: TEXT_DIM }}>generated in your browser.</span>
+          </h2>
+          <p className="reveal-up" style={{ ...subStyle, transitionDelay: '120ms' }}>
+            BIP-39 HD keys created locally. Encrypted with your passphrase via AES-256-GCM
+            and stored in this browser. Our servers never see them.
           </p>
 
-          {/* security feature pills */}
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28 }}>
-            <FeaturePill icon={<KeyIcon />} label="client-side BIP-39" />
-            <FeaturePill icon={<ShieldIcon />} label="AES-256-GCM" />
-            <FeaturePill icon={<GlobeIcon />} label="self-custody" />
+          {/* Trust pills row — small, subtle, gives the eye something */}
+          <div className="reveal-up" style={{
+            display: 'flex', gap: 8, flexWrap: 'wrap',
+            marginBottom: 36,
+            transitionDelay: '180ms',
+          }}>
+            {trustPills.map(({ label, icon }) => (
+              <span key={label} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7,
+                fontSize: 11,
+                padding: '5px 11px',
+                color: TEXT_FAINT,
+                background: 'rgba(146,0,225,0.04)',
+                border: `1px solid ${BORDER}`,
+                fontFamily: 'JetBrains Mono, monospace',
+                letterSpacing: '0.02em',
+              }}>
+                <span style={{ color: LILAC, display: 'inline-flex' }}>{icon}</span>
+                {label}
+              </span>
+            ))}
           </div>
 
-          <form
-            onSubmit={async e => {
-              e.preventDefault();
-              setErr('');
-              if (pass !== pass2) { setErr('Passphrases do not match.'); return; }
-              setBusy(true);
-              try {
-                const w = await create(name || undefined, pass);
-                setJustCreated({ mnemonic: w.mnemonic, address: w.address });
-                setName(''); setPass(''); setPass2('');
-              } catch (e: any) {
-                setErr(e?.message || 'Failed to create wallet');
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>label · optional</label>
-              <input
-                style={inputStyle}
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="agent-bot"
-                spellCheck={false}
-                onFocus={e => { e.target.style.borderColor = LILAC; }}
-                onBlur={e => { e.target.style.borderColor = BORDER_DIM; }}
-              />
+          <div className="reveal-up wallet-card" style={{ ...cardStyle, transitionDelay: '220ms' }}>
+            <form
+              onSubmit={async e => {
+                e.preventDefault();
+                setErr('');
+                if (pass !== pass2) { setErr('Passphrases do not match.'); return; }
+                setBusy(true);
+                try {
+                  const w = await create(name || undefined, pass);
+                  setJustCreated({ mnemonic: w.mnemonic, address: w.address });
+                  setName(''); setPass(''); setPass2('');
+                } catch (e: any) {
+                  setErr(e?.message || 'Failed to create wallet');
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              <div style={{ marginBottom: 18 }}>
+                <label style={labelStyle}>label · optional</label>
+                <input
+                  style={inputStyle}
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="agent-bot"
+                  spellCheck={false}
+                  onFocus={e => { e.target.style.borderColor = BORDER_HOVER; }}
+                  onBlur={e => { e.target.style.borderColor = BORDER; }}
+                />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+                <div>
+                  <label style={labelStyle}>passphrase</label>
+                  <input
+                    type="password"
+                    style={inputStyle}
+                    value={pass}
+                    onChange={e => setPass(e.target.value)}
+                    required minLength={8}
+                    placeholder="min 8 characters"
+                    onFocus={e => { e.target.style.borderColor = BORDER_HOVER; }}
+                    onBlur={e => { e.target.style.borderColor = BORDER; }}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>confirm</label>
+                  <input
+                    type="password"
+                    style={inputStyle}
+                    value={pass2}
+                    onChange={e => setPass2(e.target.value)}
+                    required minLength={8}
+                    onFocus={e => { e.target.style.borderColor = BORDER_HOVER; }}
+                    onBlur={e => { e.target.style.borderColor = BORDER; }}
+                  />
+                </div>
+              </div>
+              {err && (
+                <p style={{
+                  color: RED, fontSize: 12, marginBottom: 16,
+                  padding: '8px 12px', border: '1px solid rgba(248,81,73,0.25)',
+                  background: 'rgba(248,81,73,0.06)',
+                }}>{err}</p>
+              )}
+              <button
+                type="submit"
+                disabled={busy}
+                style={{ ...primaryBtn, opacity: busy ? 0.5 : 1, cursor: busy ? 'wait' : 'pointer' }}
+                onMouseEnter={e => { if (!busy) {const el = (e.currentTarget as HTMLButtonElement); el.style.background = PRIMARY_BTN_HOVER_BG; el.style.boxShadow = PRIMARY_BTN_HOVER_SHADOW;}; }}
+                onMouseLeave={e => { {const el = (e.currentTarget as HTMLButtonElement); el.style.background = primaryBtn.background as string; el.style.boxShadow = '';}; }}
+              >
+                {busy ? 'generating…' : 'generate wallet'}
+              </button>
+              <p style={{
+                marginTop: 22, marginBottom: 0,
+                display: 'flex', alignItems: 'center', gap: 9,
+                padding: '10px 12px',
+                fontSize: 11, color: AMBER, lineHeight: 1.6,
+                fontFamily: 'JetBrains Mono, monospace',
+                background: 'rgba(254,188,46,0.05)',
+                border: '1px solid rgba(254,188,46,0.18)',
+              }}>
+                <span style={{ flexShrink: 0, display: 'inline-flex' }}>{WarnIcon}</span>
+                <span>forget your passphrase = lose access. there is no reset.</span>
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // ── Just created — show recovery phrase ──────────────────────────────
+  if (justCreated && state.kind === 'unlocked') {
+    const words = justCreated.mnemonic.split(' ');
+    return (
+      <section id="wallet" style={sectionStyle}>
+        <div style={sectionGlow} />
+        <div style={containerStyle}>
+          <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+            <span className="step-badge" style={{ borderColor: 'rgba(254,188,46,0.4)', color: AMBER, background: 'linear-gradient(135deg, rgba(254,188,46,0.08), rgba(254,188,46,0.02))' }}>!</span>
+            <span style={{ ...kickerStyle, color: AMBER, marginBottom: 0 }}>backup</span>
+          </div>
+          <h2 className="reveal-up" style={{ ...h2Style, transitionDelay: '60ms' }}>
+            Save your 12-word recovery phrase.
+          </h2>
+          <p className="reveal-up" style={{ ...subStyle, transitionDelay: '120ms' }}>
+            The only way to restore your wallet on another device. Shown once — close this view and
+            it's gone for good. Write them down or save them to a password manager.
+          </p>
+
+          <div className="reveal-up wallet-card" style={{ ...cardStyle, padding: '32px', transitionDelay: '180ms' }}>
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8,
+              marginBottom: 24,
+            }}>
+              {words.map((w, i) => (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'baseline', gap: 10,
+                  padding: '10px 14px',
+                  background: BG_INPUT,
+                  border: `1px solid ${BORDER}`,
+                  fontFamily: 'JetBrains Mono, monospace',
+                }}>
+                  <span style={{ fontSize: 10, color: TEXT_GHOST, minWidth: 18, fontWeight: 500 }}>
+                    {(i + 1).toString().padStart(2, '0')}
+                  </span>
+                  <span style={{ fontSize: 14, color: TEXT, fontWeight: 400, userSelect: 'all' }}>
+                    {w}
+                  </span>
+                </div>
+              ))}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
+
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <CopyButton text={justCreated.mnemonic} label="copy phrase" size="md" />
+              <button
+                type="button"
+                style={ghostBtn}
+                onClick={() => {
+                  const blob = new Blob([
+                    `0GENT wallet recovery phrase\n` +
+                    `Address: ${justCreated.address}\n` +
+                    `Created: ${new Date().toISOString()}\n\n` +
+                    `${justCreated.mnemonic}\n\n` +
+                    `Keep this file offline. Anyone with these 12 words controls the wallet.`,
+                  ], { type: 'text/plain' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `0gent-recovery-${justCreated.address.slice(0, 8)}.txt`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+              >
+                download .txt
+              </button>
+              <button
+                type="button"
+                style={{ ...primaryBtn, marginLeft: 'auto' }}
+                onClick={() => setJustCreated(null)}
+                onMouseEnter={e => {const el = (e.currentTarget as HTMLButtonElement); el.style.background = PRIMARY_BTN_HOVER_BG; el.style.boxShadow = PRIMARY_BTN_HOVER_SHADOW;}}
+                onMouseLeave={e => {const el = (e.currentTarget as HTMLButtonElement); el.style.background = primaryBtn.background as string; el.style.boxShadow = '';}}
+              >
+                I've saved it
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // ── Locked ──────────────────────────────────────────────────────────
+  if (state.kind === 'locked') {
+    return (
+      <section id="wallet" style={sectionStyle}>
+        <div style={sectionGlow} />
+        <div style={containerStyle}>
+          <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+            <span className="step-badge" style={{ borderColor: 'rgba(254,188,46,0.4)', color: AMBER, background: 'linear-gradient(135deg, rgba(254,188,46,0.08), rgba(254,188,46,0.02))' }}>🔒</span>
+            <span style={{ ...kickerStyle, marginBottom: 0 }}>welcome back</span>
+          </div>
+          <h2 className="reveal-up" style={{ ...h2Style, transitionDelay: '60ms' }}>Unlock to continue.</h2>
+          <p className="reveal-up" style={{ ...subStyle, transitionDelay: '120ms' }}>
+            Wallet found in this browser. Enter your passphrase to decrypt and resume your session.
+          </p>
+
+          <div className="reveal-up wallet-card" style={{ ...cardStyle, transitionDelay: '180ms' }}>
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              gap: 12, flexWrap: 'wrap', marginBottom: 28,
+              paddingBottom: 22, borderBottom: `1px solid ${BORDER}`,
+            }}>
               <div>
-                <label style={labelStyle}>passphrase · min 8</label>
+                <div style={{ fontSize: 11, color: TEXT_FAINT, marginBottom: 6 }}>
+                  {state.stored.name}
+                </div>
+                <code style={{
+                  color: TEXT, fontSize: 13, fontFamily: 'JetBrains Mono, monospace',
+                  userSelect: 'all',
+                }}>
+                  {shortAddress(state.stored.address)}
+                </code>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 11, color: TEXT_FAINT, marginBottom: 6 }}>balance</div>
+                <span style={{
+                  color: TEXT, fontSize: 17, fontWeight: 500,
+                  fontFamily: 'JetBrains Mono, monospace',
+                }}>
+                  {balance ? Number(balance.zg).toFixed(4) : '…'}
+                </span>
+                <span style={{ color: TEXT_FAINT, marginLeft: 5, fontSize: 13, fontFamily: 'JetBrains Mono, monospace' }}>0G</span>
+              </div>
+            </div>
+
+            <form
+              onSubmit={async e => {
+                e.preventDefault();
+                setErr('');
+                setBusy(true);
+                try {
+                  await unlock(pass);
+                  setPass('');
+                } catch (e: any) {
+                  setErr(e?.message || 'Failed to unlock');
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              <div style={{ marginBottom: 16 }}>
+                <label style={labelStyle}>passphrase</label>
                 <input
                   type="password"
                   style={inputStyle}
                   value={pass}
                   onChange={e => setPass(e.target.value)}
-                  required
-                  minLength={8}
-                  onFocus={e => { e.target.style.borderColor = LILAC; }}
-                  onBlur={e => { e.target.style.borderColor = BORDER_DIM; }}
+                  autoFocus
+                  onFocus={e => { e.target.style.borderColor = BORDER_HOVER; }}
+                  onBlur={e => { e.target.style.borderColor = BORDER; }}
                 />
               </div>
-              <div>
-                <label style={labelStyle}>confirm</label>
-                <input
-                  type="password"
-                  style={inputStyle}
-                  value={pass2}
-                  onChange={e => setPass2(e.target.value)}
-                  required
-                  minLength={8}
-                  onFocus={e => { e.target.style.borderColor = LILAC; }}
-                  onBlur={e => { e.target.style.borderColor = BORDER_DIM; }}
-                />
+              {err && (
+                <p style={{
+                  color: RED, fontSize: 12, marginBottom: 14,
+                  padding: '8px 12px',
+                  border: '1px solid rgba(248,81,73,0.25)',
+                  background: 'rgba(248,81,73,0.06)',
+                }}>{err}</p>
+              )}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  style={{ ...primaryBtn, opacity: busy ? 0.5 : 1 }}
+                  onMouseEnter={e => { if (!busy) {const el = (e.currentTarget as HTMLButtonElement); el.style.background = PRIMARY_BTN_HOVER_BG; el.style.boxShadow = PRIMARY_BTN_HOVER_SHADOW;}; }}
+                  onMouseLeave={e => {const el = (e.currentTarget as HTMLButtonElement); el.style.background = primaryBtn.background as string; el.style.boxShadow = '';}}
+                >
+                  {busy ? 'unlocking…' : 'unlock'}
+                </button>
+                <button
+                  type="button"
+                  style={{ ...ghostBtn, marginLeft: 'auto', color: 'rgba(248,81,73,0.7)', borderColor: 'rgba(248,81,73,0.18)' }}
+                  onClick={() => { if (confirm('Delete this wallet from this browser? Make sure you have your recovery phrase.')) forget(); }}
+                >
+                  forget wallet
+                </button>
               </div>
-            </div>
-            {err && (
-              <p style={{
-                color: RED, fontSize: 12, fontFamily: 'JetBrains Mono, monospace',
-                marginBottom: 14, padding: '8px 12px',
-                border: '1px solid rgba(248,81,73,0.3)', background: 'rgba(248,81,73,0.08)',
-              }}>{err}</p>
-            )}
-            <button
-              type="submit"
-              disabled={busy}
-              style={{ ...primaryBtn, opacity: busy ? 0.5 : 1, cursor: busy ? 'wait' : 'pointer' }}
-            >
-              {busy ? 'generating…' : '⚡ generate wallet'}
-            </button>
-          </form>
-
-          <p style={{ color: FAINT, fontSize: 11, marginTop: 24, lineHeight: 1.7, fontFamily: 'JetBrains Mono, monospace' }}>
-            <span style={{ color: '#febc2e' }}>⚠</span>  forget your passphrase = lose access. there is no reset.
-          </p>
-        </Card>
+            </form>
+          </div>
+        </div>
       </section>
     );
   }
 
-  // ── Just created → show mnemonic once ────────────────────────────────
-  if (justCreated && state.kind === 'unlocked') {
-    const words = justCreated.mnemonic.split(' ');
-    return (
-      <section id="wallet" style={sectionStyle}>
-        <Card>
-          <StatusPill kind="warn" label="step 02 / backup" />
-          <div style={{ marginTop: 18 }}>
-            <H2 kicker="recovery phrase">Save these 12 words</H2>
-            <p style={{ color: DIM, fontSize: 14, lineHeight: 1.65, marginBottom: 22, maxWidth: 540 }}>
-              The <em>only</em> way to recover your wallet on another device. Shown once — close this view
-              and the seed is gone. Write them down or save to a password manager.
-            </p>
-          </div>
-
-          {/* Numbered word grid */}
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8,
-            padding: 18,
-            background: BG_INNER,
-            border: `1px dashed ${LILAC}`,
-            marginBottom: 20,
-          }}>
-            {words.map((w, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'baseline', gap: 8,
-                padding: '8px 12px',
-                background: 'rgba(146,0,225,0.06)',
-                border: `1px solid ${BORDER_DIM}`,
-              }}>
-                <span style={{
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
-                  color: FAINT, minWidth: 18, fontWeight: 600,
-                }}>{(i + 1).toString().padStart(2, '0')}</span>
-                <span style={{
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: 14,
-                  color: TEXT, fontWeight: 500, userSelect: 'all',
-                }}>{w}</span>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <CopyButton text={justCreated.mnemonic} label="copy phrase" />
-            <button
-              type="button"
-              style={ghostBtn}
-              onClick={() => {
-                const blob = new Blob([
-                  `0GENT wallet recovery phrase\n` +
-                  `Address: ${justCreated.address}\n` +
-                  `Created: ${new Date().toISOString()}\n\n` +
-                  `${justCreated.mnemonic}\n\n` +
-                  `Keep this file offline and secret. Anyone with these 12 words controls the wallet.`,
-                ], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `0gent-recovery-${justCreated.address.slice(0, 8)}.txt`;
-                a.click();
-                URL.revokeObjectURL(url);
-              }}
-            >
-              ⬇ download .txt
-            </button>
-            <button
-              type="button"
-              style={primaryBtn}
-              onClick={() => setJustCreated(null)}
-            >
-              ✓ i've saved it
-            </button>
-          </div>
-        </Card>
-      </section>
-    );
-  }
-
-  // ── Locked state → unlock prompt ─────────────────────────────────────
-  if (state.kind === 'locked') {
-    return (
-      <section id="wallet" style={sectionStyle}>
-        <Card>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 18 }}>
-            <StatusPill kind="locked" label="locked" />
-            <span style={{ color: FAINT, fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>
-              {state.stored.name}
-            </span>
-          </div>
-
-          <H2 kicker="resume session">Unlock your wallet</H2>
-
-          {/* Read-only summary even while locked */}
-          <div style={{
-            padding: '16px 18px',
-            background: BG_INNER,
-            border: `1px solid ${BORDER_DIM}`,
-            marginBottom: 22,
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              <div>
-                <div style={labelStyle}>address</div>
-                <code style={{ color: LILAC, fontSize: 13, fontFamily: 'JetBrains Mono, monospace', userSelect: 'all' }}>
-                  {shortAddress(state.stored.address)}
-                </code>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={labelStyle}>balance</div>
-                <span style={{ color: TEXT, fontSize: 18, fontWeight: 600, fontFamily: 'JetBrains Mono, monospace' }}>
-                  {balance ? Number(balance.zg).toFixed(4) : '…'}
-                </span>
-                <span style={{ color: FAINT, marginLeft: 5, fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>0G</span>
-              </div>
-            </div>
-          </div>
-
-          <form
-            onSubmit={async e => {
-              e.preventDefault();
-              setErr('');
-              setBusy(true);
-              try {
-                await unlock(pass);
-                setPass('');
-              } catch (e: any) {
-                setErr(e?.message || 'Failed to unlock');
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <div style={{ marginBottom: 14 }}>
-              <label style={labelStyle}>passphrase</label>
-              <input
-                type="password"
-                style={inputStyle}
-                value={pass}
-                onChange={e => setPass(e.target.value)}
-                autoFocus
-                onFocus={e => { e.target.style.borderColor = LILAC; }}
-                onBlur={e => { e.target.style.borderColor = BORDER_DIM; }}
-              />
-            </div>
-            {err && (
-              <p style={{
-                color: RED, fontSize: 12, fontFamily: 'JetBrains Mono, monospace',
-                marginBottom: 14, padding: '8px 12px',
-                border: '1px solid rgba(248,81,73,0.3)', background: 'rgba(248,81,73,0.08)',
-              }}>{err}</p>
-            )}
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <button type="submit" disabled={busy} style={{ ...primaryBtn, opacity: busy ? 0.5 : 1 }}>
-                {busy ? 'unlocking…' : '🔓 unlock'}
-              </button>
-              <button
-                type="button"
-                style={{ ...ghostBtn, color: RED, borderColor: 'rgba(248,81,73,0.3)' }}
-                onClick={() => { if (confirm('Delete this wallet from this browser? You can restore from your recovery phrase later.')) forget(); }}
-              >
-                forget wallet
-              </button>
-            </div>
-          </form>
-        </Card>
-      </section>
-    );
-  }
-
-  // ── Unlocked state → wallet detail ───────────────────────────────────
+  // ── Unlocked ────────────────────────────────────────────────────────
   const w = state.wallet;
   const explorerUrl = EXPLORER_BASE + w.address;
   const zg = balance ? Number(balance.zg) : 0;
@@ -569,163 +581,136 @@ export function WalletPanel() {
 
   return (
     <section id="wallet" style={sectionStyle}>
-      <Card>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 18 }}>
-          <StatusPill kind="active" label="active" />
-          <span style={{ color: TEXT, fontSize: 14, fontFamily: 'JetBrains Mono, monospace', fontWeight: 600 }}>
-            {w.name}
-          </span>
-          <span style={{ color: FAINT, fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>
-            on 0G testnet · chain 16602
-          </span>
-        </div>
-
-        {/* Address row */}
-        <div style={{ marginBottom: 24 }}>
-          <div style={labelStyle}>wallet address</div>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
-            padding: '12px 14px',
-            background: BG_INNER,
-            border: `1px solid ${BORDER_DIM}`,
-          }}>
-            <code style={{
-              color: LILAC, fontSize: 13, fontFamily: 'JetBrains Mono, monospace',
-              userSelect: 'all', wordBreak: 'break-all', flex: 1, minWidth: 280,
-            }}>{w.address}</code>
-            <CopyButton text={w.address} label="copy" inline size="sm" />
-            <a
-              href={explorerUrl}
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                ...ghostBtn,
-                padding: '4px 10px', fontSize: 10,
-                textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 5,
-              }}
-            >
-              explorer ↗
-            </a>
-          </div>
-        </div>
-
-        {/* Big balance display */}
-        <div style={{
-          padding: '24px 22px',
-          background: 'linear-gradient(135deg, rgba(146,0,225,0.10) 0%, rgba(146,0,225,0.02) 100%)',
-          border: `1px solid ${BORDER}`,
-          marginBottom: 24,
-          position: 'relative',
+      <div style={sectionGlow} />
+      <div style={containerStyle}>
+        <div className="reveal-up" style={{
+          display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+          marginBottom: 14,
         }}>
-          <div style={{ ...labelStyle, marginBottom: 4 }}>balance</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-            <span style={{
-              fontFamily: 'JetBrains Mono, monospace',
-              fontSize: 44, fontWeight: 700, color: TEXT,
-              letterSpacing: '-0.02em', lineHeight: 1,
+          <span className="step-badge" style={{ borderColor: 'rgba(63,185,80,0.4)', color: GREEN, background: 'linear-gradient(135deg, rgba(63,185,80,0.08), rgba(63,185,80,0.02))' }}>✓</span>
+          <span style={{ ...kickerStyle, marginBottom: 0 }}>your agent</span>
+          <StatusTag kind="active">active</StatusTag>
+        </div>
+        <h2 className="reveal-up" style={{ ...h2Style, transitionDelay: '60ms' }}>{w.name}</h2>
+        <p className="reveal-up" style={{ ...subStyle, transitionDelay: '120ms' }}>
+          Wallet unlocked in this browser. Use it from the terminal below or via the CLI / SDK
+          to provision real resources on 0G Chain.
+        </p>
+
+        <div className="reveal-up wallet-card" style={{ ...cardStyle, transitionDelay: '180ms' }}>
+          {/* Address row */}
+          <div style={{ marginBottom: 28 }}>
+            <div style={labelStyle}>address</div>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+              paddingBottom: 14,
+              borderBottom: `1px solid ${BORDER}`,
             }}>
-              {balance ? Number(balance.zg).toFixed(4) : '0.0000'}
-            </span>
-            <span style={{
-              fontFamily: 'JetBrains Mono, monospace',
-              fontSize: 18, color: LILAC, fontWeight: 600,
-            }}>0G</span>
+              <code style={{
+                color: TEXT, fontSize: 13,
+                fontFamily: 'JetBrains Mono, monospace',
+                userSelect: 'all', wordBreak: 'break-all',
+                flex: 1, minWidth: 260,
+              }}>{w.address}</code>
+              <CopyButton text={w.address} />
+              <a
+                href={explorerUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  ...ghostBtn,
+                  padding: '5px 10px', fontSize: 11,
+                  textDecoration: 'none',
+                  display: 'inline-flex', alignItems: 'center',
+                }}
+              >
+                explorer ↗
+              </a>
+            </div>
+          </div>
+
+          {/* Balance — quieter, no gradient bg */}
+          <div style={{
+            display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap',
+            marginBottom: isFunded ? 24 : 16,
+          }}>
+            <div>
+              <div style={labelStyle}>balance</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <span style={{
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: 28, fontWeight: 500, color: TEXT,
+                  letterSpacing: '-0.01em', lineHeight: 1,
+                }}>
+                  {balance ? Number(balance.zg).toFixed(4) : '0.0000'}
+                </span>
+                <span style={{
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: 14, color: LILAC, fontWeight: 500,
+                }}>0G</span>
+              </div>
+            </div>
             <button
               type="button"
               onClick={refreshBalance}
               style={{
                 ...ghostBtn,
-                marginLeft: 'auto', padding: '5px 11px', fontSize: 10,
+                marginLeft: 'auto', padding: '5px 10px', fontSize: 11,
               }}
-              title="refresh balance"
             >
-              ↻ refresh
+              refresh
             </button>
           </div>
-          {balance && (
+
+          {/* Faucet hint when balance is 0 — much quieter */}
+          {balance && !isFunded && (
             <div style={{
-              marginTop: 10,
+              padding: '14px 16px',
+              background: 'rgba(254,188,46,0.04)',
+              border: '1px solid rgba(254,188,46,0.18)',
+              marginBottom: 24,
+              fontSize: 12, color: TEXT_DIM, lineHeight: 1.7,
               fontFamily: 'JetBrains Mono, monospace',
-              fontSize: 11, color: FAINT,
             }}>
-              {balance.wei} wei · auto-refreshes every 15s
+              <div style={{ marginBottom: 6, color: AMBER, fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: 10 }}>
+                fund this wallet to start
+              </div>
+              open <a href={FAUCET_URL} target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'none' }}>faucet.0g.ai</a>, paste the address, request — funds arrive in ~30s.
             </div>
           )}
-        </div>
 
-        {/* Faucet card when balance is 0 */}
-        {balance && !isFunded && (
+          {/* Action row */}
           <div style={{
-            padding: '18px 20px',
-            background: 'rgba(254,188,46,0.06)',
-            border: '1px solid rgba(254,188,46,0.3)',
-            marginBottom: 24,
+            display: 'flex', gap: 8, flexWrap: 'wrap',
+            paddingTop: 20, borderTop: `1px solid ${BORDER}`,
           }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12,
-              fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#febc2e',
-              fontWeight: 700, letterSpacing: '0.04em',
-            }}>
-              <span>⚡</span> fund this wallet to start using your agent
-            </div>
-            <ol style={{
-              margin: 0, paddingLeft: 20,
-              fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: 'rgba(254,254,254,0.7)',
-              lineHeight: 1.9,
-            }}>
-              <li>open the <a href={FAUCET_URL} target="_blank" rel="noreferrer" style={{ color: LILAC }}>0G testnet faucet</a></li>
-              <li>paste your address (it's already in your clipboard if you tapped <em>copy</em> above)</li>
-              <li>click <em>request 0G</em> — funds arrive in &lt; 30s</li>
-            </ol>
+            <a
+              href={FAUCET_URL}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                ...ghostBtn,
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                ...(isFunded ? {} : { borderColor: 'rgba(254,188,46,0.3)', color: AMBER }),
+              }}
+            >
+              faucet ↗
+            </a>
+            <button type="button" style={ghostBtn} onClick={lock}>
+              lock
+            </button>
+            <button
+              type="button"
+              style={{ ...ghostBtn, marginLeft: 'auto', color: 'rgba(248,81,73,0.7)', borderColor: 'rgba(248,81,73,0.18)' }}
+              onClick={() => { if (confirm('Delete this wallet from this browser?')) forget(); }}
+            >
+              forget wallet
+            </button>
           </div>
-        )}
-
-        {/* Action row */}
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <a
-            href={FAUCET_URL}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              ...ghostBtn,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              ...(isFunded ? {} : { borderColor: 'rgba(254,188,46,0.4)', color: '#febc2e' }),
-            }}
-          >
-            ⚡ open faucet ↗
-          </a>
-          <button type="button" style={ghostBtn} onClick={lock}>🔒 lock</button>
-          <button
-            type="button"
-            style={{ ...ghostBtn, marginLeft: 'auto', color: RED, borderColor: 'rgba(248,81,73,0.3)' }}
-            onClick={() => { if (confirm('Delete this wallet from this browser? Make sure you have your recovery phrase.')) forget(); }}
-          >
-            forget wallet
-          </button>
         </div>
-      </Card>
+      </div>
     </section>
-  );
-}
-
-// ─── small bits ───────────────────────────────────────────────────────
-
-function FeaturePill({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <div style={{
-      display: 'inline-flex', alignItems: 'center', gap: 7,
-      padding: '6px 12px',
-      border: `1px solid ${BORDER_DIM}`,
-      background: 'rgba(0,0,0,0.3)',
-      fontFamily: 'JetBrains Mono, monospace',
-      fontSize: 11, color: DIM,
-      letterSpacing: '0.02em',
-    }}>
-      <span style={{ color: LILAC, display: 'inline-flex' }}>{icon}</span>
-      {label}
-    </div>
   );
 }

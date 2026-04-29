@@ -25,7 +25,7 @@ function App() {
       <Nav />
       <Hero />
       <div className="reveal"><WalletPanel /></div>
-      <Terminal />
+      <div className="reveal"><Terminal /></div>
       <div className="reveal"><Features /></div>
       <div className="reveal"><HowItWorks /></div>
       <div className="reveal"><ZGIntegration /></div>

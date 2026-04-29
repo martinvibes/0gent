@@ -85,11 +85,24 @@ body::after {
 .fade-in { animation: fadeIn 0.25s ease-out; }
 .wave-bar { transform-origin: bottom; }
 
-/* ─── Reveal ─── */
+/* ─── Reveal (top-level wrapper, used by App.tsx) ─── */
 .reveal { opacity:0; transform:translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
 .reveal.visible { opacity:1; transform:translateY(0); }
 
-/* ─── Card ─── */
+/* ─── Reveal-up (per-element, used inside sections for staggered entry) ─── */
+/* Children of a `.reveal.visible` parent are animated in via a CSS sibling delay */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible .reveal-up,
+.reveal-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Card (legacy class, still used by some panels) ─── */
 .card {
   background: #0c0c14;
   border: 1px solid rgba(183,95,255,0.1);
@@ -99,6 +112,67 @@ body::after {
 .card:hover {
   border-color: rgba(183,95,255,0.25);
   transform: translateY(-2px);
+}
+
+/* ─── Feature card (Features.tsx) — subtle hover lift + icon box ─── */
+.feature-card {
+  position: relative;
+}
+.feature-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top right, rgba(146,0,225,0.08), transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.feature-card:hover::after { opacity: 1; }
+.feature-card:hover .feature-icon {
+  border-color: rgba(183,95,255,0.4);
+  background: linear-gradient(135deg, rgba(146,0,225,0.18) 0%, rgba(146,0,225,0.04) 100%);
+}
+
+/* ─── ZGIntegration card — subtle border + edge glow on hover ─── */
+.zg-card:hover {
+  border-color: rgba(183,95,255,0.3);
+  transform: translateY(-3px);
+}
+.zg-card:hover .zg-top-edge { opacity: 1; }
+
+/* ─── Wallet section step number badge ─── */
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(183,95,255,0.3);
+  background: linear-gradient(135deg, rgba(146,0,225,0.10) 0%, rgba(146,0,225,0.02) 100%);
+  color: #B75FFF;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* ─── Wallet card — subtle gradient border accent ─── */
+.wallet-card {
+  position: relative;
+  isolation: isolate;
+}
+.wallet-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 0;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(183,95,255,0.18), transparent 40%, transparent 60%, rgba(183,95,255,0.10));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* ─── Section divider ─── */

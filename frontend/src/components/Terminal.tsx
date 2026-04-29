@@ -923,12 +923,56 @@ export function Terminal() {
     <section
       id="terminal"
       style={{
-        maxWidth: 980,
+        maxWidth: 1100,
         margin: '0 auto',
-        padding: '0 24px 100px',
+        padding: '40px 24px 100px',
+        position: 'relative',
       }}
     >
-      <div className="glow-border" style={{ borderRadius: 14 }}>
+      {/* Subtle bg glow — top-right */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        background: 'radial-gradient(ellipse 45% 40% at 80% 25%, rgba(146,0,225,0.06), transparent 70%)',
+      }} />
+
+      {/* Section kicker — matches wallet panel's "01 / get started" rhythm */}
+      <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+        <span className="step-badge">02</span>
+        <span style={{
+          fontSize: 12,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: '#B75FFF',
+          fontWeight: 500,
+        }}>try it live</span>
+      </div>
+      <h2 className="reveal-up" style={{
+        fontSize: 'min(40px, 3.4vw)',
+        fontWeight: 500,
+        letterSpacing: '-0.03em',
+        lineHeight: 1.1,
+        maxWidth: 640,
+        margin: 0,
+        marginBottom: 16,
+        color: '#fefefe',
+        transitionDelay: '60ms',
+      }}>The actual API, in your browser.</h2>
+      <p className="reveal-up" style={{
+        fontSize: 15,
+        color: 'rgba(254,254,254,0.5)',
+        maxWidth: 540,
+        lineHeight: 1.7,
+        margin: 0,
+        marginBottom: 36,
+        transitionDelay: '120ms',
+      }}>
+        Free commands run live against <span style={{ color: '#B75FFF' }}>api.0gent.xyz</span> right
+        now. Paid commands work the same way once your wallet is funded.
+      </p>
+
+      <div className="glow-border" style={{ borderRadius: 14, maxWidth: 980, margin: '0 auto' }}>
         <div
           style={{
             background: BG,
