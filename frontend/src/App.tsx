@@ -8,6 +8,7 @@ import { ZGIntegration } from './components/ZGIntegration';
 import { Footer } from './components/Footer';
 import { WalletPanel } from './components/WalletPanel';
 import { Logos } from './components/Logos';
+import { AgentProfile } from './components/AgentProfile';
 import { WalletProvider } from './lib/walletContext';
 
 function App() {
@@ -26,6 +27,12 @@ function App() {
 
   if (path === '/logos' || path === '/logos/') {
     return <Logos />;
+  }
+
+  // /agent/0xABC... — agent profile page
+  const agentMatch = path.match(/^\/agent\/([^/]+)\/?$/);
+  if (agentMatch) {
+    return <AgentProfile address={agentMatch[1]} />;
   }
 
   return (

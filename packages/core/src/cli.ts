@@ -36,6 +36,11 @@ import {
   healthCmd,
   doctorCmd,
 } from './commands/misc.js';
+import {
+  computeProvidersCmd,
+  computeStatusCmd,
+  computeInferCmd,
+} from './commands/compute.js';
 import { c } from './ui.js';
 
 const program = new Command();
@@ -60,7 +65,7 @@ function styleHelp(p: Command): void {
 program
   .name('0gent')
   .description('Decentralized infrastructure for autonomous AI agents on 0G Chain')
-  .version('0.1.1')
+  .version('0.2.1')
   .showSuggestionAfterError(true)
   .showHelpAfterError(c.dim('(run "0gent help" to list commands)'))
   .addHelpText('beforeAll', '\n  ' + c.brand('▓▓') + c.accent('▓▓') + '  ' + c.bold('0GENT') + '  ' + c.dim('— infrastructure for AI agents on 0G Chain') + '\n')
@@ -158,6 +163,24 @@ email
   .option('-l, --limit <n>', 'Show only the latest N messages')
   .action(withErr((inboxId: string, opts: { compact?: boolean; limit?: string }) => emailReadCmd(inboxId, opts)));
 email.command('threads <inboxId>').description('List threads').action(withErr(emailThreadsCmd));
+
+// ── compute (0G Compute Network — AI inference) ──
+const compute = program.command('compute').description('0G Compute Network — AI inference');
+compute
+  .command('providers')
+  .description('List available inference providers on 0G Compute')
+  .action(withErr(computeProvidersCmd));
+compute
+  .command('status')
+  .description('Show operator-side ledger + provider availability')
+  .action(withErr(computeStatusCmd));
+compute
+  .command('infer <prompt>')
+  .description('Run an LLM inference call via 0G Compute (costs 0.05 0G)')
+  .option('-m, --model <name>', 'override model')
+  .option('-t, --max-tokens <n>', 'max tokens (default 500)')
+  .option('-s, --system <text>', 'system prompt')
+  .action(withErr(computeInferCmd));
 
 // ── memory ──
 const memory = program.command('memory').description('Agent memory on 0G Storage');

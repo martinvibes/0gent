@@ -19,7 +19,10 @@ router.get("/", (_req, res: Response) => {
         read: config.priceEmailRead,
         threads: config.priceEmailRead,
       },
-      compute: { provision: config.priceComputeProvision },
+      compute: {
+        provision: config.priceComputeProvision,
+        infer: config.priceComputeInfer,
+      },
       domain: { register: config.priceDomainRegister },
       memory: { read: "free", write: "free" },
     },

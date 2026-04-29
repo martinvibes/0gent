@@ -12,6 +12,7 @@ import identityRouter from "./routes/identity";
 import memoryRouter from "./routes/memory";
 import pricingRouter from "./routes/pricing";
 import walletRouter from "./routes/wallet";
+import agentRouter from "./routes/agent";
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use("/domain", domainRouter);
 app.use("/identity", identityRouter);
 app.use("/memory", memoryRouter);
 app.use("/wallet", walletRouter);
+app.use("/agent", agentRouter);
 
 // Root → quick info
 app.get("/", (_req, res) => {

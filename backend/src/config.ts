@@ -51,6 +51,7 @@ export const config = {
   priceEmailSend: optional("PRICE_EMAIL_SEND", "0.08"),
   priceEmailRead: optional("PRICE_EMAIL_READ", "0.02"),
   priceComputeProvision: optional("PRICE_COMPUTE", "1.0"),
+  priceComputeInfer: optional("PRICE_COMPUTE_INFER", "0.05"),
   priceDomainRegister: optional("PRICE_DOMAIN", "2.0"),
   priceIdentityMint: optional("PRICE_IDENTITY_MINT", "0.1"),
 } as const;

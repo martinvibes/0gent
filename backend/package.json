@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@0gfoundation/0g-ts-sdk": "^1.2.1",
+    "@0glabs/0g-serving-broker": "^0.7.5",
     "@types/cors": "^2.8.19",
     "better-sqlite3": "^12.6.2",
     "cors": "^2.8.6",

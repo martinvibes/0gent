@@ -698,6 +698,17 @@ export function WalletPanel() {
             >
               faucet ↗
             </a>
+            <a
+              href={`/agent/${w.address}`}
+              style={{
+                ...ghostBtn,
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              public profile →
+            </a>
             <button type="button" style={ghostBtn} onClick={lock}>
               lock
             </button>

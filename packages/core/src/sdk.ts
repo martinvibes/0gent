@@ -322,6 +322,53 @@ export class ZeroGent {
     return data.threads || [];
   }
 
+  // ─── 0G Compute (AI inference) ───
+
+  /**
+   * List the AI inference providers currently available on 0G Compute Network.
+   * Free, no payment.
+   */
+  async computeProviders(): Promise<
+    Array<{ provider: string; name: string; serviceType: string; url: string; model?: string }>
+  > {
+    const r = await this.rawGet<{ providers: any[] }>('/compute/providers');
+    return r.providers || [];
+  }
+
+  /**
+   * Operator-side status of the 0G Compute integration: ledger balance, ready flag.
+   */
+  async computeStatus(): Promise<{
+    operator: string;
+    providersAvailable: number;
+    sampleProviders: Array<{ provider: string; model: string; type: string }>;
+    ledger: { exists: boolean; totalBalance: string; locked: string; available: string; message?: string };
+    ready: boolean;
+  }> {
+    return this.rawGet('/compute/status');
+  }
+
+  /**
+   * Run an LLM inference call via 0G Compute Network. Pays 0.05 0G per call.
+   * Operator must have funded their 0G Compute ledger first.
+   */
+  async computeInfer(
+    prompt: string,
+    opts: { model?: string; maxTokens?: number; system?: string } = {}
+  ): Promise<{
+    response: string;
+    model: string;
+    provider: string;
+    usage: { promptTokens?: number; completionTokens?: number; totalTokens?: number } | null;
+  }> {
+    const { data } = await this.paid<any>(
+      'POST',
+      '/compute/infer',
+      { prompt, ...opts }
+    );
+    return data;
+  }
+
   // ─── Wallet / balance ───
 
   async balance(): Promise<BalanceInfo> {
