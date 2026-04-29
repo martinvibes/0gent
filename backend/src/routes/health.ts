@@ -7,7 +7,7 @@ router.get("/", (_req, res) => {
   res.json({
     status: "ok",
     service: "0GENT",
-    version: "0.1.0",
+    version: "0.2.0",
     chain: {
       name: "0G Chain",
       chainId: config.zgChainId,
