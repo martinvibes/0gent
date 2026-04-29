@@ -27,10 +27,10 @@ export async function emailProvisionCmd(opts: { name?: string; yes?: boolean }):
     sp.stop();
     blank();
     success('Email inbox provisioned');
-    kv('Address', r.address);
-    kv('Inbox ID', r.id);
-    kv('Owner', r.owner);
-    kv('Resource ID', String(r.resourceId));
+    kv('Address', c.bold(c.accent(r.address)));
+    kv('Inbox ID', c.mono(r.id));
+    kv('Owner', c.addr(r.owner));
+    kv('Resource ID', c.bold(String(r.resourceId)));
     blank();
     info('Send with: ' + c.accent(`0gent email send ${r.id} --to you@... --subject "Hi" --body "..."`));
     info('Read with: ' + c.accent(`0gent email read ${r.id}`));
@@ -52,9 +52,9 @@ export async function emailSendCmd(inboxId: string, opts: { to?: string; subject
     const r = await z.emailSend(inboxId, opts.to, opts.subject!, opts.body);
     sp.stop();
     success('Email sent');
-    kv('From', r.from);
-    kv('To', r.to);
-    kv('Subject', r.subject);
+    kv('From', c.accent(r.from));
+    kv('To', c.addr(r.to));
+    kv('Subject', c.bold(r.subject || '(no subject)'));
     kv('Sent', new Date(r.timestamp).toLocaleString());
   } catch (e) {
     sp.fail(String((e as Error).message));
@@ -62,29 +62,77 @@ export async function emailSendCmd(inboxId: string, opts: { to?: string; subject
   }
 }
 
-export async function emailReadCmd(inboxId: string): Promise<void> {
+export async function emailReadCmd(
+  inboxId: string,
+  opts: { compact?: boolean; limit?: string } = {}
+): Promise<void> {
   const z = await getZeroGent();
   const sp = spinner('Reading inbox');
   z.onPaymentStatus = (m) => (sp.text = m);
   try {
-    const messages = await z.emailRead(inboxId);
+    const all = await z.emailRead(inboxId);
     sp.stop();
-    if (!messages.length) {
+    if (!all.length) {
       info('No messages.');
       return;
     }
-    const table = new Table({
-      head: [c.dim('Dir'), c.dim('From'), c.dim('Subject'), c.dim('When')],
-      style: { border: ['grey'] },
-      colWidths: [6, 28, 40, 22],
-      wordWrap: true,
-    });
-    for (const m of messages) {
-      const dir = m.direction === 'inbound' ? c.brand('in') : c.accent('out');
-      table.push([dir, m.from, m.subject, new Date(m.timestamp).toLocaleString()]);
+
+    const limit = Number(opts.limit) || 0;
+    // Show newest first; messages from API are already ordered timestamp DESC
+    const messages = limit > 0 ? all.slice(0, limit) : all;
+
+    // Compact mode: keep the old table-only view (great for scripting)
+    if (opts.compact) {
+      const table = new Table({
+        head: [c.dim('Dir'), c.dim('From'), c.dim('Subject'), c.dim('When')],
+        style: { border: ['grey'] },
+        colWidths: [6, 28, 40, 22],
+        wordWrap: true,
+      });
+      for (const m of messages) {
+        const dir = m.direction === 'inbound' ? c.brand('← in') : c.accent('→ out');
+        table.push([dir, m.from, m.subject, new Date(m.timestamp).toLocaleString()]);
+      }
+      console.log(table.toString());
+      info(`${all.length} message(s)${limit > 0 && limit < all.length ? ` (showing ${limit})` : ''}`);
+      return;
     }
-    console.log(table.toString());
-    info(`${messages.length} message(s)`);
+
+    // Default: card-style with full body content
+    blank();
+    for (const m of messages) {
+      const arrow = m.direction === 'inbound' ? c.brand('←') : c.accent('→');
+      const dirLabel = m.direction === 'inbound' ? c.brand('inbound') : c.accent('outbound');
+      const when = new Date(m.timestamp).toLocaleString();
+
+      console.log('  ' + c.dim('─'.repeat(70)));
+      console.log('  ' + arrow + ' ' + dirLabel + '  ' + c.dim(when));
+      console.log();
+      console.log('    ' + c.dim('from   ') + c.addr(m.from));
+      console.log('    ' + c.dim('to     ') + c.addr(m.to));
+      console.log('    ' + c.dim('subject') + ' ' + c.bold(m.subject || '(no subject)'));
+      blank();
+
+      // Body content
+      const body = (m.body || '').trim();
+      if (!body) {
+        console.log('    ' + c.dim('(no body)'));
+      } else {
+        // Indent each line, dim quoted (lines starting with '>')
+        for (const line of body.split('\n')) {
+          if (line.startsWith('>')) {
+            console.log('    ' + c.dim(line));
+          } else {
+            console.log('    ' + c.mono(line));
+          }
+        }
+      }
+      blank();
+    }
+    console.log('  ' + c.dim('─'.repeat(70)));
+    info(`${all.length} message(s)${limit > 0 && limit < all.length ? ` (showing ${limit})` : ''}` +
+      c.dim(`  •  use --compact for table view, --limit N to show fewer`));
+    blank();
   } catch (e) {
     sp.fail(String((e as Error).message));
   }

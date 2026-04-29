@@ -1,6 +1,7 @@
 import inquirer from 'inquirer';
 import { ZeroGent } from '../sdk.js';
 import { load } from '../config.js';
+import { c } from '../ui.js';
 
 let cached: ZeroGent | null = null;
 
@@ -13,7 +14,12 @@ export async function getZeroGent(passphrase?: string): Promise<ZeroGent> {
   let pass = passphrase || process.env.OGENT_WALLET_PASSPHRASE;
   if (!pass) {
     const ans = await inquirer.prompt([
-      { type: 'password', name: 'passphrase', message: 'Wallet passphrase:', mask: '*' },
+      {
+        type: 'password',
+        name: 'passphrase',
+        message: 'Wallet passphrase ' + c.dim('(or set OGENT_WALLET_PASSPHRASE to skip)') + ':',
+        mask: '*',
+      },
     ]);
     pass = ans.passphrase;
   }

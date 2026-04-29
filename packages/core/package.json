@@ -1,6 +1,6 @@
 {
   "name": "@0gent/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Decentralized infrastructure for autonomous AI agents on 0G Chain",
   "type": "module",
   "bin": {

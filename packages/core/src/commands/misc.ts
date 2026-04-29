@@ -4,12 +4,65 @@ import { getZeroGent } from './helpers.js';
 import { c, success, fail, info, kv, blank, spinner, printHeader } from '../ui.js';
 import { formatEther } from 'ethers';
 import { getProvider } from '../chain.js';
+import Table from 'cli-table3';
+
+// ─── lightweight markdown colorizer for `0gent skill` ──────────────────
+
+function colorizeMarkdown(text: string): string {
+  const lines = text.split('\n');
+  let inCodeBlock = false;
+  return lines
+    .map((raw) => {
+      // Fenced code block toggle
+      if (raw.trim().startsWith('```')) {
+        inCodeBlock = !inCodeBlock;
+        return c.dim(raw);
+      }
+      if (inCodeBlock) return c.mono(raw);
+
+      // Headers
+      if (raw.startsWith('# ')) return c.bold(c.brand(raw));
+      if (raw.startsWith('## ')) return c.bold(c.accent(raw));
+      if (raw.startsWith('### ')) return c.bold(c.addr(raw));
+      if (raw.startsWith('#### ')) return c.bold(raw);
+
+      // HTTP verb + path lines (e.g. "POST /email/inboxes")
+      const verb = raw.match(/^(GET|POST|PUT|DELETE|PATCH)\s+(\S+)/);
+      if (verb) {
+        const verbColor =
+          verb[1] === 'GET' ? c.ok :
+          verb[1] === 'DELETE' ? c.err :
+          verb[1] === 'POST' ? c.accent : c.warn;
+        return '  ' + verbColor(c.bold(verb[1].padEnd(7))) + c.addr(verb[2]) + raw.slice(verb[0].length);
+      }
+
+      // Cost: lines (e.g. "Cost: 0.1 0G", "Cost: Free")
+      if (/^\s*Cost:/i.test(raw)) {
+        const m = raw.match(/^(\s*Cost:\s*)(.+)$/i);
+        if (m) {
+          const isFree = /free/i.test(m[2]);
+          return c.dim(m[1]) + (isFree ? c.ok(m[2]) : c.warn(m[2]));
+        }
+      }
+
+      // **bold** inline
+      const bolded = raw.replace(/\*\*([^*]+)\*\*/g, (_m, t) => c.bold(t));
+      // `code` inline
+      const monoed = bolded.replace(/`([^`]+)`/g, (_m, t) => c.mono(t));
+      // Bullet lines start with "- "
+      if (/^\s*-\s/.test(monoed)) {
+        return monoed.replace(/^(\s*)(-)(\s)/, (_m, sp, dash, s) => sp + c.accent(dash) + s);
+      }
+      return monoed;
+    })
+    .join('\n');
+}
 
 export async function skillCmd(): Promise<void> {
   const cfg = load();
   const res = await fetch(cfg.apiEndpoint + '/skill.md');
   const text = await res.text();
-  console.log(text);
+  console.log(colorizeMarkdown(text));
 }
 
 export async function balanceCmd(): Promise<void> {
@@ -32,26 +85,76 @@ export async function balanceCmd(): Promise<void> {
 
 export async function pricingCmd(): Promise<void> {
   const cfg = load();
+  let live: any = null;
   try {
     const res = await fetch(cfg.apiEndpoint + '/pricing');
-    if (res.ok) {
-      const data = await res.json();
-      console.log(JSON.stringify(data, null, 2));
-      return;
-    }
+    if (res.ok) live = await res.json();
   } catch {}
 
-  // Fallback: hardcoded pricing
+  // Build rows from live data when available, otherwise use known defaults
+  type Row = { service: string; price: string };
+  const rows: Row[] = [];
+  const fmt = (v: any): string => {
+    if (v === undefined || v === null) return '—';
+    if (typeof v === 'string') return v;
+    return `${v} 0G`;
+  };
+  if (live?.services) {
+    const s = live.services;
+    if (s.identity) rows.push({ service: 'Identity mint', price: fmt(s.identity.mint) });
+    if (s.email) {
+      rows.push({ service: 'Email inbox', price: fmt(s.email.provision) });
+      rows.push({ service: 'Email send', price: fmt(s.email.send) });
+      rows.push({ service: 'Email read', price: fmt(s.email.read) });
+      rows.push({ service: 'Email threads', price: fmt(s.email.threads) });
+    }
+    if (s.phone) {
+      rows.push({ service: 'Phone provision', price: fmt(s.phone.provision) });
+      rows.push({ service: 'SMS send', price: fmt(s.phone.sms) });
+    }
+    if (s.compute) rows.push({ service: 'Compute (VPS)', price: fmt(s.compute.provision) });
+    if (s.domain) rows.push({ service: 'Domain register', price: fmt(s.domain.register) });
+    if (s.memory) {
+      rows.push({ service: 'Memory read', price: fmt(s.memory.read) });
+      rows.push({ service: 'Memory write', price: fmt(s.memory.write) });
+    }
+  } else {
+    // Fallback if API is down
+    rows.push(
+      { service: 'Identity mint', price: '0.1 0G' },
+      { service: 'Email inbox', price: '0.2 0G' },
+      { service: 'Email send', price: '0.08 0G' },
+      { service: 'Email read', price: '0.02 0G' },
+      { service: 'Phone provision', price: '0.5 0G' },
+      { service: 'SMS send', price: '0.01 0G' },
+      { service: 'Memory r/w', price: 'free' }
+    );
+  }
+
+  const network = live?.network || `0G Chain (${cfg.chainId})`;
+  const currency = live?.currency || '0G';
+
   blank();
-  console.log(c.bold('  0GENT Pricing (0G Tokens)'));
+  console.log('  ' + c.bold(c.brand('▓▓') + c.accent('▓▓')) + '  ' + c.bold('0GENT pricing'));
+  console.log('  ' + c.dim('paid in ') + c.accent(currency) + c.dim(' on ') + c.addr(network));
   blank();
-  kv('Phone provision', '0.5 / month');
-  kv('SMS send', '0.01');
-  kv('Email inbox', '0.2 / month');
-  kv('Compute (VPS)', '1.0 / month');
-  kv('Domain register', '2.0 / year');
-  kv('Identity mint', '0.1');
-  kv('Memory r/w', 'free');
+
+  const table = new Table({
+    head: [c.dim('Service'), c.dim('Cost')],
+    style: { border: ['grey'] },
+    colWidths: [22, 18],
+  });
+  for (const r of rows) {
+    const isFree = /free/i.test(r.price);
+    table.push([
+      c.mono(r.service),
+      isFree ? c.ok(r.price) : c.bold(c.accent(r.price)),
+    ]);
+  }
+  console.log(table.toString().split('\n').map((l) => '  ' + l).join('\n'));
+
+  blank();
+  info(c.dim('all paid endpoints settle on-chain via x402'));
   blank();
 }
 

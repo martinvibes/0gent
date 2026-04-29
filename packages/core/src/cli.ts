@@ -40,10 +40,31 @@ import { c } from './ui.js';
 
 const program = new Command();
 
+// ─── colored help formatter ────────────────────────────────────────────
+// Patches commander's default help so commands, options, headers, and the
+// banner all use the 0G purple palette instead of white-on-black.
+function styleHelp(p: Command): void {
+  p.configureHelp({
+    sortSubcommands: true,
+    subcommandTerm: (cmd) => c.accent(cmd.name()) + (cmd.aliases().length ? c.dim(' | ' + cmd.aliases().join(', ')) : ''),
+    subcommandDescription: (cmd) => cmd.description(),
+    optionTerm: (opt) => c.accent(opt.flags),
+    optionDescription: (opt) => opt.description,
+    argumentTerm: (arg) => c.accent('<' + arg.name() + '>'),
+    commandUsage: (cmd) => c.bold(cmd.name()) + ' ' + c.dim(cmd.usage()),
+    commandDescription: (cmd) => cmd.description(),
+  });
+  p.commands.forEach(styleHelp);
+}
+
 program
   .name('0gent')
   .description('Decentralized infrastructure for autonomous AI agents on 0G Chain')
-  .version('0.1.0');
+  .version('0.1.1')
+  .showSuggestionAfterError(true)
+  .showHelpAfterError(c.dim('(run "0gent help" to list commands)'))
+  .addHelpText('beforeAll', '\n  ' + c.brand('▓▓') + c.accent('▓▓') + '  ' + c.bold('0GENT') + '  ' + c.dim('— infrastructure for AI agents on 0G Chain') + '\n')
+  .addHelpText('after', `\n${c.dim('Tips:')}\n${c.dim('  •  set ')}${c.accent('OGENT_WALLET_PASSPHRASE')}${c.dim(' in your env to skip passphrase prompts')}\n${c.dim('  •  run ')}${c.accent('0gent <command> --help')}${c.dim(' for details on any command')}\n${c.dim('  •  docs: ')}${c.addr('https://0gent.xyz')}${c.dim('  ·  npm: ')}${c.addr('https://npmjs.com/package/@0gent/core')}\n`);
 
 program.command('setup').description('Interactive first-time setup').action(withErr(setupCmd));
 
@@ -130,7 +151,12 @@ email
   .option('-s, --subject <text>', 'subject')
   .option('-b, --body <text>', 'body')
   .action(withErr(emailSendCmd));
-email.command('read <inboxId>').description('Read inbox').action(withErr(emailReadCmd));
+email
+  .command('read <inboxId>')
+  .description('Read inbox (shows full message bodies)')
+  .option('-c, --compact', 'Compact table view (no bodies)')
+  .option('-l, --limit <n>', 'Show only the latest N messages')
+  .action(withErr((inboxId: string, opts: { compact?: boolean; limit?: string }) => emailReadCmd(inboxId, opts)));
 email.command('threads <inboxId>').description('List threads').action(withErr(emailThreadsCmd));
 
 // ── memory ──
@@ -147,6 +173,9 @@ program.command('balance').description('Show wallet balance').action(withErr(bal
 program.command('pricing').description('Show service prices').action(withErr(pricingCmd));
 program.command('health').description('API + chain health').action(withErr(healthCmd));
 program.command('doctor').description('Diagnose setup').action(withErr(doctorCmd));
+
+// Apply colored help formatting now that all commands are registered.
+styleHelp(program);
 
 program.parseAsync().catch((err) => {
   console.error('\n  ' + c.err('✗') + ' ' + (err.message || String(err)) + '\n');
