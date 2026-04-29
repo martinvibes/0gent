@@ -435,7 +435,7 @@ function StatCard({
 function ResourceRow({ resource }: { resource: AgentResource }) {
   const isActive = resource.statusLabel === 'active';
   return (
-    <div style={{
+    <div className="ap-resource-row" style={{
       display: 'grid',
       gridTemplateColumns: 'auto 1fr auto auto',
       alignItems: 'center', gap: 14,

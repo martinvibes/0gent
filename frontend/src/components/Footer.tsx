@@ -3,8 +3,8 @@ import { LogoLockup } from './Logo';
 export function Footer() {
   return (
     <>
-      <section style={{ padding: '140px 0', textAlign: 'center' }}>
-        <h2 style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', marginBottom: 20 }}>
+      <section className="final-cta" style={{ padding: '140px 0', textAlign: 'center' }}>
+        <h2 className="final-cta-h2" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', marginBottom: 20 }}>
           Give your agent superpowers
         </h2>
         <p style={{ fontSize: 17, color: 'rgba(254,254,254,0.5)', maxWidth: 500, margin: '0 auto 36px', lineHeight: 1.7 }}>
@@ -40,7 +40,7 @@ export function Footer() {
         </div>
       </section>
 
-      <footer style={{ borderTop: '1px solid rgba(183,95,255,0.1)', padding: '48px 24px' }}>
+      <footer className="footer-row" style={{ borderTop: '1px solid rgba(183,95,255,0.1)', padding: '48px 24px' }}>
         <div style={{
           maxWidth: 1100, margin: '0 auto',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',

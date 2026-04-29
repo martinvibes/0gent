@@ -258,7 +258,7 @@ export function WalletPanel() {
   // ── No wallet → create CTA ─────────────────────────────────────────
   if (state.kind === 'none') {
     return (
-      <section id="wallet" style={sectionStyle}>
+      <section id="wallet" className="wallet-section" style={sectionStyle}>
         <div style={sectionGlow} />
         <div style={containerStyle}>
           <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
@@ -392,7 +392,7 @@ export function WalletPanel() {
   if (justCreated && state.kind === 'unlocked') {
     const words = justCreated.mnemonic.split(' ');
     return (
-      <section id="wallet" style={sectionStyle}>
+      <section id="wallet" className="wallet-section" style={sectionStyle}>
         <div style={sectionGlow} />
         <div style={containerStyle}>
           <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
@@ -472,7 +472,7 @@ export function WalletPanel() {
   // ── Locked ──────────────────────────────────────────────────────────
   if (state.kind === 'locked') {
     return (
-      <section id="wallet" style={sectionStyle}>
+      <section id="wallet" className="wallet-section" style={sectionStyle}>
         <div style={sectionGlow} />
         <div style={containerStyle}>
           <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
@@ -580,7 +580,7 @@ export function WalletPanel() {
   const isFunded = zg > 0;
 
   return (
-    <section id="wallet" style={sectionStyle}>
+    <section id="wallet" className="wallet-section" style={sectionStyle}>
       <div style={sectionGlow} />
       <div style={containerStyle}>
         <div className="reveal-up" style={{

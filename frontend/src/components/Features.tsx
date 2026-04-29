@@ -89,7 +89,7 @@ const S = {
 
 export function Features() {
   return (
-    <section id="features" style={{ ...S.section, position: 'relative', overflow: 'hidden' }}>
+    <section id="features" className="section-pad" style={{ ...S.section, position: 'relative', overflow: 'hidden' }}>
       {/* Subtle bg glow — center-left */}
       <div style={{
         position: 'absolute',
@@ -99,7 +99,7 @@ export function Features() {
       }} />
       <div style={{ ...S.container, position: 'relative' }}>
         <div className="reveal-up" style={S.label}>Services</div>
-        <h2 className="reveal-up" style={S.h2}>Everything an agent needs</h2>
+        <h2 className="reveal-up section-h2" style={S.h2}>Everything an agent needs</h2>
         <p className="reveal-up" style={S.sub}>Real-world infrastructure via API, paid with 0G tokens, owned by your wallet.</p>
 
         <div style={S.grid}>

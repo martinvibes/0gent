@@ -42,6 +42,7 @@ export function HowItWorks() {
     <section
       id="how-it-works"
       ref={sectionRef as any}
+      className="section-pad"
       style={{ padding: '120px 0', position: 'relative', overflow: 'hidden' }}
     >
       {/* CSS keyframes scoped to this component */}
@@ -81,7 +82,7 @@ export function HowItWorks() {
         <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#B75FFF', marginBottom: 16, fontWeight: 500 }}>
           x402 Protocol
         </div>
-        <h2 className="reveal-up" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 20, transitionDelay: '60ms' }}>
+        <h2 className="reveal-up section-h2" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 20, transitionDelay: '60ms' }}>
           How it works
         </h2>
         <div className="reveal-up" style={{
@@ -117,7 +118,7 @@ export function HowItWorks() {
           </button>
         </div>
 
-        <div className="reveal-up" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'start', transitionDelay: '180ms' }}>
+        <div className="reveal-up hiw-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'start', transitionDelay: '180ms' }}>
           <div>
             {steps.map((s, i) => {
               const isActive = active === i;
@@ -233,7 +234,7 @@ export function HowItWorks() {
             })}
           </div>
 
-          <div style={{
+          <div className="hiw-preview" style={{
             border: '1px solid rgba(183,95,255,0.1)',
             borderRadius: 12,
             minHeight: 380,

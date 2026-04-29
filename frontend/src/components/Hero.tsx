@@ -2,7 +2,7 @@ import Orb from './Orb';
 
 export function Hero() {
   return (
-    <section style={{
+    <section className="hero-section" style={{
       paddingTop:180, paddingBottom:170, position:'relative', textAlign:'center', overflow:'hidden',
     }}>
       {/* Orb Background */}
@@ -56,8 +56,8 @@ export function Hero() {
         </div>
 
         {/* Heading */}
-        <h1 style={{
-          fontSize:'min(72px, 6vw)', fontWeight:500, letterSpacing:'-0.04em', lineHeight:1.05,
+        <h1 className="hero-h1" style={{
+          fontSize:'clamp(40px, 6vw, 72px)', fontWeight:500, letterSpacing:'-0.04em', lineHeight:1.05,
           marginBottom:24,
           background:'linear-gradient(180deg, #FEFEFE 30%, rgba(254,254,254,0.5))',
           WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
@@ -66,12 +66,12 @@ export function Hero() {
           Infrastructure for<br />Autonomous AI Agents
         </h1>
 
-        <p style={{ fontSize:17, color:'rgba(254,254,254,0.7)', maxWidth:520, margin:'0 auto 40px', lineHeight:1.7, pointerEvents: 'auto' }}>
-          Identity, email, AI inference, memory — paid per call with 0G tokens via x402. Your wallet is your identity. No API keys. No signup.
+        <p className="hero-sub" style={{ fontSize:17, color:'rgba(254,254,254,0.7)', maxWidth:520, margin:'0 auto 40px', lineHeight:1.7, pointerEvents: 'auto' }}>
+          Your AI agent gets real email inboxes, AI brain, and persistent memory, and pays for everything itself using crypto. No accounts. No humans needed.
         </p>
 
         {/* Buttons */}
-        <div style={{ display:'flex', gap:14, justifyContent:'center', marginBottom:56, pointerEvents: 'auto' }}>
+        <div className="hero-buttons" style={{ display:'flex', gap:14, justifyContent:'center', marginBottom:56, pointerEvents: 'auto' }}>
           <a href="#wallet" style={{
             display:'inline-flex', alignItems:'center', gap:8, height:48, padding:'0 28px',
             background:'#9200E1', color:'#fff', fontSize:14, fontWeight:500, borderRadius:100,
@@ -85,10 +85,10 @@ export function Hero() {
         </div>
 
         {/* Stats */}
-        <div style={{ display:'flex', justifyContent:'center', gap:56, pointerEvents: 'auto' }}>
+        <div className="hero-stats" style={{ display:'flex', justifyContent:'center', gap:56, pointerEvents: 'auto' }}>
           {([['4','0G Components'],['98','Contract Tests'],['x402','Payment Protocol']] as const).map(([v,l]) => (
             <div key={l} style={{ textAlign:'center' }}>
-              <div className="mono" style={{ fontSize:28, fontWeight:600, color:'#B75FFF' }}>{v}</div>
+              <div className="mono hero-stats-num" style={{ fontSize:28, fontWeight:600, color:'#B75FFF' }}>{v}</div>
               <div style={{ fontSize:11, color:'rgba(254,254,254,0.4)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:4 }}>{l}</div>
             </div>
           ))}
