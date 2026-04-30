@@ -67,7 +67,7 @@ export function Hero() {
         </h1>
 
         <p className="hero-sub" style={{ fontSize:17, color:'rgba(254,254,254,0.7)', maxWidth:520, margin:'0 auto 40px', lineHeight:1.7, pointerEvents: 'auto' }}>
-          Your AI agent gets real email inboxes, AI brain, and persistent memory, and pays for everything itself using crypto. No accounts. No humans needed.
+          Your AI agent gets real phone numbers, email inboxes, AI brain, and persistent memory, and pays for everything itself using crypto. No accounts. No humans needed.
         </p>
 
         {/* Buttons */}

@@ -47,6 +47,13 @@ const IdentityIcon = (
   </svg>
 );
 
+const SocialIcon = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    <path d="M8 9h8M8 13h5" />
+  </svg>
+);
+
 interface Feature {
   icon: ReactNode;
   title: string;
@@ -61,9 +68,10 @@ const features: Feature[] = [
   { icon: EmailIcon,    title: 'Email Inboxes',      desc: 'Dedicated <name>@0gent.xyz inbox. Send via Resend. Inbound replies parsed by Cloudflare Worker, full thread preserved.', code: 'POST /email/provision\n→ 402: pay 0.2 0G\n→ scout@0gent.xyz',           tag: 'Cloudflare · Resend', status: 'live' },
   { icon: SparkIcon,    title: 'AI Inference',       desc: 'Pay-per-call LLM inference via the 0G Compute Network. Real on-chain micropayments, returns OpenAI-format completions.', code: 'POST /compute/infer\n→ 402: pay 0.05 0G\n→ qwen-2.5-7b reply',          tag: '0G Compute Network', status: 'live' },
   { icon: ServerIcon,   title: 'Memory (Storage)',   desc: 'Persistent agent memory backed by 0G Storage — write once, read forever, indexed by your wallet.',                       code: 'POST /memory/<wallet>\n→ free\n→ 0G Storage rootHash',                  tag: '0G Storage',          status: 'live' },
-  { icon: PhoneIcon,    title: 'Phone & SMS',        desc: 'Real phone numbers in 150+ countries. Send/receive SMS. Voice calls with TTS, recording, DTMF.',                          code: 'POST /phone/provision\n→ 402: pay 0.5 0G\n→ +1 (415) 555-0142',       tag: 'Telnyx',              status: 'dev'  },
+  { icon: PhoneIcon,    title: 'Phone & SMS',        desc: 'Real phone numbers across 170+ countries. Send SMS to anywhere. Provisioning + SMS verified end-to-end on Telnyx.',         code: 'POST /phone/provision\n→ 402: pay 0.5 0G\n→ +1 (816) 496-1100',       tag: 'Telnyx',              status: 'live' },
   { icon: GlobeIcon,    title: 'Domains',            desc: 'Register domains with full DNS control. .com, .dev, .ai — hundreds of TLDs.',                                              code: 'POST /domain/register\n→ 402: pay 2.0 0G\n→ agent-alpha.dev',           tag: 'Namecheap',           status: 'dev'  },
   { icon: ServerIcon,   title: 'Compute VPS',        desc: 'Hardened VPS instances. SSH key-only, UFW firewall, Node.js 22 pre-installed. Wired to Hetzner Cloud, awaiting credit.',  code: 'POST /compute/provision\n→ 402: pay 1.0 0G\n→ 49.12.218.44 (cx22)',    tag: 'Hetzner',             status: 'dev'  },
+  { icon: SocialIcon,   title: 'X Account',          desc: 'Agents own and operate their own X accounts — post, reply, follow, build an audience. Each action paid for and authenticated on-chain.', code: 'POST /x/buy\n→ 402: pay 5.0 0G\n→ ready X account, posting',    tag: 'Coming soon',         status: 'dev'  },
 ];
 
 const S = {

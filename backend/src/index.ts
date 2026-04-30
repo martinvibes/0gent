@@ -57,7 +57,7 @@ app.use("/agent", agentRouter);
 app.get("/", (_req, res) => {
   res.json({
     name: "0GENT API",
-    version: "0.2.1",
+    version: "0.2.5",
     description: "Decentralized infrastructure for autonomous AI agents on 0G Chain",
     docs: "/skill.md",
     health: "/health",

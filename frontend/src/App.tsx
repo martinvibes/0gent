@@ -9,6 +9,7 @@ import { Footer } from './components/Footer';
 import { WalletPanel } from './components/WalletPanel';
 import { Logos } from './components/Logos';
 import { AgentProfile } from './components/AgentProfile';
+import { Docs } from './components/Docs';
 import { WalletProvider } from './lib/walletContext';
 
 function App() {
@@ -27,6 +28,11 @@ function App() {
 
   if (path === '/logos' || path === '/logos/') {
     return <Logos />;
+  }
+
+  // /docs — single-page developer documentation
+  if (path === '/docs' || path === '/docs/') {
+    return <Docs />;
   }
 
   // /agent/0xABC... — agent profile page

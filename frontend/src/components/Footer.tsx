@@ -53,6 +53,7 @@ export function Footer() {
           </a>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
             {[
+              ['Docs',       '/docs',                                                           false],
               ['skill.md',   '/skill.md',                                                       false],
               ['npm',        'https://www.npmjs.com/package/@0gent/core',                      true],
               ['GitHub',     'https://github.com/martinvibes/0gent',                            true],

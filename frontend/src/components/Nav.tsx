@@ -27,7 +27,7 @@ export function Nav() {
             ['Features',     '#features'],
             ['How it Works', '#how-it-works'],
             ['Stack',        '#stack'],
-            ['Docs',         '/skill.md'],
+            ['Docs',         '/docs'],
           ].map(([label, href]) => (
             <a
               key={label}

@@ -112,35 +112,43 @@ Returns: { id, name, status, ipv4 }
 DELETE /compute/:id
 Cost: Free
 
-### Phone & SMS
+### Phone & SMS ✅
 
-**Provider Status** ✅
+Live end-to-end on Telnyx (verified account, worldwide coverage, attached messaging profile). Twilio code path also wired as a fallback — set `PHONE_PROVIDER=twilio` to switch. Real numbers are owned by the agent's wallet, recorded on `AgentRegistry`, leased for 30 days at a time.
+
+**Provider Status**
 GET /phone/status
 Cost: Free
-Returns: { provider: "twilio" | "telnyx", ready, capabilities: { search, provision, sms } }
-Reports which upstream phone provider is wired and whether it's credentialed.
+Returns: { provider: "telnyx" | "twilio", ready, capabilities: { search, provision, sms } }
 
-**Search Available Numbers** ✅
+**Search Available Numbers**
 GET /phone/search?country=US&areaCode=415
 Cost: Free
-Returns: { numbers: [{ phoneNumber, region, type }], provider }
-Live inventory. Backed by Twilio when `TWILIO_*` env is set, Telnyx when `TELNYX_API_KEY` is set. Search itself is free; both providers support every major country (`US`, `CA`, `GB`, etc.).
+Returns: { numbers: [{ phoneNumber, region, type }], country: { code, name, curated }, provider }
+Live inventory. Aliases like `country=UK` resolve to GB; full names like `country=United Kingdom` also work; any 2-letter ISO code is passed through to the upstream provider (170+ countries on Telnyx).
 
-**Provision Phone Number** 🟡
+**List Curated Countries**
+GET /phone/countries
+Cost: Free
+Returns: { countries: [{ code, name, region, popular }], count, note }
+50 curated picks with names + region grouping. Twilio/Telnyx both serve more than these — list is a hint, not a hard limit.
+
+**Provision Phone Number**
 POST /phone/provision
 Cost: 0.5 0G
-Body: { "country": "US", "areaCode": "415" }
+Body: { "country": "US", "areaCode": "415" }            ← any-available mode
+   or  { "phoneNumber": "+18164961100" }                ← exact-number mode
 Returns: { id, phoneNumber, country, owner, resourceId, expiresAt }
-Code wired against both Twilio and Telnyx. On a Twilio trial account this will fail with the upstream error surfaced as-is — works the moment the provider account is upgraded out of trial / funded.
+Pre-flight validates E.164 BEFORE x402 charges, so typos cost nothing. Country mode rotates through 5 candidates if the upstream returns inventory churn (Telnyx 10027). Number is owned by your wallet for 30 days.
 
-**Send SMS** 🟡
+**Send SMS**
 POST /phone/:id/sms
 Cost: 0.01 0G
 Body: { "to": "+15551234567", "body": "Hello from 0GENT" }
 Returns: { id, from, to, body, timestamp }
-Same situation as provision — wired but constrained by the trial account state.
+Pre-flight catches To==From, missing fields, and malformed E.164 BEFORE x402 charges. Telnyx-specific errors (caller-ID restrictions, region locks) translate to actionable messages instead of raw upstream JSON.
 
-**SMS Logs** ✅ (read-only, hits local DB)
+**SMS Logs**
 GET /phone/:id/logs?owner=0xYOUR_WALLET
 Cost: Free
 Returns: { logs: [{ direction, from, to, body, timestamp }] }

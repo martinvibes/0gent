@@ -183,15 +183,16 @@ $ 0gent compute infer "Reply with one short sentence: what is 0G Chain?"
 | `0gent memory list` | free | ✅ | List keys + 0G Storage root hashes. |
 | `0gent memory delete <key>` | free | ✅ | Remove the entry. |
 
-### Phone & SMS
+### Phone & SMS ✅
 
-Provider-agnostic. Backend picks **Twilio** when `TWILIO_*` env is set, falls back to **Telnyx** when `TELNYX_API_KEY` is present. Both code paths exist; switching is an env-var change, no code edits required.
+Live end-to-end on **Telnyx** (verified account, worldwide coverage, messaging profile attached). **Twilio** also wired as a runtime fallback — switch with `PHONE_PROVIDER=twilio` env var, zero code edits required. Numbers are owned by your wallet, leased for 30 days at a time.
 
 | Command | Cost | Status | Notes |
 |---|---|---|---|
-| `0gent phone search [--country US] [--area 415]` | free | ✅ | **Live** — real upstream inventory from Twilio (or Telnyx if configured). |
-| `0gent phone provision --country US [--area 415]` | 0.5 | 🟡 | Code wired against both providers. On a Twilio trial account this fails with the upstream error surfaced — works the moment the account is upgraded. |
-| `0gent phone sms <phoneId> --to +1... --body "..."` | 0.01 | 🟡 | Same situation as provision. |
+| `0gent phone countries [--region <name>]` | free | ✅ | List the 50 curated supported countries; full inventory is 170+ via the upstream provider. |
+| `0gent phone search [--country US] [--area 415]` | free | ✅ | Real upstream inventory. Aliases (`UK→GB`, `USA→US`, full names) resolve automatically. |
+| `0gent phone provision [<phoneNumber>] [--country US]` | 0.5 | ✅ | Pass a specific E.164 to buy that exact number, or `--country` to grab the first available. CLI pre-validates E.164 before any payment. |
+| `0gent phone sms <phoneId> --to +1... --body "..."` | 0.01 | ✅ | End-to-end SMS delivery verified. Pre-flight catches To==From, missing fields, and bad E.164 BEFORE x402 charges. |
 | `0gent phone logs <phoneId>` | free | ✅ | Reads local DB; provider-agnostic. |
 
 ### Utility
