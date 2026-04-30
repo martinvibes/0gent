@@ -38,20 +38,55 @@ export async function provisionNumber(
   phoneNumber?: string
 ): Promise<{ id: string; phoneNumber: string; country: string; owner: string; provisionedAt: string }> {
   const client = getClient();
-  let chosen: string;
+  let chosen: string | null = null;
 
   if (phoneNumber) {
-    chosen = phoneNumber;
+    // Specific-number mode — let Telnyx validate; no retry pool, just one try.
+    try {
+      await client.numberOrders.create({
+        phone_numbers: [{ phone_number: phoneNumber }],
+        messaging_profile_id: config.telnyxMessagingProfileId || undefined,
+      } as any);
+      chosen = phoneNumber;
+    } catch (e: any) {
+      const msg = String(e?.message || e);
+      if (/10027/.test(msg)) {
+        throw new Error(
+          `Telnyx no longer has ${phoneNumber} in inventory. Numbers can disappear seconds after a search — re-run "phone search" and try a different one.`
+        );
+      }
+      throw e;
+    }
   } else {
-    const available = await searchNumbers(country, { areaCode, limit: 1 });
-    if (available.length === 0) throw new Error(`No numbers available in ${country}`);
-    chosen = available[0].phoneNumber;
-  }
+    // Country-pool mode — search wide, try each candidate until one orders cleanly.
+    // Telnyx returns 10027 when a previously-searched number is no longer orderable
+    // by the time we try; rotating through the search results dodges this without
+    // making the user pay again.
+    const candidates = await searchNumbers(country, { areaCode, limit: 5 });
+    if (candidates.length === 0) throw new Error(`No numbers available in ${country}`);
 
-  await client.numberOrders.create({
-    phone_numbers: [{ phone_number: chosen }],
-    messaging_profile_id: config.telnyxMessagingProfileId || undefined,
-  } as any);
+    let lastErr: any = null;
+    for (const c of candidates) {
+      try {
+        await client.numberOrders.create({
+          phone_numbers: [{ phone_number: c.phoneNumber }],
+          messaging_profile_id: config.telnyxMessagingProfileId || undefined,
+        } as any);
+        chosen = c.phoneNumber;
+        break;
+      } catch (e: any) {
+        lastErr = e;
+        if (!/10027/.test(String(e?.message || e))) throw e; // hard fail on anything else
+        // 10027 — try next candidate
+      }
+    }
+    if (!chosen) {
+      throw new Error(
+        `Telnyx rejected all ${candidates.length} candidates in ${country}${areaCode ? ` area ${areaCode}` : ""} ` +
+        `(error 10027 — inventory churn). Try again with a different area code, or a major city like 415, 212, 312.`
+      );
+    }
+  }
 
   if (config.telnyxMessagingProfileId) {
     try {
