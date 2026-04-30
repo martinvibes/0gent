@@ -66,7 +66,7 @@ function styleHelp(p: Command): void {
 program
   .name('0gent')
   .description('Decentralized infrastructure for autonomous AI agents on 0G Chain')
-  .version('0.2.3')
+  .version('0.2.4')
   .showSuggestionAfterError(true)
   .showHelpAfterError(c.dim('(run "0gent help" to list commands)'))
   .addHelpText('beforeAll', '\n  ' + c.brand('▓▓') + c.accent('▓▓') + '  ' + c.bold('0GENT') + '  ' + c.dim('— infrastructure for AI agents on 0G Chain') + '\n')
