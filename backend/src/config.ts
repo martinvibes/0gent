@@ -25,6 +25,10 @@ export const config = {
   telnyxApiKey: optional("TELNYX_API_KEY", ""),
   telnyxMessagingProfileId: optional("TELNYX_MESSAGING_PROFILE_ID", ""),
 
+  // Twilio
+  twilioAccountSid: optional("TWILIO_ACCOUNT_SID", ""),
+  twilioAuthToken: optional("TWILIO_AUTH_TOKEN", ""),
+
   // Cloudflare (Email Routing — inbound)
   cloudflareApiToken: optional("CLOUDFLARE_API_TOKEN", ""),
   cloudflareZoneId: optional("CLOUDFLARE_ZONE_ID", ""),

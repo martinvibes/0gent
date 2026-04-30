@@ -60,10 +60,12 @@ npm i -g @0gent/core
 npm i -g @0gent/core
 ```
 
-Or run without installing:
+Or run any command without installing — perfect for one-off agent scripts or CI:
 
 ```bash
 npx @0gent/core compute providers
+npx @0gent/core phone search --country US --area 415
+npx @0gent/core compute infer "what is 0G Chain?"
 ```
 
 Requires Node.js ≥ 18.
@@ -90,6 +92,9 @@ Requires Node.js ≥ 18.
 
 # 6. Ask an LLM, paid in 0G (0.05 0G)
 0gent compute infer "What is 0G Chain in one sentence?"
+
+# 7. Search real phone-number inventory (free)
+0gent phone search --country US --area 415
 ```
 
 Every paid step is a real on-chain transaction on 0G Chain. Every resource is owned by your wallet, recorded in `AgentRegistry.sol`, forever.
@@ -180,14 +185,14 @@ $ 0gent compute infer "Reply with one short sentence: what is 0G Chain?"
 
 ### Phone & SMS
 
-🟡 Code wired to Telnyx; awaiting Telnyx account credentialing. Commands accept the same shapes they will when live, so demo scripts remain stable.
+Provider-agnostic. Backend picks **Twilio** when `TWILIO_*` env is set, falls back to **Telnyx** when `TELNYX_API_KEY` is present. Both code paths exist; switching is an env-var change, no code edits required.
 
 | Command | Cost | Status | Notes |
 |---|---|---|---|
-| `0gent phone search [--country US] [--area 415]` | free | 🟡 | Inventory search. |
-| `0gent phone provision --country US [--area 415]` | 0.5 | 🟡 | Real US/intl number, pay-as-you-go. |
-| `0gent phone sms <phoneId> --to +1... --body "..."` | 0.01 | 🟡 | Send SMS. |
-| `0gent phone logs <phoneId>` | free | 🟡 | SMS history (owner-scoped). |
+| `0gent phone search [--country US] [--area 415]` | free | ✅ | **Live** — real upstream inventory from Twilio (or Telnyx if configured). |
+| `0gent phone provision --country US [--area 415]` | 0.5 | 🟡 | Code wired against both providers. On a Twilio trial account this fails with the upstream error surfaced — works the moment the account is upgraded. |
+| `0gent phone sms <phoneId> --to +1... --body "..."` | 0.01 | 🟡 | Same situation as provision. |
+| `0gent phone logs <phoneId>` | free | ✅ | Reads local DB; provider-agnostic. |
 
 ### Utility
 

@@ -70,7 +70,8 @@ curl -X POST https://api.0gent.xyz/email/provision \
 | **Memory** — read/write/delete | ✅ Live | free | 0G Storage via `@0glabs/0g-ts-sdk` |
 | **Wallet** — generate, balance | ✅ Live | free | Non-custodial; server forgets the seed immediately |
 | **Agent Profile** — public lookup | ✅ Live | free | `GET /agent/<address>` — identity + resources + balance |
-| **Phone & SMS** | 🟡 In dev | 0.5 / 0.01 | Code wired to Telnyx; account not yet credentialed |
+| **Phone — search** | ✅ Live | free | Real upstream inventory via Twilio (or Telnyx if its key is set) |
+| **Phone — provision / SMS** | 🟡 In dev | 0.5 / 0.01 | Code wired against Twilio + Telnyx; constrained by trial account until upgraded |
 | **Compute (VPS)** | 🟡 In dev | 1.0 / month | Code wired to Hetzner Cloud; awaiting `HCLOUD_TOKEN` |
 | **Domains** | 🟡 In dev | 2.0 / year | Code wired to Namecheap; awaiting credentials |
 
@@ -142,7 +143,8 @@ The same flow drives every paid service — only the resource type and price cha
 - **Frontend** — Vite + React + TypeScript, deployed on Vercel
 - **CLI / SDK** — `@0gent/core` on npm
 - **Email** — Resend (outbound), Cloudflare Email Workers + `postal-mime` (inbound)
-- **Phone (planned)** — Telnyx
+- **Phone search (live)** — Twilio (free trial), with a Telnyx fallback if `TELNYX_API_KEY` is set instead
+- **Phone provisioning + SMS (planned)** — same providers, awaiting trial upgrade
 - **Compute VPS (planned)** — Hetzner Cloud
 - **Domains (planned)** — Namecheap
 
@@ -186,7 +188,8 @@ cp .env.example .env
 #   DATA_DIR=/your/persistent/path  — for SQLite to survive restarts
 #
 # Optional (light up the 🟡 services):
-#   TELNYX_API_KEY, TELNYX_MESSAGING_PROFILE_ID
+#   TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN  — phone search live on free trial
+#   TELNYX_API_KEY, TELNYX_MESSAGING_PROFILE_ID  — alternative phone provider
 #   HCLOUD_TOKEN
 #   NAMECHEAP_API_KEY, NAMECHEAP_API_USER
 ```

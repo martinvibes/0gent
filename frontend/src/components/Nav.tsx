@@ -42,8 +42,7 @@ export function Nav() {
         </div>
 
         <a
-          href="/skill.md"
-          target="_blank"
+          href="#terminal"
           className="nav-cta"
           style={{
             display: 'inline-flex', alignItems: 'center', height: 32, padding: '0 16px',

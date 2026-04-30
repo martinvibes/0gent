@@ -112,30 +112,38 @@ Returns: { id, name, status, ipv4 }
 DELETE /compute/:id
 Cost: Free
 
-### Phone & SMS 🟡
+### Phone & SMS
 
-**Search Available Numbers**
+**Provider Status** ✅
+GET /phone/status
+Cost: Free
+Returns: { provider: "twilio" | "telnyx", ready, capabilities: { search, provision, sms } }
+Reports which upstream phone provider is wired and whether it's credentialed.
+
+**Search Available Numbers** ✅
 GET /phone/search?country=US&areaCode=415
 Cost: Free
-Returns: { numbers: [{ phoneNumber, region, type }] }
+Returns: { numbers: [{ phoneNumber, region, type }], provider }
+Live inventory. Backed by Twilio when `TWILIO_*` env is set, Telnyx when `TELNYX_API_KEY` is set. Search itself is free; both providers support every major country (`US`, `CA`, `GB`, etc.).
 
-**Provision Phone Number**
+**Provision Phone Number** 🟡
 POST /phone/provision
 Cost: 0.5 0G
 Body: { "country": "US", "areaCode": "415" }
 Returns: { id, phoneNumber, country, owner, resourceId, expiresAt }
+Code wired against both Twilio and Telnyx. On a Twilio trial account this will fail with the upstream error surfaced as-is — works the moment the provider account is upgraded out of trial / funded.
 
-**Send SMS**
+**Send SMS** 🟡
 POST /phone/:id/sms
 Cost: 0.01 0G
 Body: { "to": "+15551234567", "body": "Hello from 0GENT" }
 Returns: { id, from, to, body, timestamp }
+Same situation as provision — wired but constrained by the trial account state.
 
-**SMS Logs**
+**SMS Logs** ✅ (read-only, hits local DB)
 GET /phone/:id/logs?owner=0xYOUR_WALLET
 Cost: Free
-
-Telnyx integration; needs a credentialed Telnyx account before these light up.
+Returns: { logs: [{ direction, from, to, body, timestamp }] }
 
 ### Domain 🟡
 

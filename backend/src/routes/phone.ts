@@ -1,17 +1,34 @@
-import { Router, Response } from "express";
+import { Router, Response, Request } from "express";
 import { x402, AuthenticatedRequest } from "../middleware/x402";
 import { config } from "../config";
-import * as phoneService from "../services/phone";
+import * as phoneService from "../services/phone-provider";
 import { registerResourceOnChain } from "../services/chain";
 
 const router = Router();
+
+// Free — reports which provider is wired and whether it's credentialed.
+router.get("/status", (_req: Request, res: Response) => {
+  const active = phoneService.active();
+  const ready =
+    (active.name === "twilio" && !!config.twilioAccountSid && !!config.twilioAuthToken) ||
+    (active.name === "telnyx" && !!config.telnyxApiKey);
+  res.json({
+    provider: active.name,
+    ready,
+    capabilities: {
+      search: ready,
+      provision: ready, // may still fail on a trial Twilio account; clear error returned
+      sms: ready,       // trial Twilio limited to verified destinations
+    },
+  });
+});
 
 router.get("/search", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const country = (req.query.country as string) || "US";
     const areaCode = req.query.areaCode as string | undefined;
     const numbers = await phoneService.searchNumbers(country, { areaCode });
-    res.json({ numbers });
+    res.json({ numbers, provider: phoneService.active().name });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -52,6 +69,9 @@ router.post(
 );
 
 router.get("/:id/logs", async (req: AuthenticatedRequest, res: Response) => {
+  // /phone/status is the only sub-route that takes precedence over /:id, so guard
+  // any future "magic" path values that could collide with phone-IDs.
+  if (req.params.id === "status") { res.status(404).end(); return; }
   try {
     const owner = req.query.owner as string;
     if (!owner) { res.status(400).json({ error: "owner query param required" }); return; }
