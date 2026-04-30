@@ -12,14 +12,16 @@ export function Footer() {
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', padding: '0 24px' }}>
           <a
-            href="#wallet"
+            href="https://www.npmjs.com/package/@0gent/core"
+            target="_blank"
+            rel="noreferrer"
             style={{
               display: 'inline-flex', alignItems: 'center', height: 48, padding: '0 28px',
               background: '#9200E1', color: '#fff', fontSize: 14, fontWeight: 500, borderRadius: 100,
               border: 'none', transition: 'filter 0.2s', textDecoration: 'none',
             }}
           >
-            Create your wallet →
+            Install the CLI →
           </a>
           <a
             href="https://www.npmjs.com/package/@0gent/core"

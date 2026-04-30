@@ -938,9 +938,9 @@ export function Terminal() {
         background: 'radial-gradient(ellipse 45% 40% at 80% 25%, rgba(146,0,225,0.06), transparent 70%)',
       }} />
 
-      {/* Section kicker — matches wallet panel's "01 / get started" rhythm */}
+      {/* Section kicker — first numbered step on the page */}
       <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-        <span className="step-badge">02</span>
+        <span className="step-badge">01</span>
         <span style={{
           fontSize: 12,
           letterSpacing: '0.12em',

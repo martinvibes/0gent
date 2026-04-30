@@ -254,9 +254,11 @@ export function WalletPanel() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [justCreated, setJustCreated] = useState<{ mnemonic: string; address: string } | null>(null);
+  const [unlockMode, setUnlockMode] = useState(false);
 
-  // ── No wallet → create CTA ─────────────────────────────────────────
-  if (state.kind === 'none') {
+  // ── No wallet (or locked wallet present) → create flow + inline unlock ───
+  if (state.kind === 'none' || state.kind === 'locked') {
+    const lockedStored = state.kind === 'locked' ? state.stored : null;
     return (
       <section id="wallet" className="wallet-section" style={sectionStyle}>
         <div style={sectionGlow} />
@@ -297,6 +299,147 @@ export function WalletPanel() {
           </div>
 
           <div className="reveal-up wallet-card" style={{ ...cardStyle, transitionDelay: '220ms' }}>
+            {/* Inline unlock affordance — only renders when an encrypted wallet
+                exists in this browser. Compact by default; click "unlock" to
+                reveal the passphrase form right here, instead of a whole
+                separate section above. */}
+            {lockedStored && (
+              <div style={{
+                marginBottom: 22,
+                padding: unlockMode ? '14px 16px 16px' : '11px 14px',
+                border: `1px solid ${unlockMode ? 'rgba(254,188,46,0.35)' : 'rgba(254,188,46,0.18)'}`,
+                background: unlockMode ? 'rgba(254,188,46,0.05)' : 'rgba(254,188,46,0.025)',
+                transition: 'all 0.2s ease',
+              }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  flexWrap: 'wrap',
+                }}>
+                  <span style={{ color: AMBER, fontSize: 13, lineHeight: 1, display: 'inline-flex' }}>🔒</span>
+                  <span style={{ fontSize: 12, color: TEXT_DIM, fontFamily: 'JetBrains Mono, monospace' }}>
+                    existing wallet ·
+                    <span style={{ color: TEXT, marginLeft: 6 }}>{shortAddress(lockedStored.address)}</span>
+                  </span>
+                  <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                    {!unlockMode ? (
+                      <button
+                        type="button"
+                        onClick={() => { setUnlockMode(true); setErr(''); setPass(''); }}
+                        style={{
+                          background: 'transparent',
+                          color: AMBER,
+                          fontSize: 11,
+                          fontFamily: 'JetBrains Mono, monospace',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.06em',
+                          padding: '4px 10px',
+                          border: '1px solid rgba(254,188,46,0.35)',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                        }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(254,188,46,0.08)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                      >
+                        unlock
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => { setUnlockMode(false); setErr(''); setPass(''); }}
+                        style={{
+                          background: 'transparent',
+                          color: TEXT_FAINT,
+                          fontSize: 11,
+                          fontFamily: 'JetBrains Mono, monospace',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.06em',
+                          padding: '4px 10px',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        cancel
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {unlockMode && (
+                  <form
+                    onSubmit={async e => {
+                      e.preventDefault();
+                      setErr(''); setBusy(true);
+                      try {
+                        await unlock(pass);
+                        setPass(''); setUnlockMode(false);
+                      } catch (e: any) {
+                        setErr(e?.message || 'Failed to unlock');
+                      } finally {
+                        setBusy(false);
+                      }
+                    }}
+                    style={{ marginTop: 14 }}
+                  >
+                    <input
+                      type="password"
+                      style={{ ...inputStyle, marginBottom: 10 }}
+                      value={pass}
+                      onChange={e => setPass(e.target.value)}
+                      placeholder="passphrase"
+                      autoFocus
+                      onFocus={e => { e.target.style.borderColor = BORDER_HOVER; }}
+                      onBlur={e => { e.target.style.borderColor = BORDER; }}
+                    />
+                    {err && (
+                      <p style={{
+                        color: RED, fontSize: 11, marginBottom: 10,
+                        padding: '7px 10px',
+                        border: '1px solid rgba(248,81,73,0.25)',
+                        background: 'rgba(248,81,73,0.06)',
+                      }}>{err}</p>
+                    )}
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <button
+                        type="submit"
+                        disabled={busy || !pass}
+                        style={{ ...primaryBtn, opacity: (busy || !pass) ? 0.5 : 1, height: 38, fontSize: 12, padding: '0 18px' }}
+                        onMouseEnter={e => { if (!busy && pass) {const el = (e.currentTarget as HTMLButtonElement); el.style.background = PRIMARY_BTN_HOVER_BG; el.style.boxShadow = PRIMARY_BTN_HOVER_SHADOW;}; }}
+                        onMouseLeave={e => {const el = (e.currentTarget as HTMLButtonElement); el.style.background = primaryBtn.background as string; el.style.boxShadow = '';}}
+                      >
+                        {busy ? 'unlocking…' : 'unlock'}
+                      </button>
+                      <button
+                        type="button"
+                        style={{
+                          marginLeft: 'auto',
+                          background: 'transparent', color: 'rgba(248,81,73,0.7)',
+                          fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+                          padding: '6px 10px',
+                          border: '1px solid rgba(248,81,73,0.18)',
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => { if (confirm('Delete this wallet from this browser? Make sure you have your recovery phrase.')) forget(); }}
+                      >
+                        forget
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {/* Subtle divider when unlock UI is showing — separates the two flows */}
+            {lockedStored && !unlockMode && (
+              <p style={{
+                fontSize: 11, color: TEXT_FAINT,
+                marginBottom: 18,
+                fontFamily: 'JetBrains Mono, monospace',
+                letterSpacing: '0.04em',
+              }}>
+                — or generate a new wallet below —
+              </p>
+            )}
+
             <form
               onSubmit={async e => {
                 e.preventDefault();
@@ -313,6 +456,7 @@ export function WalletPanel() {
                   setBusy(false);
                 }
               }}
+              style={{ display: unlockMode ? 'none' : 'block' }}
             >
               <div style={{ marginBottom: 18 }}>
                 <label style={labelStyle}>label · optional</label>
@@ -468,111 +612,6 @@ export function WalletPanel() {
       </section>
     );
   }
-
-  // ── Locked ──────────────────────────────────────────────────────────
-  if (state.kind === 'locked') {
-    return (
-      <section id="wallet" className="wallet-section" style={sectionStyle}>
-        <div style={sectionGlow} />
-        <div style={containerStyle}>
-          <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-            <span className="step-badge" style={{ borderColor: 'rgba(254,188,46,0.4)', color: AMBER, background: 'linear-gradient(135deg, rgba(254,188,46,0.08), rgba(254,188,46,0.02))' }}>🔒</span>
-            <span style={{ ...kickerStyle, marginBottom: 0 }}>welcome back</span>
-          </div>
-          <h2 className="reveal-up" style={{ ...h2Style, transitionDelay: '60ms' }}>Unlock to continue.</h2>
-          <p className="reveal-up" style={{ ...subStyle, transitionDelay: '120ms' }}>
-            Wallet found in this browser. Enter your passphrase to decrypt and resume your session.
-          </p>
-
-          <div className="reveal-up wallet-card" style={{ ...cardStyle, transitionDelay: '180ms' }}>
-            <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              gap: 12, flexWrap: 'wrap', marginBottom: 28,
-              paddingBottom: 22, borderBottom: `1px solid ${BORDER}`,
-            }}>
-              <div>
-                <div style={{ fontSize: 11, color: TEXT_FAINT, marginBottom: 6 }}>
-                  {state.stored.name}
-                </div>
-                <code style={{
-                  color: TEXT, fontSize: 13, fontFamily: 'JetBrains Mono, monospace',
-                  userSelect: 'all',
-                }}>
-                  {shortAddress(state.stored.address)}
-                </code>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 11, color: TEXT_FAINT, marginBottom: 6 }}>balance</div>
-                <span style={{
-                  color: TEXT, fontSize: 17, fontWeight: 500,
-                  fontFamily: 'JetBrains Mono, monospace',
-                }}>
-                  {balance ? Number(balance.zg).toFixed(4) : '…'}
-                </span>
-                <span style={{ color: TEXT_FAINT, marginLeft: 5, fontSize: 13, fontFamily: 'JetBrains Mono, monospace' }}>0G</span>
-              </div>
-            </div>
-
-            <form
-              onSubmit={async e => {
-                e.preventDefault();
-                setErr('');
-                setBusy(true);
-                try {
-                  await unlock(pass);
-                  setPass('');
-                } catch (e: any) {
-                  setErr(e?.message || 'Failed to unlock');
-                } finally {
-                  setBusy(false);
-                }
-              }}
-            >
-              <div style={{ marginBottom: 16 }}>
-                <label style={labelStyle}>passphrase</label>
-                <input
-                  type="password"
-                  style={inputStyle}
-                  value={pass}
-                  onChange={e => setPass(e.target.value)}
-                  autoFocus
-                  onFocus={e => { e.target.style.borderColor = BORDER_HOVER; }}
-                  onBlur={e => { e.target.style.borderColor = BORDER; }}
-                />
-              </div>
-              {err && (
-                <p style={{
-                  color: RED, fontSize: 12, marginBottom: 14,
-                  padding: '8px 12px',
-                  border: '1px solid rgba(248,81,73,0.25)',
-                  background: 'rgba(248,81,73,0.06)',
-                }}>{err}</p>
-              )}
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <button
-                  type="submit"
-                  disabled={busy}
-                  style={{ ...primaryBtn, opacity: busy ? 0.5 : 1 }}
-                  onMouseEnter={e => { if (!busy) {const el = (e.currentTarget as HTMLButtonElement); el.style.background = PRIMARY_BTN_HOVER_BG; el.style.boxShadow = PRIMARY_BTN_HOVER_SHADOW;}; }}
-                  onMouseLeave={e => {const el = (e.currentTarget as HTMLButtonElement); el.style.background = primaryBtn.background as string; el.style.boxShadow = '';}}
-                >
-                  {busy ? 'unlocking…' : 'unlock'}
-                </button>
-                <button
-                  type="button"
-                  style={{ ...ghostBtn, marginLeft: 'auto', color: 'rgba(248,81,73,0.7)', borderColor: 'rgba(248,81,73,0.18)' }}
-                  onClick={() => { if (confirm('Delete this wallet from this browser? Make sure you have your recovery phrase.')) forget(); }}
-                >
-                  forget wallet
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   // ── Unlocked ────────────────────────────────────────────────────────
   const w = state.wallet;
   const explorerUrl = EXPLORER_BASE + w.address;

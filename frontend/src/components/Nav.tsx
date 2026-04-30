@@ -23,7 +23,7 @@ export function Nav() {
 
         <div className="nav-links" style={{ display: 'flex', gap: 22 }}>
           {[
-            ['Wallet',       '#wallet'],
+            ['Try it',       '#terminal'],
             ['Features',     '#features'],
             ['How it Works', '#how-it-works'],
             ['Stack',        '#stack'],
@@ -42,7 +42,7 @@ export function Nav() {
         </div>
 
         <a
-          href="#wallet"
+          href="#terminal"
           className="nav-cta"
           style={{
             display: 'inline-flex', alignItems: 'center', height: 32, padding: '0 16px',

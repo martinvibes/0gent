@@ -35,11 +35,27 @@ function App() {
     return <AgentProfile address={agentMatch[1]} />;
   }
 
+  // /try — internal wallet sandbox. Not linked from anywhere on the marketing
+  // page, used for live testing of the wallet UX without polluting the landing.
+  if (path === '/try' || path === '/try/') {
+    return (
+      <WalletProvider>
+        <Nav />
+        {/* "reveal visible" forces the .reveal-up children to opacity:1 immediately
+             — on the landing page this is normally toggled by the IntersectionObserver
+             once the section scrolls into view, but /try is a single-section page so
+             we just mark it visible from the start. */}
+        <div className="reveal visible" style={{ paddingTop: 100 }}>
+          <WalletPanel />
+        </div>
+      </WalletProvider>
+    );
+  }
+
   return (
     <WalletProvider>
       <Nav />
       <Hero />
-      <div className="reveal"><WalletPanel /></div>
       <div className="reveal"><Terminal /></div>
       <div className="reveal"><Features /></div>
       <div className="reveal"><HowItWorks /></div>
