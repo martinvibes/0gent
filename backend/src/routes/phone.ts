@@ -1,9 +1,10 @@
-import { Router, Response, Request } from "express";
+import { Router, Response, Request, NextFunction } from "express";
 import { x402, AuthenticatedRequest } from "../middleware/x402";
 import { config } from "../config";
 import * as phoneService from "../services/phone-provider";
 import { registerResourceOnChain } from "../services/chain";
 import { SUPPORTED_COUNTRIES, resolveCountry, suggestCountry } from "../services/phone-countries";
+import { db } from "../db";
 
 const router = Router();
 
@@ -74,16 +75,35 @@ router.get("/search", async (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
+// Provision pre-flight — runs BEFORE x402. Catches malformed E.164 input
+// when the agent picked a specific number to buy. Without this, the agent
+// pays 0.5 0G then Twilio 400s, which is unfair UX.
+function provisionPreflight(req: Request, res: Response, next: NextFunction): void {
+  const phoneNumber = req.body?.phoneNumber;
+  if (phoneNumber !== undefined && phoneNumber !== null && phoneNumber !== "") {
+    if (typeof phoneNumber !== "string" || !/^\+[1-9]\d{6,14}$/.test(phoneNumber)) {
+      res.status(400).json({
+        error: `phoneNumber must be a valid E.164 number, e.g. +14155550100. Got: "${String(phoneNumber).slice(0, 32)}"`,
+        code: "BAD_E164",
+      });
+      return;
+    }
+  }
+  next();
+}
+
 router.post(
   "/provision",
+  provisionPreflight,
   x402(config.pricePhoneProvision, "phone"),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const payer = req.payment!.payer;
       const country = req.body.country || "US";
       const areaCode = req.body.areaCode;
+      const phoneNumber: string | undefined = req.body.phoneNumber || undefined;
 
-      const phone = await phoneService.provisionNumber(country, payer, areaCode);
+      const phone = await phoneService.provisionNumber(country, payer, areaCode, phoneNumber);
       const expiresAt = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
       const resourceId = await registerResourceOnChain(payer, 0, phone.phoneNumber, expiresAt);
 
@@ -94,8 +114,48 @@ router.post(
   }
 );
 
+// SMS pre-flight — runs BEFORE x402 so users aren't charged for messages we
+// can already tell will fail (missing fields, To==From, malformed E.164, etc.).
+// Twilio's other restrictions (trial-account region locks, unverified caller IDs)
+// can't be checked locally, so those still cost the agent the SMS fee. Agents
+// using a paid Twilio account won't hit those.
+function smsPreflight(req: Request, res: Response, next: NextFunction): void {
+  const { to, body } = req.body || {};
+  if (!to || typeof to !== "string") {
+    res.status(400).json({ error: "'to' is required (E.164 format, e.g. +14155550100)", code: "MISSING_TO" });
+    return;
+  }
+  if (!body || typeof body !== "string" || body.length === 0) {
+    res.status(400).json({ error: "'body' is required (non-empty string)", code: "MISSING_BODY" });
+    return;
+  }
+  if (!/^\+[1-9]\d{6,14}$/.test(to)) {
+    res.status(400).json({
+      error: `'to' must be a valid E.164 number, e.g. +14155550100. Got: "${to.slice(0, 32)}"`,
+      code: "BAD_E164",
+    });
+    return;
+  }
+  const id = String(req.params.id || "");
+  const row = db.prepare("SELECT phone_number FROM phone_numbers WHERE id = ?").get(id) as any;
+  if (!row) {
+    res.status(404).json({ error: "phone number not found", code: "PHONE_NOT_FOUND" });
+    return;
+  }
+  if (row.phone_number === to) {
+    res.status(400).json({
+      error: "Cannot send SMS from a number to itself. Pick a different 'to' number.",
+      code: "TO_EQUALS_FROM",
+      from: row.phone_number,
+    });
+    return;
+  }
+  next();
+}
+
 router.post(
   "/:id/sms",
+  smsPreflight,
   x402(config.priceSmsSend, "sms"),
   async (req: AuthenticatedRequest, res: Response) => {
     try {

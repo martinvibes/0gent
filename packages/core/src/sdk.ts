@@ -270,8 +270,33 @@ export class ZeroGent {
     return res.numbers;
   }
 
-  async phoneProvision(country = 'US', areaCode?: string): Promise<PhoneResult> {
-    const { data } = await this.paid<PhoneResult>('POST', '/phone/provision', { country, areaCode });
+  /**
+   * Provision a phone number.
+   *
+   * Three call shapes:
+   *   z.phoneProvision()                                    — default US, any area code
+   *   z.phoneProvision('GB')                                — first available GB number
+   *   z.phoneProvision('GB', '020')                         — first available GB London
+   *   z.phoneProvision({ phoneNumber: '+14155550100' })     — buy this exact number
+   *
+   * The exact-number form requires the number to be in Twilio's live inventory
+   * at the moment of the call. If someone else just bought it the call fails
+   * with a clear "no longer available" error.
+   */
+  async phoneProvision(
+    countryOrOpts: string | { country?: string; areaCode?: string; phoneNumber?: string } = 'US',
+    areaCode?: string
+  ): Promise<PhoneResult> {
+    const opts =
+      typeof countryOrOpts === 'string'
+        ? { country: countryOrOpts, areaCode }
+        : countryOrOpts;
+    const body = {
+      country: opts.country || 'US',
+      areaCode: opts.areaCode,
+      phoneNumber: opts.phoneNumber,
+    };
+    const { data } = await this.paid<PhoneResult>('POST', '/phone/provision', body);
     return data;
   }
 

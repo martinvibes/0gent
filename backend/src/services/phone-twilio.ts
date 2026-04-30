@@ -108,35 +108,97 @@ export async function searchNumbers(
 //
 // POST /IncomingPhoneNumbers.json with form { PhoneNumber: "+1..." }
 //
-// On Twilio trial this will fail; Twilio returns a clean error which we
-// surface to the caller as-is.
+// Two modes:
+//   1. specific: pass `phoneNumber` → buys that exact E.164 if Twilio still
+//      has it in inventory. (Numbers can disappear seconds after a search if
+//      someone else buys them.)
+//   2. country: omit phoneNumber → searches inventory in {country, areaCode}
+//      and buys the first available.
 //
 export async function provisionNumber(
   country: string,
   owner: string,
-  areaCode?: string
+  areaCode?: string,
+  phoneNumber?: string
 ): Promise<{ id: string; phoneNumber: string; country: string; owner: string; provisionedAt: string }> {
-  const available = await searchNumbers(country, { areaCode, limit: 1 });
-  if (available.length === 0) throw new Error(`No numbers available in ${country}`);
+  let chosen: string;
+  let recordedCountry: string;
 
-  const chosen = available[0].phoneNumber;
-  await twilioPostForm("/IncomingPhoneNumbers.json", { PhoneNumber: chosen });
+  if (phoneNumber) {
+    // Specific-number mode — let Twilio be the source of truth on availability.
+    chosen = phoneNumber;
+    recordedCountry = country || ""; // caller may pass empty; we'll use whatever Twilio returns if needed
+  } else {
+    const available = await searchNumbers(country, { areaCode, limit: 1 });
+    if (available.length === 0) throw new Error(`No numbers available in ${country}`);
+    chosen = available[0].phoneNumber;
+    recordedCountry = country;
+  }
+
+  try {
+    await twilioPostForm("/IncomingPhoneNumbers.json", { PhoneNumber: chosen });
+  } catch (e: any) {
+    const msg = String(e?.message || e);
+    // Twilio returns 400 with code 21452 / 21404 when a specific number is no
+    // longer available (someone else just bought it, or it isn't sold by Twilio).
+    if (phoneNumber && /\(40[04]\)/.test(msg)) {
+      throw new Error(
+        `Twilio doesn't have ${phoneNumber} in inventory anymore. Numbers disappear seconds after a search if someone else buys them — re-run "phone search --country ${country}" and pick another.`
+      );
+    }
+    throw e;
+  }
 
   const id = uuid();
   const now = new Date().toISOString();
   db.prepare(
     "INSERT INTO phone_numbers (id, phone_number, country, owner, provisioned_at) VALUES (?, ?, ?, ?, ?)"
-  ).run(id, chosen, country, owner, now);
+  ).run(id, chosen, recordedCountry, owner, now);
 
-  return { id, phoneNumber: chosen, country, owner, provisionedAt: now };
+  return { id, phoneNumber: chosen, country: recordedCountry, owner, provisionedAt: now };
 }
 
 // ─── Send SMS ─────────────────────────────────────────────────────────
 //
 // POST /Messages.json with form { From, To, Body }
 //
-// Twilio trial will only deliver to verified caller-ID numbers.
+// Twilio trial accounts can ONLY deliver to numbers verified as caller-IDs in
+// the Twilio console (Phone Numbers → Verified Caller IDs). Sending to anywhere
+// else returns 21408. We translate that into a clear actionable error rather
+// than leaking the raw upstream JSON.
 //
+function translateTwilioSmsError(rawMessage: string): string {
+  // rawMessage shape from twilioPostForm: 'Twilio POST /Messages.json failed (400): {"code":21408,...}'
+  const match = rawMessage.match(/\((\d{3})\):\s*(\{[\s\S]*\})/);
+  if (!match) return rawMessage;
+  let body: any = {};
+  try { body = JSON.parse(match[2]); } catch { return rawMessage; }
+  const code = body.code;
+  switch (code) {
+    case 21266:
+      return "SMS rejected: 'to' and 'from' cannot be the same number.";
+    case 21408:
+      return "SMS rejected: this Twilio account isn't allowed to send to that region. " +
+             "On a Twilio TRIAL account, you can only send to numbers verified as caller-IDs " +
+             "(Twilio Console → Phone Numbers → Verified Caller IDs). " +
+             "Verify the destination there, or upgrade the operator's Twilio account out of trial.";
+    case 21610:
+      return "SMS rejected: this destination has unsubscribed (replied STOP).";
+    case 21614:
+      return "SMS rejected: 'to' is not a valid mobile number.";
+    case 21612:
+      return "SMS rejected: 'to' is not currently reachable via SMS.";
+    case 30003:
+      return "SMS rejected: destination handset is unreachable (off / no signal).";
+    case 30005:
+      return "SMS rejected: destination is unknown to the carrier.";
+    case 30006:
+      return "SMS rejected: destination is on a landline or unreachable carrier.";
+    default:
+      return `SMS rejected by Twilio (${code}): ${body.message || rawMessage.slice(0, 200)}`;
+  }
+}
+
 export async function sendSms(
   phoneNumberId: string,
   to: string,
@@ -147,11 +209,15 @@ export async function sendSms(
   if (!row) throw new Error("Phone number not found or not owned by you");
   if (!row.active) throw new Error("Phone number is deactivated");
 
-  await twilioPostForm("/Messages.json", {
-    From: row.phone_number,
-    To: to,
-    Body: body,
-  });
+  try {
+    await twilioPostForm("/Messages.json", {
+      From: row.phone_number,
+      To: to,
+      Body: body,
+    });
+  } catch (e: any) {
+    throw new Error(translateTwilioSmsError(String(e?.message || e)));
+  }
 
   const msgId = uuid();
   const now = new Date().toISOString();

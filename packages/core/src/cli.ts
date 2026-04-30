@@ -116,9 +116,9 @@ phone
   .option('-a, --area-code <code>', 'area code')
   .action(withErr(phoneSearchCmd));
 phone
-  .command('provision')
-  .description('Provision a phone number')
-  .option('-c, --country <code>', 'country ISO-2', 'US')
+  .command('provision [phoneNumber]')
+  .description('Provision a phone number — pass an E.164 number to buy that exact one, or use --country to buy any available')
+  .option('-c, --country <code>', 'country ISO-2 (used when no phoneNumber given)', 'US')
   .option('-a, --area-code <code>', 'area code')
   .option('-y, --yes', 'skip confirmation')
   .action(withErr(phoneProvisionCmd));
@@ -136,7 +136,7 @@ phone
 // `0gent provision phone` convenience alias
 const provision = program.command('provision').description('Provision a resource (alias)');
 provision
-  .command('phone')
+  .command('phone [phoneNumber]')
   .option('-c, --country <code>', 'country ISO-2', 'US')
   .option('-a, --area-code <code>', 'area code')
   .option('-y, --yes')

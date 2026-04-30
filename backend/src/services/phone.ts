@@ -34,13 +34,20 @@ export async function searchNumbers(
 export async function provisionNumber(
   country: string,
   owner: string,
-  areaCode?: string
+  areaCode?: string,
+  phoneNumber?: string
 ): Promise<{ id: string; phoneNumber: string; country: string; owner: string; provisionedAt: string }> {
   const client = getClient();
-  const available = await searchNumbers(country, { areaCode, limit: 1 });
-  if (available.length === 0) throw new Error(`No numbers available in ${country}`);
+  let chosen: string;
 
-  const chosen = available[0].phoneNumber;
+  if (phoneNumber) {
+    chosen = phoneNumber;
+  } else {
+    const available = await searchNumbers(country, { areaCode, limit: 1 });
+    if (available.length === 0) throw new Error(`No numbers available in ${country}`);
+    chosen = available[0].phoneNumber;
+  }
+
   await client.numberOrders.create({
     phone_numbers: [{ phone_number: chosen }],
     messaging_profile_id: config.telnyxMessagingProfileId || undefined,

@@ -72,25 +72,42 @@ export async function phoneCountriesCmd(opts: { region?: string }): Promise<void
   }
 }
 
-export async function phoneProvisionCmd(opts: { country?: string; areaCode?: string; yes?: boolean }): Promise<void> {
+export async function phoneProvisionCmd(
+  phoneNumberArg: string | undefined,
+  opts: { country?: string; areaCode?: string; yes?: boolean }
+): Promise<void> {
   const z = await getZeroGent();
+
+  // Validate positional E.164 early — saves the user a round-trip if they typo.
+  if (phoneNumberArg && !/^\+[1-9]\d{6,14}$/.test(phoneNumberArg)) {
+    throw new Error(
+      `"${phoneNumberArg}" is not a valid E.164 phone number (expected like +14155550100). ` +
+      `If you meant a country code, use --country ${phoneNumberArg.replace(/[^A-Za-z]/g, '').toUpperCase() || 'GB'}.`
+    );
+  }
+
+  const target = phoneNumberArg
+    ? `the number ${phoneNumberArg}`
+    : `any available number in ${opts.country || 'US'}`;
 
   if (!opts.yes) {
     const { confirm } = await inquirer.prompt([
       {
         type: 'confirm',
         name: 'confirm',
-        message: `Provision a phone number in ${opts.country || 'US'}? (costs 0G tokens)`,
+        message: `Provision ${target}? (costs 0G tokens)`,
         default: true,
       },
     ]);
     if (!confirm) return;
   }
 
-  const sp = spinner('Provisioning phone number');
+  const sp = spinner(phoneNumberArg ? `Provisioning ${phoneNumberArg}` : 'Provisioning phone number');
   z.onPaymentStatus = (m) => (sp.text = m);
   try {
-    const r = await z.phoneProvision(opts.country || 'US', opts.areaCode);
+    const r = phoneNumberArg
+      ? await z.phoneProvision({ phoneNumber: phoneNumberArg, country: opts.country, areaCode: opts.areaCode })
+      : await z.phoneProvision(opts.country || 'US', opts.areaCode);
     sp.stop();
     blank();
     success('Phone number provisioned');
