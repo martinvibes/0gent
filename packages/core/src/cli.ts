@@ -15,6 +15,7 @@ import {
   phoneProvisionCmd,
   phoneSmsCmd,
   phoneLogsCmd,
+  phoneCountriesCmd,
 } from './commands/phone.js';
 import {
   emailProvisionCmd,
@@ -103,6 +104,11 @@ identity.command('show').description('Show your agent identity').action(withErr(
 
 // ── phone ──
 const phone = program.command('phone').description('Phone numbers and SMS');
+phone
+  .command('countries')
+  .description('List the 50 countries available for phone-number search')
+  .option('-r, --region <region>', 'filter by region (europe, asia-pacific, latin america, ...)')
+  .action(withErr(phoneCountriesCmd));
 phone
   .command('search')
   .description('Search available phone numbers')

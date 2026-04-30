@@ -42,7 +42,7 @@ export function Nav() {
         </div>
 
         <a
-          href="#terminal"
+          href="/skill.md"
           className="nav-cta"
           style={{
             display: 'inline-flex', alignItems: 'center', height: 32, padding: '0 16px',

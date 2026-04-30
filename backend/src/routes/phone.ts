@@ -3,6 +3,7 @@ import { x402, AuthenticatedRequest } from "../middleware/x402";
 import { config } from "../config";
 import * as phoneService from "../services/phone-provider";
 import { registerResourceOnChain } from "../services/chain";
+import { SUPPORTED_COUNTRIES, resolveCountry, suggestCountry } from "../services/phone-countries";
 
 const router = Router();
 
@@ -23,12 +24,51 @@ router.get("/status", (_req: Request, res: Response) => {
   });
 });
 
+// Free — list of curated supported countries with names. Useful as an
+// inventory hint for clients that want to surface a picker.
+router.get("/countries", (_req: Request, res: Response) => {
+  res.json({
+    countries: SUPPORTED_COUNTRIES,
+    count: SUPPORTED_COUNTRIES.length,
+    note:
+      "These are 50 curated picks. Twilio supports 170+ countries total — " +
+      "pass any ISO 3166-1 alpha-2 code (e.g. SE, KE, NG) to /phone/search to try, " +
+      "even if it isn't on this list. Coverage shifts; not every country has " +
+      "live inventory at every moment.",
+    curated: true,
+    twilioCoverageHint: "https://www.twilio.com/en-us/guidelines/regulatory",
+  });
+});
+
 router.get("/search", async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const country = (req.query.country as string) || "US";
+    const rawCountry = (req.query.country as string) || "US";
     const areaCode = req.query.areaCode as string | undefined;
-    const numbers = await phoneService.searchNumbers(country, { areaCode });
-    res.json({ numbers, provider: phoneService.active().name });
+
+    // Resolve aliases (UK→GB, USA→US, full names like "United Kingdom").
+    // Any unrecognised *2-letter* input is passed through to Twilio — they
+    // support 170+ countries; our 50 is just a curated picker hint.
+    const resolved = resolveCountry(rawCountry);
+    if (!resolved) {
+      const hint = suggestCountry(rawCountry);
+      res.status(400).json({
+        error: `Country "${rawCountry}" doesn't look like a valid ISO 3166-1 alpha-2 code.`,
+        suggestion: hint ? { code: hint.code, name: hint.name } : null,
+        hint: 'Call GET /phone/countries for 50 curated picks, or pass any 2-letter ISO code to try Twilio inventory directly.',
+      });
+      return;
+    }
+
+    const numbers = await phoneService.searchNumbers(resolved.code, { areaCode });
+    res.json({
+      numbers,
+      country: {
+        code: resolved.code,
+        name: resolved.name,
+        curated: resolved.knownInList,
+      },
+      provider: phoneService.active().name,
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

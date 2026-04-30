@@ -44,6 +44,7 @@ const SIM: Record<string, Array<Line>> = {
     { type: 'out', text: 'wallet                         Show your wallet    free' },
     { type: 'out', text: 'health                         API status          free' },
     { type: 'out', text: 'pricing                        Service prices      free' },
+    { type: 'out', text: 'phone countries                List supported      free' },
     { type: 'out', text: 'phone search --country US      Search numbers      free' },
     { type: 'out', text: 'phone provision                Provision phone     0.5 0G' },
     { type: 'out', text: 'phone sms <id>                 Send SMS            0.01 0G' },
@@ -52,13 +53,6 @@ const SIM: Record<string, Array<Line>> = {
     { type: 'out', text: 'email read <id>                Read inbox          0.02 0G' },
     { type: 'out', text: 'identity mint                  Mint Agent NFT      0.1 0G' },
     { type: 'out', text: 'memory set <key> <value>       Write to 0G Storage free' },
-  ],
-  'phone search --country US': [
-    { type: 'out', text: '+1 (415) 555-0142    San Francisco    local' },
-    { type: 'out', text: '+1 (212) 555-0198    New York         local' },
-    { type: 'out', text: '+1 (310) 555-0167    Los Angeles      local' },
-    { type: 'out', text: '+1 (512) 555-0134    Austin           local' },
-    { type: 'out', text: '+1 (305) 555-0189    Miami            local' },
   ],
   'phone provision': [
     { type: 'out', text: '→ POST /phone/provision' },
@@ -99,7 +93,8 @@ const CHIPS = [
   'health',
   'pricing',
   'wallet',
-  'phone provision',
+  'phone countries',
+  'phone search --country GB',
   'email create --name agent',
   'identity mint',
   'help',
@@ -851,6 +846,98 @@ export function Terminal() {
         ]);
       } else {
         setLines(p => [...p, { type: 'err', text: 'pricing unavailable' }]);
+      }
+      setBusy(false);
+      return;
+    }
+
+    // ── phone countries — live API call, lists ~50 supported countries ───
+    if (cmd === 'phone countries') {
+      setBusy(true);
+      const { status, data } = await apiCall('GET', '/phone/countries');
+      const d = data as any;
+      if (status === 200 && d?.countries) {
+        const popular = d.countries.filter((c: any) => c.popular).slice(0, 8);
+        const rows: CardRow[] = popular.map((c: any) => ({
+          label: c.code,
+          value: c.name,
+          valueColor: LILAC,
+        }));
+        setLines(p => [
+          ...p,
+          {
+            type: 'card',
+            card: {
+              payment: 'free',
+              status,
+              icon: '🌍',
+              title: `${d.count} curated picks · 170+ on Twilio`,
+              titleSize: 'lg',
+              rows,
+              note: `★ popular · pass any ISO 3166-1 alpha-2 code (KE, NG, ZA, …) to "phone search" — even if not in this list`,
+              badge: { text: `${d.count}+`, kind: 'ok' },
+            },
+          },
+        ]);
+      } else {
+        setLines(p => [...p, { type: 'err', text: 'phone countries unavailable' }]);
+      }
+      setBusy(false);
+      return;
+    }
+
+    // ── phone search — live, free; supports `phone search --country XX --area NNN` ──
+    if (/^phone search(\s|$)/.test(cmd)) {
+      const m = /(?:--country|-c)\s+(\S+)/.exec(cmd);
+      const a = /(?:--area-code|--area|-a)\s+(\S+)/.exec(cmd);
+      const country = (m?.[1] || 'US').toUpperCase();
+      const areaCode = a?.[1];
+      setBusy(true);
+      const qs = areaCode
+        ? `?country=${encodeURIComponent(country)}&areaCode=${encodeURIComponent(areaCode)}`
+        : `?country=${encodeURIComponent(country)}`;
+      const { status, data } = await apiCall('GET', `/phone/search${qs}`);
+      const d = data as any;
+      if (status === 200 && Array.isArray(d?.numbers)) {
+        if (d.numbers.length === 0) {
+          setLines(p => [
+            ...p,
+            { type: 'err', text: `No inventory in ${d.country?.name || country} right now — try a different region` },
+            { type: 'dim', text: '   tip: "phone countries" lists all 50 supported codes' },
+          ]);
+        } else {
+          const rows: CardRow[] = d.numbers.slice(0, 5).map((n: any) => ({
+            label: n.region || country,
+            value: n.phoneNumber,
+            valueColor: LILAC,
+            mono: true,
+          }));
+          setLines(p => [
+            ...p,
+            {
+              type: 'card',
+              card: {
+                payment: 'free',
+                status,
+                icon: '📞',
+                title: `${d.numbers.length} numbers in ${d.country?.name || country}`,
+                titleSize: 'lg',
+                rows,
+                note: `provider: ${d.provider} · run "phone provision" to claim one for 0.5 0G`,
+                badge: { text: 'LIVE', kind: 'ok' },
+              },
+            },
+          ]);
+        }
+      } else if (status === 400 && d?.suggestion) {
+        setLines(p => [
+          ...p,
+          { type: 'err', text: d.error },
+          { type: 'dim', text: `   did you mean "${d.suggestion.code}" (${d.suggestion.name})?` },
+          { type: 'dim', text: `   or run "phone countries" to see all` },
+        ]);
+      } else {
+        setLines(p => [...p, { type: 'err', text: d?.error || 'phone search failed' }]);
       }
       setBusy(false);
       return;

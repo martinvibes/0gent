@@ -64,6 +64,18 @@ async function twilioPostForm(path: string, body: Record<string, string>): Promi
 // GET /AvailablePhoneNumbers/{Country}/Local.json
 //   ?AreaCode={areaCode}&PageSize=5
 //
+// Twilio uses ISO 3166-1 alpha-2 codes (US, GB, CA, AU, DE, FR, IE, NL, ES,
+// IT, BR, MX, SE, JP, ...). Common mistakes: "UK" should be "GB", "NGN" is
+// the Naira currency code not Nigeria. When Twilio doesn't sell numbers in
+// a country at all (e.g. Nigeria), they return 404 — we translate that into
+// a friendlier "country not supported" message instead of leaking the raw
+// upstream error.
+//
+const SUPPORTED_HINT =
+  "Twilio supports 170+ countries but doesn't have local-number inventory in every one. " +
+  "Try a different country — call GET /phone/countries (or `0gent phone countries`) for 50 curated picks. " +
+  "Use ISO 3166-1 alpha-2 codes (e.g. GB not UK).";
+
 export async function searchNumbers(
   country: string,
   opts?: { areaCode?: string; limit?: number }
@@ -72,8 +84,18 @@ export async function searchNumbers(
   const params = new URLSearchParams({ PageSize: String(limit) });
   if (opts?.areaCode) params.set("AreaCode", opts.areaCode);
 
-  const path = `/AvailablePhoneNumbers/${country.toUpperCase()}/Local.json?${params.toString()}`;
-  const data: any = await twilioGet(path);
+  const cc = country.toUpperCase();
+  const path = `/AvailablePhoneNumbers/${cc}/Local.json?${params.toString()}`;
+  let data: any;
+  try {
+    data = await twilioGet(path);
+  } catch (e: any) {
+    const msg = String(e?.message || e);
+    if (/\(404\)/.test(msg)) {
+      throw new Error(`No phone-number inventory available for "${cc}". ${SUPPORTED_HINT}`);
+    }
+    throw e;
+  }
   const list: any[] = data.available_phone_numbers || [];
   return list.map((n: any) => ({
     phoneNumber: n.phone_number,

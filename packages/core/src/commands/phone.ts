@@ -1,6 +1,7 @@
 import inquirer from 'inquirer';
 import Table from 'cli-table3';
 import { getZeroGent } from './helpers.js';
+import { load } from '../config.js';
 import { c, success, info, kv, blank, spinner } from '../ui.js';
 import { explorerTx } from '../chain.js';
 
@@ -22,6 +23,50 @@ export async function phoneSearchCmd(opts: { country?: string; areaCode?: string
       table.push([c.addr(n.phoneNumber), n.region, n.type]);
     }
     console.log(table.toString());
+  } catch (e) {
+    sp.fail(String((e as Error).message));
+    info('Tip: run ' + c.accent('0gent phone countries') + ' to see all supported codes.');
+  }
+}
+
+// `0gent phone countries` — list supported country codes + names.
+// Free, no wallet needed; reads directly from the public API.
+export async function phoneCountriesCmd(opts: { region?: string }): Promise<void> {
+  const cfg = load();
+  const sp = spinner('Fetching supported countries');
+  try {
+    const res = await fetch(cfg.apiEndpoint + '/phone/countries');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data: any = await res.json();
+    sp.stop();
+    let list: any[] = data.countries || [];
+    if (opts.region) {
+      const r = opts.region.toLowerCase();
+      list = list.filter((c0: any) => (c0.region || '').toLowerCase().includes(r));
+      if (!list.length) {
+        info(`No countries match region "${opts.region}". Try: north america, europe, asia-pacific, latin america, middle east, africa.`);
+        return;
+      }
+    }
+    // Group by region for readability
+    const byRegion: Record<string, any[]> = {};
+    for (const c0 of list) {
+      (byRegion[c0.region || 'Other'] ||= []).push(c0);
+    }
+    blank();
+    for (const region of Object.keys(byRegion)) {
+      console.log('  ' + c.dim('───') + ' ' + c.accent(region) + ' ' + c.dim('───'));
+      const rows = byRegion[region];
+      for (const c0 of rows) {
+        const code = c.brand(c0.code.padEnd(4));
+        const name = c0.popular ? c.accent(c0.name) : c0.name;
+        console.log('   ' + code + ' ' + name + (c0.popular ? c.dim('  ★') : ''));
+      }
+      blank();
+    }
+    info(`${data.count} curated picks shown · use ` + c.accent('0gent phone search --country <CODE>'));
+    info(c.dim('Twilio supports 170+ countries — pass any ISO 3166-1 alpha-2 code (e.g. KE, NG, ZA),'));
+    info(c.dim('even if it isn\'t on this list. Coverage shifts; some countries have inventory, some don\'t.'));
   } catch (e) {
     sp.fail(String((e as Error).message));
   }
