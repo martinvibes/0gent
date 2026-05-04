@@ -13,6 +13,7 @@ import memoryRouter from "./routes/memory";
 import pricingRouter from "./routes/pricing";
 import walletRouter from "./routes/wallet";
 import agentRouter from "./routes/agent";
+import statsRouter from "./routes/stats";
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use("/identity", identityRouter);
 app.use("/memory", memoryRouter);
 app.use("/wallet", walletRouter);
 app.use("/agent", agentRouter);
+app.use("/stats", statsRouter);
 
 // Root → quick info
 app.get("/", (_req, res) => {

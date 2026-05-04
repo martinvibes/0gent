@@ -1,6 +1,70 @@
+import { useEffect, useState } from 'react';
 import Orb from './Orb';
 
+const API = (import.meta.env.VITE_API_URL as string) || 'https://api.0gent.xyz';
+
+interface HeadlineStats {
+  wallets: number;
+  resources: number;
+  volume_0g: number;
+}
+
+function fmtN(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+  return String(n);
+}
+function fmt0G(n: number): string {
+  if (n === 0) return '0';
+  if (n < 1)   return n.toFixed(2);
+  if (n < 100) return n.toFixed(1);
+  return Math.round(n).toString();
+}
+
+// Smooth count-up animation from 0 to target on first reveal.
+function useCountUp(target: number, durationMs = 900): number {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (target === 0) { setVal(0); return; }
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      setVal(target * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, durationMs]);
+  return val;
+}
+
 export function Hero() {
+  const [stats, setStats] = useState<HeadlineStats | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchStats = async () => {
+      try {
+        const r = await fetch(API + '/stats');
+        if (!r.ok) return;
+        const d = await r.json();
+        if (!cancelled) setStats(d.headline);
+      } catch { /* silent — Hero falls back to "—" */ }
+    };
+    fetchStats();
+    const id = setInterval(fetchStats, 60_000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
+
+  // Each headline value gets its own count-up animation. The hook reruns when
+  // `stats` arrives, so the counter animates from 0 → live value.
+  const wallets   = useCountUp(stats?.wallets   ?? 0);
+  const resources = useCountUp(stats?.resources ?? 0);
+  const volume    = useCountUp(stats?.volume_0g ?? 0);
+
   return (
     <section className="hero-section" style={{
       paddingTop:180, paddingBottom:170, position:'relative', textAlign:'center', overflow:'hidden',
@@ -84,13 +148,17 @@ export function Hero() {
           }}>View Source ↗</a>
         </div>
 
-        {/* Stats */}
+        {/* Stats — live counters from /stats. Each animates 0 → target on mount. */}
         <div className="hero-stats" style={{ display:'flex', justifyContent:'center', gap:56, pointerEvents: 'auto' }}>
-          {([['4','0G Components'],['98','Contract Tests'],['x402','Payment Protocol']] as const).map(([v,l]) => (
-            <div key={l} style={{ textAlign:'center' }}>
-              <div className="mono hero-stats-num" style={{ fontSize:28, fontWeight:600, color:'#B75FFF' }}>{v}</div>
+          {([
+            [stats ? fmtN(Math.round(wallets))   : '—', 'Wallets'],
+            [stats ? fmtN(Math.round(resources)) : '—', 'Resources On-Chain'],
+            [stats ? `${fmt0G(volume)} 0G`       : '—', '0G Processed'],
+          ] as const).map(([v, l]) => (
+            <a key={l} href="/stats" style={{ textAlign:'center', textDecoration:'none' }}>
+              <div className="mono hero-stats-num" style={{ fontSize:28, fontWeight:600, color:'#B75FFF', fontVariantNumeric:'tabular-nums' }}>{v}</div>
               <div style={{ fontSize:11, color:'rgba(254,254,254,0.4)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:4 }}>{l}</div>
-            </div>
+            </a>
           ))}
         </div>
       </div>

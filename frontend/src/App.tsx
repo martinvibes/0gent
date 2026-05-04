@@ -10,6 +10,7 @@ import { WalletPanel } from './components/WalletPanel';
 import { Logos } from './components/Logos';
 import { AgentProfile } from './components/AgentProfile';
 import { Docs } from './components/Docs';
+import { Stats } from './components/Stats';
 import { WalletProvider } from './lib/walletContext';
 
 function App() {
@@ -33,6 +34,11 @@ function App() {
   // /docs — single-page developer documentation
   if (path === '/docs' || path === '/docs/') {
     return <Docs />;
+  }
+
+  // /stats — public live metrics + full transaction log
+  if (path === '/stats' || path === '/stats/') {
+    return <Stats />;
   }
 
   // /agent/0xABC... — agent profile page
