@@ -248,6 +248,115 @@ body::after {
   .final-cta-h2 { font-size: clamp(28px, 8vw, 40px) !important; }
 }
 
+/* ════════════════════════════════════════════════════════════════════ */
+/*  DASHBOARD — animations + interaction polish.                          */
+/* ════════════════════════════════════════════════════════════════════ */
+
+/* Card entrance — staggered fade + slide up. Index from CSS, not React. */
+@keyframes dashCardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dash-card {
+  animation: dashCardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.3s ease;
+  will-change: transform;
+}
+.dash-card:nth-child(1) { animation-delay: 40ms; }
+.dash-card:nth-child(2) { animation-delay: 110ms; }
+.dash-card:nth-child(3) { animation-delay: 180ms; }
+.dash-card:nth-child(4) { animation-delay: 250ms; }
+.dash-card:nth-child(5) { animation-delay: 320ms; }
+.dash-card:nth-child(6) { animation-delay: 390ms; }
+.dash-card:hover {
+  border-color: rgba(183, 95, 255, 0.30);
+  transform: translateY(-2px);
+}
+
+/* Result panels (LLM completion, key value display, etc) — soft fade */
+@keyframes dashResultIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dash-result-in {
+  animation: dashResultIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Collapsible sections — drives max-height + opacity transitions cleanly */
+.dash-collapse {
+  overflow: hidden;
+  transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, margin 0.35s ease;
+}
+
+/* Status dot — gently pulses when an action is in flight */
+@keyframes dashDotPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+.dash-pulse-dot { animation: dashDotPulse 1.6s ease-in-out infinite; }
+
+/* Primary buttons — subtle hover lift + press feedback */
+.dash-btn-primary {
+  transition: filter 0.18s ease, transform 0.12s ease, box-shadow 0.25s ease;
+}
+.dash-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 18px rgba(146, 0, 225, 0.30);
+}
+.dash-btn-primary:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+.dash-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: saturate(0.6);
+}
+
+/* Ghost buttons — quieter version of the same */
+.dash-btn-ghost {
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+.dash-btn-ghost:hover:not(:disabled) {
+  border-color: rgba(183, 95, 255, 0.35);
+  color: #fefefe;
+  background: rgba(183, 95, 255, 0.05);
+}
+.dash-btn-ghost:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Inputs — focus ring */
+.dash-input { transition: border-color 0.18s ease, background 0.18s ease; }
+.dash-input:focus { border-color: rgba(183, 95, 255, 0.45); background: rgba(0, 0, 0, 0.65); }
+
+/* Inbox / list-item rows — hoverable */
+.dash-row { transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease; }
+.dash-row:hover { border-color: rgba(183, 95, 255, 0.28); background: rgba(146, 0, 225, 0.03); }
+
+/* "Live" indicator strip used in the Phone card */
+.dash-live-stripe {
+  background: linear-gradient(90deg,
+    rgba(125, 239, 177, 0.0) 0%,
+    rgba(125, 239, 177, 0.45) 50%,
+    rgba(125, 239, 177, 0.0) 100%);
+  background-size: 200% 100%;
+  animation: dashLiveStripe 3s linear infinite;
+}
+@keyframes dashLiveStripe {
+  from { background-position: 200% 0%; }
+  to   { background-position: -200% 0%; }
+}
+
+/* Reduce motion honors user pref */
+@media (prefers-reduced-motion: reduce) {
+  .dash-card,
+  .dash-result-in,
+  .dash-collapse,
+  .dash-pulse-dot,
+  .dash-live-stripe { animation: none !important; transition: none !important; }
+}
+
 /* Small mobile (< 480px) — last-mile tightening */
 @media (max-width: 480px) {
   .hero-h1 { font-size: clamp(36px, 12vw, 48px) !important; }

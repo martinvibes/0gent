@@ -23,10 +23,10 @@ export function Nav() {
 
         <div className="nav-links" style={{ display: 'flex', gap: 22 }}>
           {[
-            ['Try it',       '#terminal'],
+            ['Dashboard',    '/dashboard'],
+            ['Stats',        '/stats'],
             ['Features',     '#features'],
             ['How it Works', '#how-it-works'],
-            ['Stack',        '#stack'],
             ['Docs',         '/docs'],
           ].map(([label, href]) => (
             <a

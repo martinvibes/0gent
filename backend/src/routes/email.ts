@@ -3,8 +3,36 @@ import { x402, AuthenticatedRequest } from "../middleware/x402";
 import { config } from "../config";
 import * as emailService from "../services/email";
 import { registerResourceOnChain } from "../services/chain";
+import { db } from "../db";
+import { ethers } from "ethers";
 
 const router = Router();
+
+// ─── List inboxes owned by an address (free) ───
+//
+// `/agent/<address>` returns on-chain numeric resource IDs; this endpoint
+// returns the DB-level inbox rows including the UUID `id` that send/read/threads
+// expect. Used by the user dashboard to bridge the on-chain → DB gap.
+//
+// Owner match is checksum-aware: the deployer wallet uses ethers' canonical
+// checksumming, but the on-chain payer might come back lowercased depending
+// on transaction encoding. Compare in lowercase form to be safe.
+router.get("/by-owner/:address", (req: Request, res: Response) => {
+  try {
+    const raw = req.params.address;
+    if (!ethers.isAddress(raw)) {
+      res.status(400).json({ error: "Invalid address" });
+      return;
+    }
+    const lower = raw.toLowerCase();
+    const rows = db.prepare(
+      "SELECT id, address, local_part, owner, created_at, active FROM email_inboxes WHERE LOWER(owner) = ? AND active = 1 ORDER BY created_at DESC"
+    ).all(lower) as any[];
+    res.json({ inboxes: rows, count: rows.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ─── Provision an inbox (paid) ───
 router.post(

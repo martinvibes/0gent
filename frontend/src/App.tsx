@@ -11,6 +11,7 @@ import { Logos } from './components/Logos';
 import { AgentProfile } from './components/AgentProfile';
 import { Docs } from './components/Docs';
 import { Stats } from './components/Stats';
+import { Dashboard } from './components/Dashboard';
 import { WalletProvider } from './lib/walletContext';
 
 function App() {
@@ -39,6 +40,15 @@ function App() {
   // /stats — public live metrics + full transaction log
   if (path === '/stats' || path === '/stats/') {
     return <Stats />;
+  }
+
+  // /dashboard — non-technical user dashboard (wallet → identity → email → AI → memory)
+  if (path === '/dashboard' || path === '/dashboard/') {
+    return (
+      <WalletProvider>
+        <Dashboard />
+      </WalletProvider>
+    );
   }
 
   // /agent/0xABC... — agent profile page
