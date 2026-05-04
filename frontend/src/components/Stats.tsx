@@ -5,10 +5,15 @@
  * Pulls from GET /stats and GET /stats/transactions on the live API.
  */
 
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Nav } from './Nav';
 import { Footer } from './Footer';
 import { LogoLockup } from './Logo';
+import {
+  IdentityIcon, EmailIcon, SendIcon, InboxIcon, ThreadIcon,
+  PhoneIcon, SmsIcon, BrainIcon, ServerIcon, GlobeIcon, DatabaseIcon, PackageIcon,
+  CloseIcon,
+} from './Icons';
 
 const API = (import.meta.env.VITE_API_URL as string) || 'https://api.0gent.xyz';
 
@@ -46,17 +51,17 @@ interface Tx {
   endpoint: string; timestamp: string; nonce?: string;
 }
 
-const ENDPOINT_META: Record<string, { label: string; emoji: string; color: string }> = {
-  identity:        { label: 'Identity NFT mint',  emoji: '🪪', color: LILAC },
-  email:           { label: 'Email inbox',        emoji: '📧', color: '#7DEFB1' },
-  'email-send':    { label: 'Email sent',         emoji: '📤', color: '#7DEFB1' },
-  'email-read':    { label: 'Email read',         emoji: '📥', color: '#7DEFB1' },
-  'email-threads': { label: 'Email threads',      emoji: '🧵', color: '#7DEFB1' },
-  phone:           { label: 'Phone number',       emoji: '📞', color: '#FFC97A' },
-  sms:             { label: 'SMS sent',           emoji: '💬', color: '#FFC97A' },
-  'compute-infer': { label: 'AI inference',       emoji: '🧠', color: '#CB8AFF' },
-  compute:         { label: 'Compute VPS',        emoji: '💻', color: '#CB8AFF' },
-  domain:          { label: 'Domain register',    emoji: '🌐', color: '#FFC97A' },
+const ENDPOINT_META: Record<string, { label: string; icon: ReactNode; color: string }> = {
+  identity:        { label: 'Identity NFT mint',  icon: <IdentityIcon size={14} color={LILAC} />,        color: LILAC },
+  email:           { label: 'Email inbox',        icon: <EmailIcon    size={14} color="#7DEFB1" />,      color: '#7DEFB1' },
+  'email-send':    { label: 'Email sent',         icon: <SendIcon     size={14} color="#7DEFB1" />,      color: '#7DEFB1' },
+  'email-read':    { label: 'Email read',         icon: <InboxIcon    size={14} color="#7DEFB1" />,      color: '#7DEFB1' },
+  'email-threads': { label: 'Email threads',      icon: <ThreadIcon   size={14} color="#7DEFB1" />,      color: '#7DEFB1' },
+  phone:           { label: 'Phone number',       icon: <PhoneIcon    size={14} color="#FFC97A" />,      color: '#FFC97A' },
+  sms:             { label: 'SMS sent',           icon: <SmsIcon      size={14} color="#FFC97A" />,      color: '#FFC97A' },
+  'compute-infer': { label: 'AI inference',       icon: <BrainIcon    size={14} color="#CB8AFF" />,      color: '#CB8AFF' },
+  compute:         { label: 'Compute VPS',        icon: <ServerIcon   size={14} color="#CB8AFF" />,      color: '#CB8AFF' },
+  domain:          { label: 'Domain register',    icon: <GlobeIcon    size={14} color="#FFC97A" />,      color: '#FFC97A' },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────
@@ -112,10 +117,13 @@ function HeadlineCard({ value, label, sub }: { value: string; label: string; sub
   );
 }
 
-function StatRow({ label, value }: { label: string; value: string | number }) {
+function StatRow({ label, icon, value }: { label: string; icon?: ReactNode; value: string | number }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px', borderTop: `1px solid ${BORDER}` }}>
-      <div style={{ fontSize: 13, color: TEXT_DIM }}>{label}</div>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px', borderTop: `1px solid ${BORDER}`, gap: 12 }}>
+      <div style={{ fontSize: 13, color: TEXT_DIM, display: 'flex', alignItems: 'center', gap: 10 }}>
+        {icon && <span style={{ display: 'inline-flex', color: TEXT_FAINT }}>{icon}</span>}
+        <span>{label}</span>
+      </div>
       <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, color: TEXT, fontWeight: 500 }}>{value}</div>
     </div>
   );
@@ -125,7 +133,7 @@ const EXPLORER_TX = 'https://chainscan-galileo.0g.ai/tx/';
 const EXPLORER_ADDR = 'https://chainscan-galileo.0g.ai/address/';
 
 function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
-  const meta = ENDPOINT_META[tx.endpoint] || { label: tx.endpoint, emoji: '📦', color: LILAC };
+  const meta = ENDPOINT_META[tx.endpoint] || { label: tx.endpoint, icon: <PackageIcon size={14} color={LILAC} />, color: LILAC };
   const rowStyle: CSSProperties = {
     display: 'grid',
     gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
@@ -135,8 +143,8 @@ function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
   };
   return (
     <div style={rowStyle} className="stats-tx-row">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: meta.color, minWidth: 0 }}>
-        <span>{meta.emoji}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: meta.color, minWidth: 0 }}>
+        <span style={{ display: 'inline-flex', flexShrink: 0 }}>{meta.icon}</span>
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{meta.label}</span>
       </div>
       <div>
@@ -163,13 +171,14 @@ function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────
 
+const INLINE_TX_LIMIT = 30;
+
 export function Stats() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
-  const [txs, setTxs]     = useState<Tx[]>([]);
-  const [pagination, setPagination] = useState<{ total: number; limit: number; offset: number; has_more: boolean }>({ total: 0, limit: 50, offset: 0, has_more: false });
-  const [filter, setFilter]    = useState<string>('');
-  const [loading, setLoading]  = useState(true);
+  const [recentTxs, setRecentTxs] = useState<Tx[]>([]);
+  const [recentTotal, setRecentTotal] = useState<number>(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   // Aggregates — fetch once on mount, then poll every 30s
   useEffect(() => {
@@ -189,32 +198,28 @@ export function Stats() {
     return () => { cancelled = true; clearInterval(id); };
   }, []);
 
-  // Transactions — re-fetch on filter or pagination change
+  // Recent transactions — fetch first 30 once, refresh every 30s
   useEffect(() => {
     let cancelled = false;
-    const fetchTxs = async () => {
-      setLoading(true);
+    const fetchRecent = async () => {
       try {
-        const params = new URLSearchParams();
-        params.set('limit', String(pagination.limit));
-        params.set('offset', String(pagination.offset));
-        if (filter) params.set('endpoint', filter);
-        const r = await fetch(API + '/stats/transactions?' + params.toString());
+        const r = await fetch(API + `/stats/transactions?limit=${INLINE_TX_LIMIT}&offset=0`);
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
         if (!cancelled) {
-          setTxs(d.transactions || []);
-          setPagination(p => ({ ...p, total: d.pagination?.total ?? 0, has_more: d.pagination?.has_more ?? false }));
+          setRecentTxs(d.transactions || []);
+          setRecentTotal(d.pagination?.total ?? 0);
         }
       } catch (e: any) {
         if (!cancelled) setErrorMsg(e.message || 'failed to load transactions');
-      } finally {
-        if (!cancelled) setLoading(false);
       }
     };
-    fetchTxs();
-    return () => { cancelled = true; };
-  }, [pagination.offset, pagination.limit, filter]);
+    fetchRecent();
+    const id = setInterval(fetchRecent, 30_000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
+
+  const hasMore = recentTotal > recentTxs.length;
 
   return (
     <div style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
@@ -237,7 +242,7 @@ export function Stats() {
             What agents have done on 0GENT.
           </h1>
           <p style={{ fontSize: 17, color: TEXT_DIM, lineHeight: 1.7, maxWidth: 640 }}>
-            Every paid endpoint settles a real transaction on 0G Chain. These numbers are aggregated from the on-chain payment log — same data
+            Every paid endpoint settles a real transaction on 0G Chain. These numbers are aggregated from the on-chain payment log, same data
             anyone can pull from{' '}
             <a href="https://chainscan-galileo.0g.ai" target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline' }}>chainscan-galileo</a>.
           </p>
@@ -284,64 +289,45 @@ export function Stats() {
             <div style={{ padding: '14px 18px', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'JetBrains Mono, monospace' }}>
               By service
             </div>
-            <StatRow label="🪪 Identity NFTs minted" value={stats ? fmtN(stats.totals.identities_minted) : '…'} />
-            <StatRow label="📧 Email inboxes"        value={stats ? fmtN(stats.totals.email_inboxes)     : '…'} />
-            <StatRow label="📤 Emails sent"          value={stats ? fmtN(stats.totals.emails_sent)        : '…'} />
-            <StatRow label="📥 Emails received"      value={stats ? fmtN(stats.totals.emails_received)    : '…'} />
-            <StatRow label="📞 Phone numbers"        value={stats ? fmtN(stats.totals.phone_numbers)      : '…'} />
-            <StatRow label="💬 SMS sent"             value={stats ? fmtN(stats.totals.sms_sent)           : '…'} />
-            <StatRow label="🧠 AI inference calls"   value={stats ? fmtN(stats.totals.inference_calls)    : '…'} />
-            <StatRow label="🗂  Memory entries"       value={stats ? fmtN(stats.totals.memory_entries)     : '…'} />
+            <StatRow icon={<IdentityIcon size={14} />} label="Identity NFTs minted" value={stats ? fmtN(stats.totals.identities_minted) : '…'} />
+            <StatRow icon={<EmailIcon    size={14} />} label="Email inboxes"        value={stats ? fmtN(stats.totals.email_inboxes)     : '…'} />
+            <StatRow icon={<SendIcon     size={14} />} label="Emails sent"          value={stats ? fmtN(stats.totals.emails_sent)       : '…'} />
+            <StatRow icon={<InboxIcon    size={14} />} label="Emails received"      value={stats ? fmtN(stats.totals.emails_received)   : '…'} />
+            <StatRow icon={<PhoneIcon    size={14} />} label="Phone numbers"        value={stats ? fmtN(stats.totals.phone_numbers)     : '…'} />
+            <StatRow icon={<SmsIcon      size={14} />} label="SMS sent"             value={stats ? fmtN(stats.totals.sms_sent)          : '…'} />
+            <StatRow icon={<BrainIcon    size={14} />} label="AI inference calls"   value={stats ? fmtN(stats.totals.inference_calls)   : '…'} />
+            <StatRow icon={<DatabaseIcon size={14} />} label="Memory entries"       value={stats ? fmtN(stats.totals.memory_entries)    : '…'} />
           </div>
         </div>
 
-        {/* ── Transaction log ─────────────────── */}
-        <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        {/* ── Transaction log (capped at 30 inline) ──────── */}
+        <div style={{ marginBottom: 16, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
             <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'JetBrains Mono, monospace', marginBottom: 6 }}>
-              Transaction log
+              Recent transactions
             </div>
-            <div style={{ fontSize: 22, fontWeight: 500 }}>Every paid call ever made on 0GENT</div>
+            <div style={{ fontSize: 22, fontWeight: 500 }}>Every paid call on 0GENT</div>
             <div style={{ fontSize: 13, color: TEXT_FAINT, marginTop: 4 }}>
-              {stats ? `${fmtN(pagination.total)} transactions${filter ? ` · filtered by "${filter}"` : ''}` : 'loading…'}
+              {stats ? `Showing latest ${Math.min(INLINE_TX_LIMIT, recentTotal)} of ${fmtN(recentTotal)} total` : 'loading…'}
             </div>
           </div>
+          {hasMore && (
+            <button
+              onClick={() => setModalOpen(true)}
+              className="dash-btn-ghost"
+              style={{
+                fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+                padding: '10px 18px', cursor: 'pointer',
+                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.06)',
+                color: LILAC, fontWeight: 500,
+              }}
+            >
+              View all {fmtN(recentTotal)} →
+            </button>
+          )}
         </div>
 
-        {/* Filter pills */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
-          {[
-            ['', 'All'],
-            ['identity', '🪪 Identity'],
-            ['email', '📧 Email inbox'],
-            ['email-send', '📤 Email sent'],
-            ['phone', '📞 Phone'],
-            ['sms', '💬 SMS'],
-            ['compute-infer', '🧠 AI'],
-          ].map(([v, l]) => {
-            const active = filter === v;
-            return (
-              <button
-                key={v}
-                onClick={() => { setFilter(v); setPagination(p => ({ ...p, offset: 0 })); }}
-                style={{
-                  fontFamily: 'JetBrains Mono, monospace',
-                  fontSize: 11,
-                  padding: '6px 12px',
-                  border: `1px solid ${active ? BORDER_HOVER : BORDER}`,
-                  background: active ? 'rgba(146,0,225,0.10)' : 'transparent',
-                  color: active ? LILAC : TEXT_DIM,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {l}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Tx table */}
+        {/* Tx table — inline, no filter, no pagination */}
         <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, marginBottom: 24 }}>
           {/* Header row */}
           <div style={{
@@ -353,11 +339,188 @@ export function Stats() {
             <div>Service</div><div>Payer</div><div>Amount</div><div>Tx hash</div><div style={{ textAlign: 'right' }}>When</div>
           </div>
 
-          {loading && txs.length === 0 ? (
+          {recentTxs.length === 0 && !errorMsg ? (
             <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>Loading transactions…</div>
+          ) : recentTxs.length === 0 ? (
+            <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>
+              No transactions yet — be the first to use 0GENT!
+            </div>
+          ) : (
+            recentTxs.map((tx, i) => <TxRow key={(tx.nonce || tx.tx_hash || i) + ''} tx={tx} idx={i} />)
+          )}
+        </div>
+
+        {/* "View all" CTA — also at the bottom of the list, for mobile reach */}
+        {hasMore && (
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <button
+              onClick={() => setModalOpen(true)}
+              className="dash-btn-ghost"
+              style={{
+                fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+                padding: '12px 22px', cursor: 'pointer',
+                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.04)',
+                color: LILAC, fontWeight: 500,
+              }}
+            >
+              Browse all {fmtN(recentTotal)} transactions →
+            </button>
+          </div>
+        )}
+
+      </div>
+
+      <TransactionsModal open={modalOpen} onClose={() => setModalOpen(false)} />
+
+      <Footer />
+    </div>
+  );
+}
+
+// ─── Modal: full paginated + filterable transaction list ──────────────
+
+function TransactionsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [txs, setTxs] = useState<Tx[]>([]);
+  const [pagination, setPagination] = useState<{ total: number; limit: number; offset: number; has_more: boolean }>({ total: 0, limit: 50, offset: 0, has_more: false });
+  const [filter, setFilter] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    const fetchTxs = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        params.set('limit', String(pagination.limit));
+        params.set('offset', String(pagination.offset));
+        if (filter) params.set('endpoint', filter);
+        const r = await fetch(API + '/stats/transactions?' + params.toString());
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+        if (!cancelled) {
+          setTxs(d.transactions || []);
+          setPagination(p => ({ ...p, total: d.pagination?.total ?? 0, has_more: d.pagination?.has_more ?? false }));
+        }
+      } catch { /* swallow — modal stays empty */ }
+      finally { if (!cancelled) setLoading(false); }
+    };
+    fetchTxs();
+    return () => { cancelled = true; };
+  }, [open, pagination.offset, pagination.limit, filter]);
+
+  // Esc to close + lock body scroll while open
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 200,
+        background: 'rgba(0, 0, 0, 0.78)',
+        backdropFilter: 'blur(4px)',
+        display: 'flex', justifyContent: 'center', alignItems: 'flex-start',
+        padding: '40px 16px',
+        overflow: 'auto',
+        animation: 'dashCardIn 0.25s ease-out',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: BG_PAGE,
+          border: `1px solid ${BORDER}`,
+          width: '100%',
+          maxWidth: 1100,
+          padding: '28px 24px',
+        }}
+      >
+        {/* Modal header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, gap: 10, flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'JetBrains Mono, monospace', marginBottom: 4 }}>
+              All transactions
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 500 }}>
+              {fmtN(pagination.total)} transaction{pagination.total === 1 ? '' : 's'}{filter ? ` · "${filter}"` : ''}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 36, height: 36, background: 'transparent', cursor: 'pointer',
+              border: `1px solid ${BORDER}`, color: TEXT_DIM,
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = TEXT; e.currentTarget.style.borderColor = BORDER_HOVER; }}
+            onMouseLeave={e => { e.currentTarget.style.color = TEXT_DIM; e.currentTarget.style.borderColor = BORDER; }}
+          >
+            <CloseIcon size={16} />
+          </button>
+        </div>
+
+        {/* Filter pills */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
+          {([
+            { v: '',              label: 'All',         icon: null },
+            { v: 'identity',      label: 'Identity',    icon: <IdentityIcon size={12} /> },
+            { v: 'email',         label: 'Email inbox', icon: <EmailIcon    size={12} /> },
+            { v: 'email-send',    label: 'Email sent',  icon: <SendIcon     size={12} /> },
+            { v: 'phone',         label: 'Phone',       icon: <PhoneIcon    size={12} /> },
+            { v: 'sms',           label: 'SMS',         icon: <SmsIcon      size={12} /> },
+            { v: 'compute-infer', label: 'AI',          icon: <BrainIcon    size={12} /> },
+          ] as const).map(({ v, label, icon }) => {
+            const active = filter === v;
+            return (
+              <button
+                key={v}
+                onClick={() => { setFilter(v); setPagination(p => ({ ...p, offset: 0 })); }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                  padding: '6px 12px',
+                  border: `1px solid ${active ? BORDER_HOVER : BORDER}`,
+                  background: active ? 'rgba(146,0,225,0.10)' : 'transparent',
+                  color: active ? LILAC : TEXT_DIM,
+                  cursor: 'pointer', transition: 'all 0.15s',
+                }}
+              >
+                {icon && <span style={{ display: 'inline-flex' }}>{icon}</span>}
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tx table */}
+        <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, marginBottom: 16 }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
+            gap: 12, padding: '12px 16px', borderBottom: `1px solid ${BORDER}`,
+            fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace',
+          }}>
+            <div>Service</div><div>Payer</div><div>Amount</div><div>Tx hash</div><div style={{ textAlign: 'right' }}>When</div>
+          </div>
+          {loading && txs.length === 0 ? (
+            <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>Loading…</div>
           ) : txs.length === 0 ? (
             <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>
-              {filter ? `No ${filter} transactions yet.` : 'No transactions yet — be the first to use 0GENT!'}
+              {filter ? `No ${filter} transactions yet.` : 'No transactions.'}
             </div>
           ) : (
             txs.map((tx, i) => <TxRow key={(tx.nonce || tx.tx_hash || i) + ''} tx={tx} idx={i} />)
@@ -394,10 +557,7 @@ export function Stats() {
             >Next →</button>
           </div>
         )}
-
       </div>
-
-      <Footer />
     </div>
   );
 }

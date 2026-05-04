@@ -1,4 +1,10 @@
 import { LogoLockup } from './Logo';
+import { XIcon, TelegramIcon } from './Icons';
+
+// Telegram URL is a placeholder — swap when the real group link is ready.
+// Keep `#tg` so the link renders but doesn't go anywhere unexpected.
+const TG_URL = '#tg';
+const X_URL  = 'https://x.com/0xgents';
 
 export function Footer() {
   return (
@@ -51,16 +57,15 @@ export function Footer() {
           <a href="/" style={{ textDecoration: 'none' }}>
             <LogoLockup size={22} color="#B75FFF" />
           </a>
-          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
             {[
-              ['Dashboard',  '/dashboard',                                                      false],
-              ['Stats',      '/stats',                                                          false],
-              ['Docs',       '/docs',                                                           false],
-              ['skill.md',   '/skill.md',                                                       false],
-              ['npm',        'https://www.npmjs.com/package/@0gent/core',                      true],
-              ['GitHub',     'https://github.com/martinvibes/0gent',                            true],
-              ['0G Docs',    'https://docs.0g.ai',                                              true],
-              ['Hackathon',  'https://www.hackquest.io/hackathons/0G-APAC-Hackathon',           true],
+              ['Dashboard',  '/dashboard',                                  false],
+              ['Stats',      '/stats',                                      false],
+              ['Docs',       '/docs',                                       false],
+              ['skill.md',   '/skill.md',                                   false],
+              ['npm',        'https://www.npmjs.com/package/@0gent/core',  true],
+              ['GitHub',     'https://github.com/martinvibes/0gent',        true],
+              ['0G Docs',    'https://docs.0g.ai',                          true],
             ].map(([l, h, ext]) => (
               <a
                 key={l as string}
@@ -75,8 +80,47 @@ export function Footer() {
               </a>
             ))}
           </div>
-          <div className="mono" style={{ fontSize: 12, color: 'rgba(254,254,254,0.15)' }}>
-            #0GHackathon #BuildOn0G
+
+          {/* Socials — small icon buttons on the right of the link row */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <a
+              href={X_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Follow 0GENT on X"
+              title="X · @0xgents"
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: 34, height: 34,
+                color: 'rgba(254,254,254,0.45)',
+                border: '1px solid rgba(183,95,255,0.15)',
+                transition: 'all 0.2s ease',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.40)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.45)'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.15)'; }}
+            >
+              <XIcon size={13} />
+            </a>
+            <a
+              href={TG_URL}
+              target={TG_URL.startsWith('http') ? '_blank' : undefined}
+              rel={TG_URL.startsWith('http') ? 'noreferrer' : undefined}
+              aria-label="Join 0GENT on Telegram"
+              title={TG_URL.startsWith('http') ? 'Telegram group' : 'Telegram group · coming soon'}
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: 34, height: 34,
+                color: 'rgba(254,254,254,0.45)',
+                border: '1px solid rgba(183,95,255,0.15)',
+                transition: 'all 0.2s ease',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.40)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.45)'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.15)'; }}
+            >
+              <TelegramIcon size={14} />
+            </a>
           </div>
         </div>
       </footer>

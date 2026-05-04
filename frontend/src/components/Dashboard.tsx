@@ -17,6 +17,10 @@ import { Footer } from './Footer';
 import { useWallet } from '../lib/walletContext';
 import { shortAddress, FAUCET_URL, EXPLORER_BASE } from '../lib/wallet';
 import { createAgentClient, statusText, type AgentClient, type PaymentStatus } from '../lib/agentClient';
+import {
+  IdentityIcon, EmailIcon, PhoneIcon, BrainIcon, DatabaseIcon,
+  CopyIcon, CheckIcon, ExternalIcon, LockIcon,
+} from './Icons';
 
 // ─── Tokens ───────────────────────────────────────────────────────────
 const LILAC      = '#B75FFF';
@@ -243,18 +247,57 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
             setBusy(false);
           }
         }}>
-          <div style={{ marginBottom: 12 }}>
+          <div style={{ marginBottom: 14 }}>
             <Label>Label (optional)</Label>
             <input style={baseInput} className={inputClass} value={name} onChange={e => setName(e.target.value)} placeholder="agent-bot" />
           </div>
+
+          {/* Passphrase explanation — non-tech users often don't know what
+              this is, so spell it out before they need to type one. */}
+          <div style={{
+            marginBottom: 14, padding: '12px 14px',
+            border: `1px solid ${BORDER}`, background: 'rgba(146,0,225,0.04)',
+            fontSize: 12.5, color: TEXT_DIM, lineHeight: 1.6,
+          }}>
+            <div style={{ fontSize: 11, color: LILAC, fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+              What's a passphrase?
+            </div>
+            A password that locks your wallet on this device — only you'll know it. Pick something you can remember but no one can guess. Examples:{' '}
+            <code style={{ color: LILAC, fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>can run smile</code>,{' '}
+            <code style={{ color: LILAC, fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>blue sky bird</code>,{' '}
+            <code style={{ color: LILAC, fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>mydogjollof</code>.{' '}
+            <span style={{ color: TEXT_FAINT }}>Spaces, capitals, and punctuation all count — type it the same way every time.</span>
+            <div style={{ marginTop: 8, fontSize: 11, color: AMBER }}>
+              Different from your recovery phrase — that comes next, after the wallet is generated.
+            </div>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
             <div>
               <Label>Passphrase</Label>
-              <input type="password" style={baseInput} className={inputClass} value={pass} onChange={e => setPass(e.target.value)} placeholder="min 8 chars" required />
+              <input
+                type="password"
+                style={baseInput}
+                className={inputClass}
+                value={pass}
+                onChange={e => setPass(e.target.value)}
+                placeholder="e.g. can run smile"
+                required
+                minLength={8}
+              />
             </div>
             <div>
               <Label>Confirm</Label>
-              <input type="password" style={baseInput} className={inputClass} value={pass2} onChange={e => setPass2(e.target.value)} required />
+              <input
+                type="password"
+                style={baseInput}
+                className={inputClass}
+                value={pass2}
+                onChange={e => setPass2(e.target.value)}
+                placeholder="type it again"
+                required
+                minLength={8}
+              />
             </div>
           </div>
           {err && <div style={{ color: RED, fontSize: 12, padding: '7px 10px', border: '1px solid rgba(248,81,73,0.25)', background: 'rgba(248,81,73,0.05)', marginBottom: 10 }}>{err}</div>}
@@ -285,30 +328,160 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
   );
 }
 
-function WalletBar({ address, balance, onCopy, onLock }: { address: string; balance: string; onCopy: () => void; onLock: () => void }) {
+function AccountBar({ address, balance, onLock }: { address: string; balance: string; onLock: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    } catch { /* ignore */ }
+  };
+
   return (
-    <div style={{
-      background: BG_CARD, border: `1px solid ${BORDER}`,
-      padding: '14px 18px',
-      display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+    <div className="dash-card" style={{
+      background: BG_CARD,
+      border: `1px solid ${BORDER}`,
+      padding: '16px 20px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 18,
+      flexWrap: 'wrap',
+      animationDelay: '0ms',
     }}>
+      {/* Connection indicator */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ width: 7, height: 7, background: GREEN, borderRadius: '50%', display: 'inline-block', boxShadow: `0 0 6px ${GREEN}` }} />
-        <span style={{ fontSize: 11, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.08em' }}>connected</span>
+        <span className="dash-pulse-dot" style={{ width: 8, height: 8, background: GREEN, borderRadius: '50%', display: 'inline-block', boxShadow: `0 0 8px ${GREEN}` }} />
+        <span style={{ fontSize: 10, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.10em' }}>connected</span>
       </div>
-      <code
-        title={address}
-        onClick={onCopy}
-        style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: TEXT, cursor: 'pointer' }}
-      >{shortAddress(address)}</code>
-      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-        <div style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-          <span style={{ fontSize: 11, color: TEXT_FAINT, marginRight: 6 }}>balance</span>
-          <span style={{ fontSize: 14, color: LILAC }}>{balance} 0G</span>
+
+      {/* Address with explicit copy button */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+        <code
+          title={address}
+          style={{
+            fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: TEXT,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}
+        >{shortAddress(address)}</code>
+        <button
+          onClick={copy}
+          aria-label="Copy address"
+          title={copied ? 'Copied!' : 'Copy address'}
+          className={ghostClass}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            height: 28, padding: '0 10px',
+            background: copied ? 'rgba(125,239,177,0.08)' : 'transparent',
+            border: `1px solid ${copied ? 'rgba(125,239,177,0.35)' : BORDER}`,
+            color: copied ? GREEN : TEXT_DIM,
+            fontSize: 11,
+            fontFamily: 'JetBrains Mono, monospace',
+            cursor: 'pointer',
+          }}
+        >
+          {copied ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
+          <span>{copied ? 'copied' : 'copy'}</span>
+        </button>
+      </div>
+
+      {/* Balance + actions on the right */}
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <span style={{ fontSize: 10, color: TEXT_FAINT, textTransform: 'uppercase', letterSpacing: '0.08em' }}>balance</span>
+          <span style={{ fontSize: 16, color: LILAC, fontWeight: 500 }}>{balance}</span>
+          <span style={{ fontSize: 11, color: TEXT_FAINT }}>0G</span>
         </div>
-        <a href={EXPLORER_BASE + address} target="_blank" rel="noreferrer" style={{ ...ghostBtn, height: 30, padding: '0 12px', fontSize: 11, textDecoration: 'none' }}>view ↗</a>
-        <button onClick={onLock} style={{ ...ghostBtn, height: 30, padding: '0 12px', fontSize: 11 }}>lock</button>
+        <a
+          href={EXPLORER_BASE + address}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="View on explorer"
+          title="View on chainscan-galileo"
+          className={ghostClass}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 28, padding: '0 10px', fontSize: 11, textDecoration: 'none', color: TEXT_DIM, border: `1px solid ${BORDER}`, fontFamily: 'JetBrains Mono, monospace' }}
+        >
+          <ExternalIcon size={11} />
+          <span>view</span>
+        </a>
+        <button
+          onClick={onLock}
+          aria-label="Lock wallet"
+          title="Lock wallet"
+          className={ghostClass}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 28, padding: '0 10px', fontSize: 11, color: TEXT_DIM, border: `1px solid ${BORDER}`, background: 'transparent', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace' }}
+        >
+          <LockIcon size={11} />
+          <span>lock</span>
+        </button>
       </div>
+    </div>
+  );
+}
+
+// ─── Tab strip ────────────────────────────────────────────────────────
+
+type TabId = 'ask' | 'identity' | 'email' | 'phone' | 'memory';
+
+const TABS: { id: TabId; label: string; icon: ReactNode; cost?: string }[] = [
+  { id: 'ask',      label: 'Ask AI',        icon: <BrainIcon    size={14} />, cost: '0.05 0G' },
+  { id: 'identity', label: 'Identity',      icon: <IdentityIcon size={14} />, cost: '0.1 0G' },
+  { id: 'email',    label: 'Email',         icon: <EmailIcon    size={14} />, cost: 'from 0.02 0G' },
+  { id: 'phone',    label: 'Phone & SMS',   icon: <PhoneIcon    size={14} /> },
+  { id: 'memory',   label: 'Memory',        icon: <DatabaseIcon size={14} />, cost: 'free' },
+];
+
+function TabStrip({ active, onChange }: { active: TabId; onChange: (id: TabId) => void }) {
+  return (
+    <div
+      role="tablist"
+      style={{
+        display: 'flex',
+        gap: 4,
+        marginBottom: 18,
+        padding: 6,
+        background: BG_CARD,
+        border: `1px solid ${BORDER}`,
+        overflowX: 'auto',
+        scrollbarWidth: 'none',
+      }}
+    >
+      {TABS.map(t => {
+        const isActive = active === t.id;
+        return (
+          <button
+            key={t.id}
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onChange(t.id)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '10px 16px',
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 12,
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: isActive ? TEXT : TEXT_FAINT,
+              background: isActive ? 'rgba(146,0,225,0.12)' : 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background 0.18s ease, color 0.18s ease',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              borderBottom: isActive ? `2px solid ${LILAC}` : '2px solid transparent',
+            }}
+          >
+            <span style={{ display: 'inline-flex', color: isActive ? LILAC : TEXT_FAINT }}>{t.icon}</span>
+            <span>{t.label}</span>
+            {t.cost && (
+              <span style={{ marginLeft: 6, fontSize: 9, color: isActive ? LILAC : TEXT_GHOST, fontWeight: 400 }}>
+                {t.cost}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -451,7 +624,7 @@ function EmailCard({ client }: { client: AgentClient }) {
                         {open ? '▾ close' : '▸ send'}
                       </span>
                     </div>
-                    {open && <SendEmail client={client} inboxId={i.id} onSent={() => setSelected(null)} />}
+                    {open && <InboxActions client={client} inboxId={i.id} />}
                   </div>
                 );
               })}
@@ -508,7 +681,43 @@ function EmailCard({ client }: { client: AgentClient }) {
   );
 }
 
-function SendEmail({ client, inboxId, onSent }: { client: AgentClient; inboxId: string; onSent: () => void }) {
+function InboxActions({ client, inboxId }: { client: AgentClient; inboxId: string }) {
+  const [mode, setMode] = useState<'send' | 'read'>('send');
+
+  return (
+    <div className="dash-result-in" style={{ marginTop: 8, padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.04)' }}>
+      {/* Sub-tabs: Send vs Read */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
+        <button
+          onClick={() => setMode('send')}
+          className={ghostClass}
+          style={{
+            ...ghostBtn,
+            height: 30, padding: '0 14px', fontSize: 11,
+            color: mode === 'send' ? LILAC : TEXT_DIM,
+            borderColor: mode === 'send' ? BORDER_HOVER : BORDER,
+            background: mode === 'send' ? 'rgba(146,0,225,0.08)' : 'transparent',
+          }}
+        >Send · 0.08 0G</button>
+        <button
+          onClick={() => setMode('read')}
+          className={ghostClass}
+          style={{
+            ...ghostBtn,
+            height: 30, padding: '0 14px', fontSize: 11,
+            color: mode === 'read' ? LILAC : TEXT_DIM,
+            borderColor: mode === 'read' ? BORDER_HOVER : BORDER,
+            background: mode === 'read' ? 'rgba(146,0,225,0.08)' : 'transparent',
+          }}
+        >Inbox · 0.02 0G</button>
+      </div>
+
+      {mode === 'send' ? <SendEmail client={client} inboxId={inboxId} /> : <ReadInbox client={client} inboxId={inboxId} />}
+    </div>
+  );
+}
+
+function SendEmail({ client, inboxId }: { client: AgentClient; inboxId: string }) {
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -519,13 +728,12 @@ function SendEmail({ client, inboxId, onSent }: { client: AgentClient; inboxId: 
     try {
       await client.paid('POST', `/email/${inboxId}/send`, { to, subject, body }, setState);
       setTo(''); setSubject(''); setBody('');
-      setTimeout(() => { setState({ kind: 'success' }); onSent(); }, 0);
       setTimeout(() => setState({ kind: 'idle' }), 2500);
     } catch { /* */ }
   };
 
   return (
-    <div className="dash-result-in" style={{ marginTop: 8, padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.04)' }}>
+    <div>
       <div style={{ display: 'grid', gap: 8 }}>
         <input style={baseInput} className={inputClass} value={to} onChange={e => setTo(e.target.value)} placeholder="to · user@example.com" autoFocus />
         <input style={baseInput} className={inputClass} value={subject} onChange={e => setSubject(e.target.value)} placeholder="subject (optional)" />
@@ -535,6 +743,129 @@ function SendEmail({ client, inboxId, onSent }: { client: AgentClient; inboxId: 
         </button>
       </div>
       <ProgressLine status={state} />
+    </div>
+  );
+}
+
+// Field names match what /email/:id/inbox actually returns. The backend
+// service maps DB columns (from_address, to_address, body_text) to a flatter
+// API shape (from, to, body) — so we read the API shape here, not the DB one.
+interface InboundMessage {
+  id: string;
+  direction: string;
+  from: string;
+  to: string;
+  subject: string;
+  body: string;
+  timestamp: string;
+}
+
+function ReadInbox({ client, inboxId }: { client: AgentClient; inboxId: string }) {
+  const [state, setState] = useState<PaymentStatus>({ kind: 'idle' });
+  const [messages, setMessages] = useState<InboundMessage[] | null>(null);
+  const [opened, setOpened] = useState<string | null>(null);
+
+  const load = async () => {
+    try {
+      const r = await client.paid<{ messages: InboundMessage[] }>('GET', `/email/${inboxId}/inbox`, undefined, setState);
+      setMessages(r?.messages || []);
+      setTimeout(() => setState({ kind: 'idle' }), 1500);
+    } catch { /* error in state */ }
+  };
+
+  if (messages === null) {
+    return (
+      <div>
+        <div style={{ fontSize: 12.5, color: TEXT_DIM, lineHeight: 1.6, marginBottom: 12 }}>
+          Reading the inbox costs 0.02 0G. You'll see all messages — both ones you've sent and any inbound replies your inbox has received.
+        </div>
+        <button style={primaryBtn} className={primaryClass} onClick={load} disabled={state.kind !== 'idle' && state.kind !== 'error' && state.kind !== 'success'}>
+          Pay 0.02 0G to read
+        </button>
+        <ProgressLine status={state} />
+      </div>
+    );
+  }
+
+  if (messages.length === 0) {
+    return (
+      <div style={{ fontSize: 13, color: TEXT_DIM, padding: '8px 0' }}>
+        No messages in this inbox yet.{' '}
+        <button onClick={load} style={{ background: 'transparent', border: 'none', color: LILAC, cursor: 'pointer', textDecoration: 'underline', fontSize: 12, padding: 0 }}>
+          Refresh (0.02 0G)
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <span style={{ fontSize: 11, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>
+          {messages.length} message{messages.length === 1 ? '' : 's'}
+        </span>
+        <button
+          onClick={() => { setMessages(null); setOpened(null); }}
+          className={ghostClass}
+          style={{ ...ghostBtn, height: 26, padding: '0 10px', fontSize: 10 }}
+        >refresh ↻</button>
+      </div>
+      <div style={{ display: 'grid', gap: 6 }}>
+        {messages.map(m => {
+          const isOpen = opened === m.id;
+          const isInbound = m.direction === 'inbound';
+          return (
+            <div key={m.id}>
+              <div
+                onClick={() => setOpened(isOpen ? null : m.id)}
+                className="dash-row"
+                style={{
+                  padding: '10px 12px',
+                  background: BG_INPUT,
+                  border: `1px solid ${isOpen ? BORDER_HOVER : BORDER}`,
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontFamily: 'JetBrains Mono, monospace',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{
+                    fontSize: 9, color: isInbound ? GREEN : LILAC, fontWeight: 600,
+                    letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0,
+                    minWidth: 36,
+                  }}>{isInbound ? '← in' : 'out →'}</span>
+                  <code style={{ color: TEXT, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {isInbound ? m.from : m.to}
+                  </code>
+                  <span style={{ color: TEXT_FAINT, fontSize: 11, flexShrink: 0 }}>
+                    {new Date(m.timestamp).toLocaleDateString()}
+                  </span>
+                </div>
+                {m.subject && (
+                  <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 4, marginLeft: 46, fontFamily: 'inherit', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {m.subject}
+                  </div>
+                )}
+              </div>
+              {isOpen && (
+                <div className="dash-result-in" style={{
+                  padding: 14,
+                  background: BG_INPUT,
+                  border: `1px solid ${BORDER_HOVER}`,
+                  borderTop: 'none',
+                  fontSize: 13,
+                  color: TEXT_DIM,
+                  lineHeight: 1.7,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}>
+                  {m.body || <span style={{ color: TEXT_GHOST, fontStyle: 'italic' }}>(no plain-text body)</span>}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -777,7 +1108,7 @@ function MemoryCard({ client }: { client: AgentClient }) {
 
 export function Dashboard() {
   const wallet = useWallet();
-  const [copied, setCopied] = useState(false);
+  const [tab, setTab] = useState<TabId>('ask');
 
   // Fund / faucet hint when balance == 0
   const showFaucet = wallet.state.kind === 'unlocked' && wallet.balance && Number(wallet.balance.zg) === 0;
@@ -792,10 +1123,10 @@ export function Dashboard() {
     <div style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
       <Nav />
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '120px 16px 48px' }}>
+      <div style={{ maxWidth: 980, margin: '0 auto', padding: '120px 16px 48px' }}>
 
         {/* Header */}
-        <div style={{ marginBottom: 32 }}>
+        <div style={{ marginBottom: 28 }}>
           <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: LILAC, marginBottom: 12, fontFamily: 'JetBrains Mono, monospace' }}>
             Dashboard
           </div>
@@ -804,58 +1135,57 @@ export function Dashboard() {
           </h1>
           <p style={{ fontSize: 15, color: TEXT_DIM, lineHeight: 1.7, maxWidth: 640 }}>
             {wallet.state.kind === 'unlocked'
-              ? <>This is the same infrastructure your code-side agent uses, just with buttons. Every action below is a real on-chain payment.</>
+              ? <>The same infrastructure your code-side agent uses, with buttons. Every action below is a real on-chain payment.</>
               : <>Generate a wallet, fund it with free testnet 0G, then mint an identity, claim an email, ask AI questions, and write to persistent memory — all paid on-chain.</>
             }
           </p>
         </div>
 
-        {/* Top wallet bar (only when unlocked) */}
-        {wallet.state.kind === 'unlocked' && (
-          <div style={{ marginBottom: 28 }}>
-            <WalletBar
-              address={wallet.state.wallet.address}
-              balance={wallet.balance ? Number(wallet.balance.zg).toFixed(4) : '…'}
-              onCopy={async () => {
-                try { await navigator.clipboard.writeText(wallet.state.kind === 'unlocked' ? wallet.state.wallet.address : ''); setCopied(true); setTimeout(() => setCopied(false), 1200); } catch {}
-              }}
-              onLock={wallet.lock}
-            />
-            {copied && (
-              <div style={{ marginTop: 8, fontSize: 11, color: GREEN, fontFamily: 'JetBrains Mono, monospace' }}>address copied ✓</div>
-            )}
-            {showFaucet && (
-              <div style={{
-                marginTop: 12, padding: 14,
-                border: '1px solid rgba(255,201,122,0.30)', background: 'rgba(255,201,122,0.06)',
-                fontSize: 13, color: AMBER, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap',
-              }}>
-                <span>Your wallet is empty. Get free testnet 0G to start.</span>
-                <a href={FAUCET_URL} target="_blank" rel="noreferrer" style={{ ...primaryBtn, height: 32, fontSize: 12, padding: '0 14px', textDecoration: 'none' }}>
-                  Open faucet ↗
-                </a>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Main grid */}
         {wallet.state.kind !== 'unlocked' ? (
           <div style={{ maxWidth: 520 }}>
             <WalletGate />
           </div>
         ) : (
-          <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 18 }}>
-            {client && <IdentityCard client={client} />}
-            {client && <EmailCard client={client} />}
-            {client && <PhoneCard />}
-            {client && <ComputeCard client={client} />}
-            {client && <MemoryCard client={client} />}
-          </div>
+          <>
+            {/* Account bar — address + copy button + balance + actions */}
+            <div style={{ marginBottom: 14 }}>
+              <AccountBar
+                address={wallet.state.wallet.address}
+                balance={wallet.balance ? Number(wallet.balance.zg).toFixed(4) : '…'}
+                onLock={wallet.lock}
+              />
+            </div>
+
+            {/* Faucet alert when out of funds */}
+            {showFaucet && (
+              <div className="dash-result-in" style={{
+                marginBottom: 18, padding: 14,
+                border: '1px solid rgba(255,201,122,0.30)', background: 'rgba(255,201,122,0.06)',
+                fontSize: 13, color: AMBER, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+              }}>
+                <span>Your wallet is empty. Get free testnet 0G to start.</span>
+                <a href={FAUCET_URL} target="_blank" rel="noreferrer" style={{ ...primaryBtn, height: 32, fontSize: 12, padding: '0 14px', textDecoration: 'none' }} className={primaryClass}>
+                  Open faucet ↗
+                </a>
+              </div>
+            )}
+
+            {/* Tab strip */}
+            <TabStrip active={tab} onChange={setTab} />
+
+            {/* Workspace — focused, full-width section per tab */}
+            <div key={tab} className="dash-result-in">
+              {tab === 'ask'      && client && <ComputeCard  client={client} />}
+              {tab === 'identity' && client && <IdentityCard client={client} />}
+              {tab === 'email'    && client && <EmailCard    client={client} />}
+              {tab === 'phone'    &&             <PhoneCard />}
+              {tab === 'memory'   && client && <MemoryCard   client={client} />}
+            </div>
+          </>
         )}
 
         {/* Footnote */}
-        <div style={{ marginTop: 40, fontSize: 12, color: TEXT_GHOST, lineHeight: 1.7, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>
+        <div style={{ marginTop: 48, fontSize: 12, color: TEXT_GHOST, lineHeight: 1.7, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>
           Live on 0G Chain testnet · all transactions visible at <a href="/stats" style={{ color: LILAC }}>0gent.xyz/stats</a>
         </div>
       </div>
