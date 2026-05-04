@@ -4,7 +4,9 @@
  * Logs/Network tabs can show real traffic.
  */
 
-export const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3000';
+// Default to prod so the Vercel build works even if VITE_API_URL isn't set
+// in the build environment. Override locally via .env.local for dev.
+export const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://api.0gent.xyz';
 
 export interface RequestLog {
   id: number;
