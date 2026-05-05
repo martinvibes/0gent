@@ -135,7 +135,7 @@ Returns: { countries: [{ code, name, region, popular }], count, note }
 
 **Provision Phone Number**
 POST /phone/provision
-Cost: 0.5 0G
+Cost: 3.0 0G
 Body: { "country": "US", "areaCode": "415" }            ← any-available mode
    or  { "phoneNumber": "+18164961100" }                ← exact-number mode
 Returns: { id, phoneNumber, country, owner, resourceId, expiresAt }

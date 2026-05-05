@@ -28,7 +28,7 @@ interface PaymentRow {
 
 function weiToZG(weiStr: string): number {
   // amount column is wei as string. JS Number is fine for typical x402 amounts
-  // (0.01–0.5 0G) but BigInt → divide → Number to be safe.
+  // (0.01–3.0 0G) but BigInt → divide → Number to be safe.
   try {
     const w = BigInt(weiStr);
     // Divide by 1e10 first (keeps 8 decimals of precision), then Number()

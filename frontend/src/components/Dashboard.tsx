@@ -339,7 +339,7 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
   };
 
   return (
-    <div className="dash-card" style={{
+    <div className="dash-card dash-account-bar" style={{
       background: BG_CARD,
       border: `1px solid ${BORDER}`,
       padding: '16px 20px',
@@ -435,6 +435,7 @@ function TabStrip({ active, onChange }: { active: TabId; onChange: (id: TabId) =
   return (
     <div
       role="tablist"
+      className="dash-tab-strip"
       style={{
         display: 'flex',
         gap: 4,
@@ -1123,7 +1124,7 @@ export function Dashboard() {
     <div style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
       <Nav />
 
-      <div style={{ maxWidth: 980, margin: '0 auto', padding: '120px 16px 48px' }}>
+      <div className="page-wrap" style={{ maxWidth: 980, margin: '0 auto', padding: '120px 16px 48px' }}>
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>

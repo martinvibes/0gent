@@ -26,7 +26,7 @@ const BORDER = 'rgba(183,95,255,0.12)';
 // ─────────────────────────────────────────────────────────────────────────────
 type CardRow = { label: string; value: string; valueColor?: string; mono?: boolean };
 type Card = {
-  payment: 'free' | string; // 'free' or '0.5 0G' etc
+  payment: 'free' | string; // 'free' or '3.0 0G' etc
   status: number;
   icon?: string; // emoji
   title?: string;
@@ -46,7 +46,7 @@ const SIM: Record<string, Array<Line>> = {
     { type: 'out', text: 'pricing                        Service prices      free' },
     { type: 'out', text: 'phone countries                List supported      free' },
     { type: 'out', text: 'phone search --country US      Search numbers      free' },
-    { type: 'out', text: 'phone provision                Provision phone     0.5 0G' },
+    { type: 'out', text: 'phone provision                Provision phone     3.0 0G' },
     { type: 'out', text: 'phone sms <id>                 Send SMS            0.01 0G' },
     { type: 'out', text: 'email create --name agent      Create inbox        0.2 0G' },
     { type: 'out', text: 'email send <id>                Send email          0.08 0G' },
@@ -56,7 +56,7 @@ const SIM: Record<string, Array<Line>> = {
   ],
   'phone provision': [
     { type: 'out', text: '→ POST /phone/provision' },
-    { type: 'err', text: '402 Payment Required — 0.5 0G' },
+    { type: 'err', text: '402 Payment Required — 3.0 0G' },
     { type: 'out', text: '→ ZeroGentPayment.pay(nonce, "phone")' },
     { type: 'ok', text: 'Payment verified on 0G Chain' },
     { type: 'ok', text: 'Provisioned via Telnyx' },
@@ -231,6 +231,7 @@ function ConnectionStatus({ connected }: { connected: boolean }) {
 function StatusBar({ requests, lineNum }: { requests: number; lineNum: number }) {
   return (
     <div
+      className="terminal-status-bar"
       style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -241,9 +242,11 @@ function StatusBar({ requests, lineNum }: { requests: number; lineNum: number })
         fontFamily: 'JetBrains Mono, monospace',
         fontSize: 10,
         color: DIM,
+        gap: 10,
+        flexWrap: 'wrap',
       }}
     >
-      <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+      <div className="terminal-status-left" style={{ display: 'flex', gap: 10, alignItems: 'center', minWidth: 0, flexWrap: 'wrap' }}>
         <span
           style={{
             padding: '2px 7px',
@@ -251,15 +254,16 @@ function StatusBar({ requests, lineNum }: { requests: number; lineNum: number })
             color: LILAC,
             fontWeight: 700,
             letterSpacing: '0.04em',
+            flexShrink: 0,
           }}
         >
           x402
         </span>
         <span style={{ color: 'rgba(254,254,254,0.4)' }}>0G testnet</span>
-        <span style={{ color: 'rgba(254,254,254,0.25)' }}>·</span>
+        <span className="terminal-status-dot" style={{ color: 'rgba(254,254,254,0.25)' }}>·</span>
         <span style={{ color: 'rgba(254,254,254,0.4)' }}>chain 16602</span>
       </div>
-      <div style={{ display: 'flex', gap: 14 }}>
+      <div className="terminal-status-right" style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
         <span>{requests} {requests === 1 ? 'request' : 'requests'}</span>
         <span style={{ color: 'rgba(254,254,254,0.25)' }}>·</span>
         <span>Ln {lineNum}</span>
@@ -517,9 +521,9 @@ function LogsTab({ logs }: { logs: readonly RequestLog[] }) {
 function NetworkTab({ stats }: { stats: ReturnType<typeof summary> }) {
   const max = Math.max(1, ...stats.buckets);
   return (
-    <div style={{ minHeight: 360, padding: '24px 26px' }}>
-      {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 28 }}>
+    <div className="terminal-network" style={{ minHeight: 360, padding: '24px 26px' }}>
+      {/* Stat cards — auto-fit so on narrow screens they wrap to 2-col, then 1-col */}
+      <div className="terminal-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 14, marginBottom: 28 }}>
         <StatCard label="Requests / min" value={String(stats.requestsPerMin)} accent={false} />
         <StatCard label="Avg latency" value={stats.avgLatency + 'ms'} accent />
         <StatCard label="Uptime" value={stats.uptime.toFixed(1) + '%'} accent={false} />
@@ -561,13 +565,16 @@ function NetworkTab({ stats }: { stats: ReturnType<typeof summary> }) {
 function StatCard({ label, value, accent }: { label: string; value: string; accent: boolean }) {
   return (
     <div
+      className="terminal-stat-card"
       style={{
         border: `1px solid ${BORDER}`,
         padding: '18px 20px',
         background: 'rgba(146,0,225,0.03)',
+        minWidth: 0,
       }}
     >
       <div
+        className="terminal-stat-label"
         style={{
           fontFamily: 'JetBrains Mono, monospace',
           fontSize: 10,
@@ -580,12 +587,16 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
         {label}
       </div>
       <div
+        className="terminal-stat-value"
         style={{
           fontFamily: 'JetBrains Mono, monospace',
-          fontSize: 28,
+          fontSize: 'clamp(20px, 5vw, 28px)',
           fontWeight: 700,
           color: accent ? LILAC : '#fff',
           letterSpacing: '-0.01em',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         }}
       >
         {value}
@@ -923,7 +934,7 @@ export function Terminal() {
                 title: `${d.numbers.length} numbers in ${d.country?.name || country}`,
                 titleSize: 'lg',
                 rows,
-                note: `provider: ${d.provider} · run "phone provision" to claim one for 0.5 0G`,
+                note: `provider: ${d.provider} · run "phone provision" to claim one for 3.0 0G`,
                 badge: { text: 'LIVE', kind: 'ok' },
               },
             },

@@ -49,7 +49,7 @@ export const config = {
   namecheapApiUser: optional("NAMECHEAP_API_USER", ""),
 
   // Pricing (in 0G tokens, human-readable)
-  pricePhoneProvision: optional("PRICE_PHONE", "0.5"),
+  pricePhoneProvision: optional("PRICE_PHONE", "3.0"),
   priceSmsSend: optional("PRICE_SMS", "0.01"),
   priceEmailProvision: optional("PRICE_EMAIL", "0.2"),
   priceEmailSend: optional("PRICE_EMAIL_SEND", "0.08"),

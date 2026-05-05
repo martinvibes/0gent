@@ -125,7 +125,7 @@ export async function pricingCmd(): Promise<void> {
       { service: 'Email inbox', price: '0.2 0G' },
       { service: 'Email send', price: '0.08 0G' },
       { service: 'Email read', price: '0.02 0G' },
-      { service: 'Phone provision', price: '0.5 0G' },
+      { service: 'Phone provision', price: '3.0 0G' },
       { service: 'SMS send', price: '0.01 0G' },
       { service: 'Memory r/w', price: 'free' }
     );

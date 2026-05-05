@@ -134,18 +134,49 @@ export function Hero() {
           Your AI agent gets real phone numbers, email inboxes, AI brain, and persistent memory, and pays for everything itself using crypto. No accounts. No humans needed.
         </p>
 
-        {/* Buttons */}
-        <div className="hero-buttons" style={{ display:'flex', gap:14, justifyContent:'center', marginBottom:56, pointerEvents: 'auto' }}>
-          <a href="#terminal" style={{
+        {/* Buttons — Dashboard is the primary CTA. Mobile users can't see the
+            nav links, so this is the way they reach the app from the top. */}
+        <div className="hero-buttons" style={{ display:'flex', gap:14, justifyContent:'center', marginBottom:56, pointerEvents: 'auto', flexWrap: 'wrap' }}>
+          <a href="/dashboard" style={{
             display:'inline-flex', alignItems:'center', gap:8, height:48, padding:'0 28px',
             background:'#9200E1', color:'#fff', fontSize:14, fontWeight:500, borderRadius:100,
             transition:'all 0.2s', border:'none', textDecoration: 'none'
-          }}>See it run →</a>
-          <a href="https://github.com/martinvibes/0gent" target="_blank" rel="noreferrer" style={{
+          }}>Open Dashboard →</a>
+          <a href="#terminal" style={{
             display:'inline-flex', alignItems:'center', gap:8, height:48, padding:'0 28px',
             background:'rgba(254,254,254,0.04)', color:'#fff', fontSize:14, fontWeight:500,
             borderRadius:100, border:'1px solid rgba(183,95,255,0.15)', transition:'all 0.2s', textDecoration: 'none'
-          }}>View Source ↗</a>
+          }}>See it run</a>
+        </div>
+
+        {/* Quick-jump chips — visible on mobile where the nav links are hidden,
+            so users always have a way to reach the key pages from the top. */}
+        <div className="hero-chips" style={{
+          display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 36,
+          flexWrap: 'wrap', pointerEvents: 'auto',
+        }}>
+          {[
+            ['Stats',  '/stats'],
+            ['Docs',   '/docs'],
+            ['Skill manifest', '/skill.md'],
+          ].map(([l, h]) => (
+            <a
+              key={h}
+              href={h}
+              style={{
+                fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+                padding: '6px 12px',
+                color: 'rgba(254,254,254,0.55)',
+                border: '1px solid rgba(183,95,255,0.18)',
+                textDecoration: 'none',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.4)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.55)'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.18)'; }}
+            >
+              {l}
+            </a>
+          ))}
         </div>
 
         {/* Stats — live counters from /stats. Each animates 0 → target on mount. */}

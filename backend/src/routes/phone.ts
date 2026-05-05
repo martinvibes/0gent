@@ -77,7 +77,7 @@ router.get("/search", async (req: AuthenticatedRequest, res: Response) => {
 
 // Provision pre-flight — runs BEFORE x402. Catches malformed E.164 input
 // when the agent picked a specific number to buy. Without this, the agent
-// pays 0.5 0G then Twilio 400s, which is unfair UX.
+// pays 3.0 0G then Telnyx 400s, which is unfair UX.
 function provisionPreflight(req: Request, res: Response, next: NextFunction): void {
   const phoneNumber = req.body?.phoneNumber;
   if (phoneNumber !== undefined && phoneNumber !== null && phoneNumber !== "") {

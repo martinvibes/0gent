@@ -191,7 +191,7 @@ Live end-to-end on **Telnyx** (verified account, worldwide coverage, messaging p
 |---|---|---|---|
 | `0gent phone countries [--region <name>]` | free | ✅ | List the 50 curated supported countries; full inventory is 170+ via the upstream provider. |
 | `0gent phone search [--country US] [--area 415]` | free | ✅ | Real upstream inventory. Aliases (`UK→GB`, `USA→US`, full names) resolve automatically. |
-| `0gent phone provision [<phoneNumber>] [--country US]` | 0.5 | ✅ | Pass a specific E.164 to buy that exact number, or `--country` to grab the first available. CLI pre-validates E.164 before any payment. |
+| `0gent phone provision [<phoneNumber>] [--country US]` | 3.0 | ✅ | Pass a specific E.164 to buy that exact number, or `--country` to grab the first available. CLI pre-validates E.164 before any payment. |
 | `0gent phone sms <phoneId> --to +1... --body "..."` | 0.01 | ✅ | End-to-end SMS delivery verified. Pre-flight catches To==From, missing fields, and bad E.164 BEFORE x402 charges. |
 | `0gent phone logs <phoneId>` | free | ✅ | Reads local DB; provider-agnostic. |
 

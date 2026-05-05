@@ -102,7 +102,7 @@ function fmtN(n: number): string {
 
 function HeadlineCard({ value, label, sub }: { value: string; label: string; sub?: string }) {
   return (
-    <div style={{
+    <div className="stats-headline-card" style={{
       background: BG_CARD, border: `1px solid ${BORDER}`, padding: '32px 28px',
       flex: '1 1 220px', minWidth: 0,
     }}>
@@ -141,6 +141,18 @@ function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
     background: idx % 2 === 0 ? BG_ROW : 'transparent',
     fontSize: 12.5, fontFamily: 'JetBrains Mono, monospace',
   };
+  // Tiny prefix label, used on mobile to make payer-vs-tx-hash distinguishable.
+  // Hidden on desktop because column headers already do that job.
+  const prefix = (label: string) => (
+    <span className="stats-tx-prefix" style={{
+      display: 'none',
+      fontSize: 9, color: 'rgba(254,254,254,0.30)',
+      fontFamily: 'JetBrains Mono, monospace',
+      textTransform: 'uppercase', letterSpacing: '0.10em',
+      marginRight: 6,
+    }}>{label}</span>
+  );
+
   return (
     <div style={rowStyle} className="stats-tx-row">
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: meta.color, minWidth: 0 }}>
@@ -148,6 +160,7 @@ function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{meta.label}</span>
       </div>
       <div>
+        {prefix('Payer')}
         <a href={EXPLORER_ADDR + tx.payer} target="_blank" rel="noreferrer" style={{ color: TEXT, textDecoration: 'none' }}
            onMouseEnter={e => { e.currentTarget.style.color = LILAC; }}
            onMouseLeave={e => { e.currentTarget.style.color = TEXT; }}
@@ -155,6 +168,7 @@ function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
       </div>
       <div style={{ color: LILAC }}>{fmt0G(tx.amount_0g)} 0G</div>
       <div>
+        {prefix('Tx')}
         {tx.tx_hash ? (
           <a href={EXPLORER_TX + tx.tx_hash} target="_blank" rel="noreferrer" style={{ color: TEXT_FAINT, textDecoration: 'none' }}
              onMouseEnter={e => { e.currentTarget.style.color = LILAC; }}
@@ -225,7 +239,7 @@ export function Stats() {
     <div style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
       <Nav />
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '120px 24px 40px' }}>
+      <div className="page-wrap" style={{ maxWidth: 1100, margin: '0 auto', padding: '120px 24px 40px' }}>
 
         {/* ── Header ───────────────────────────── */}
         <div style={{ marginBottom: 48 }}>
@@ -255,7 +269,7 @@ export function Stats() {
         )}
 
         {/* ── Headline counters (3 big numbers) ─ */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 32 }}>
+        <div className="stats-headlines" style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 32 }}>
           <HeadlineCard
             value={stats ? fmtN(stats.headline.wallets) : '…'}
             label="Wallets"
@@ -328,26 +342,28 @@ export function Stats() {
         </div>
 
         {/* Tx table — inline, no filter, no pagination */}
-        <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, marginBottom: 24 }}>
-          {/* Header row */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
-            gap: 12, padding: '12px 16px', borderBottom: `1px solid ${BORDER}`,
-            fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace',
-          }}>
-            <div>Service</div><div>Payer</div><div>Amount</div><div>Tx hash</div><div style={{ textAlign: 'right' }}>When</div>
-          </div>
-
-          {recentTxs.length === 0 && !errorMsg ? (
-            <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>Loading transactions…</div>
-          ) : recentTxs.length === 0 ? (
-            <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>
-              No transactions yet — be the first to use 0GENT!
+        <div className="stats-tx-scroll" style={{ marginBottom: 24 }}>
+          <div style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+            {/* Header row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
+              gap: 12, padding: '12px 16px', borderBottom: `1px solid ${BORDER}`,
+              fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace',
+            }}>
+              <div>Service</div><div>Payer</div><div>Amount</div><div>Tx hash</div><div style={{ textAlign: 'right' }}>When</div>
             </div>
-          ) : (
-            recentTxs.map((tx, i) => <TxRow key={(tx.nonce || tx.tx_hash || i) + ''} tx={tx} idx={i} />)
-          )}
+
+            {recentTxs.length === 0 && !errorMsg ? (
+              <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>Loading transactions…</div>
+            ) : recentTxs.length === 0 ? (
+              <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>
+                No transactions yet — be the first to use 0GENT!
+              </div>
+            ) : (
+              recentTxs.map((tx, i) => <TxRow key={(tx.nonce || tx.tx_hash || i) + ''} tx={tx} idx={i} />)
+            )}
+          </div>
         </div>
 
         {/* "View all" CTA — also at the bottom of the list, for mobile reach */}
@@ -427,6 +443,7 @@ function TransactionsModal({ open, onClose }: { open: boolean; onClose: () => vo
   return (
     <div
       onClick={onClose}
+      className="stats-modal"
       style={{
         position: 'fixed', inset: 0, zIndex: 200,
         background: 'rgba(0, 0, 0, 0.78)',
@@ -474,7 +491,7 @@ function TransactionsModal({ open, onClose }: { open: boolean; onClose: () => vo
         </div>
 
         {/* Filter pills */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
+        <div className="stats-filter-row" style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
           {([
             { v: '',              label: 'All',         icon: null },
             { v: 'identity',      label: 'Identity',    icon: <IdentityIcon size={12} /> },
@@ -507,24 +524,26 @@ function TransactionsModal({ open, onClose }: { open: boolean; onClose: () => vo
         </div>
 
         {/* Tx table */}
-        <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, marginBottom: 16 }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
-            gap: 12, padding: '12px 16px', borderBottom: `1px solid ${BORDER}`,
-            fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace',
-          }}>
-            <div>Service</div><div>Payer</div><div>Amount</div><div>Tx hash</div><div style={{ textAlign: 'right' }}>When</div>
-          </div>
-          {loading && txs.length === 0 ? (
-            <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>Loading…</div>
-          ) : txs.length === 0 ? (
-            <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>
-              {filter ? `No ${filter} transactions yet.` : 'No transactions.'}
+        <div className="stats-tx-scroll" style={{ marginBottom: 16 }}>
+          <div style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
+              gap: 12, padding: '12px 16px', borderBottom: `1px solid ${BORDER}`,
+              fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace',
+            }}>
+              <div>Service</div><div>Payer</div><div>Amount</div><div>Tx hash</div><div style={{ textAlign: 'right' }}>When</div>
             </div>
-          ) : (
-            txs.map((tx, i) => <TxRow key={(tx.nonce || tx.tx_hash || i) + ''} tx={tx} idx={i} />)
-          )}
+            {loading && txs.length === 0 ? (
+              <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>Loading…</div>
+            ) : txs.length === 0 ? (
+              <div style={{ padding: 32, textAlign: 'center', color: TEXT_FAINT, fontSize: 13 }}>
+                {filter ? `No ${filter} transactions yet.` : 'No transactions.'}
+              </div>
+            ) : (
+              txs.map((tx, i) => <TxRow key={(tx.nonce || tx.tx_hash || i) + ''} tx={tx} idx={i} />)
+            )}
+          </div>
         </div>
 
         {/* Pagination */}

@@ -70,7 +70,7 @@ curl -X POST https://api.0gent.xyz/email/provision \
 | **Memory** — read/write/delete | ✅ Live | free | 0G Storage via `@0glabs/0g-ts-sdk` |
 | **Wallet** — generate, balance | ✅ Live | free | Non-custodial; server forgets the seed immediately |
 | **Agent Profile** — public lookup | ✅ Live | free | `GET /agent/<address>` — identity + resources + balance |
-| **Phone — search / provision / SMS** | ✅ Live | free / 0.5 / 0.01 | Real numbers worldwide via Telnyx (Twilio fallback wired). Verified account, attached messaging profile, end-to-end SMS delivery confirmed. |
+| **Phone — search / provision / SMS** | ✅ Live | free / 3.0 / 0.01 | Real numbers worldwide via Telnyx (Twilio fallback wired). Verified account, attached messaging profile, end-to-end SMS delivery confirmed. |
 | **Compute (VPS)** | 🟡 In dev | 1.0 / month | Code wired to Hetzner Cloud; awaiting `HCLOUD_TOKEN` |
 | **Domains** | 🟡 In dev | 2.0 / year | Code wired to Namecheap; awaiting credentials |
 

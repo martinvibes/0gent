@@ -12,6 +12,7 @@ import { AgentProfile } from './components/AgentProfile';
 import { Docs } from './components/Docs';
 import { Stats } from './components/Stats';
 import { Dashboard } from './components/Dashboard';
+import { NotFound } from './components/NotFound';
 import { WalletProvider } from './lib/walletContext';
 
 function App() {
@@ -74,17 +75,23 @@ function App() {
     );
   }
 
-  return (
-    <WalletProvider>
-      <Nav />
-      <Hero />
-      <div className="reveal"><Terminal /></div>
-      <div className="reveal"><Features /></div>
-      <div className="reveal"><HowItWorks /></div>
-      <div className="reveal"><ZGIntegration /></div>
-      <Footer />
-    </WalletProvider>
-  );
+  // Landing page — exact root only. Anything else that didn't match a route
+  // above falls through to the 404 page.
+  if (path === '/' || path === '') {
+    return (
+      <WalletProvider>
+        <Nav />
+        <Hero />
+        <div className="reveal"><Terminal /></div>
+        <div className="reveal"><Features /></div>
+        <div className="reveal"><HowItWorks /></div>
+        <div className="reveal"><ZGIntegration /></div>
+        <Footer />
+      </WalletProvider>
+    );
+  }
+
+  return <NotFound />;
 }
 
 export default App;

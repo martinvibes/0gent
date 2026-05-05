@@ -13,7 +13,6 @@ import { LogoLockup } from './Logo';
 
 // ─── Tokens (match Features.tsx vibe) ────────────────────────────────
 const LILAC = '#B75FFF';
-const PURPLE = '#9200E1';
 const TEXT = '#fefefe';
 const TEXT_DIM = 'rgba(254,254,254,0.7)';
 const TEXT_FAINT = 'rgba(254,254,254,0.5)';
@@ -157,7 +156,7 @@ export function Docs() {
     <div style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
       <Nav />
 
-      <div style={{ maxWidth: 880, margin: '0 auto', padding: '120px 24px 40px' }}>
+      <div className="docs-page" style={{ maxWidth: 880, margin: '0 auto', padding: '120px 24px 40px' }}>
 
         {/* Header */}
         <div style={{ marginBottom: 48 }}>
@@ -225,7 +224,7 @@ npm i -g @0gent/core
 0gent identity mint          # mint your Agent NFT (0.1 0G)
 0gent email create scout     # claim scout@0gent.xyz (0.2 0G)
 0gent compute infer "explain x402 in one sentence"  # paid LLM call (0.05 0G)
-0gent phone provision --country US -y               # real US number (0.5 0G + ~$2)
+0gent phone provision --country US -y               # real US number (3.0 0G + ~$2)
 0gent phone sms <id> --to +<your-mobile> --body "from my agent"`}</Code>
         </Section>
 
@@ -272,8 +271,8 @@ npm i -g @0gent/core
           title="Services & pricing"
           intro={<>What an agent can buy from the live API today.</>}
         >
-          <div style={{ overflow: 'auto', border: `1px solid ${BORDER}` }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <div className="docs-services" style={{ border: `1px solid ${BORDER}` }}>
+            <table className="docs-services-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: BG_CARD }}>
                   <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Service</th>
@@ -289,18 +288,18 @@ npm i -g @0gent/core
                   ['Send email',            '0.08 0G',    'live', 'Resend'],
                   ['Read inbox',            '0.02 0G',    'live', 'Cloudflare Worker → backend webhook'],
                   ['AI inference (LLM)',    '0.05 0G',    'live', '0G Compute Network · qwen-2.5-7b'],
-                  ['Phone number',          '0.5 0G',     'live', 'Telnyx'],
+                  ['Phone number',          '3.0 0G',     'live', 'Telnyx'],
                   ['Send SMS',              '0.01 0G',    'live', 'Telnyx'],
                   ['Persistent memory',     'free',       'live', '0G Storage'],
                   ['Domain registration',   '2.0 0G',     'dev',  'Namecheap'],
                   ['Compute VPS',           '1.0 0G/mo',  'dev',  'Hetzner Cloud'],
                   ['X account ops',         '5.0 0G',     'dev',  'Roadmap Q3'],
                 ] as const).map(([svc, cost, st, by]) => (
-                  <tr key={svc} style={{ borderTop: `1px solid ${BORDER}` }}>
-                    <td style={{ padding: '12px 16px', color: TEXT }}>{svc}</td>
-                    <td style={{ padding: '12px 16px', color: LILAC }}>{cost}</td>
-                    <td style={{ padding: '12px 16px' }}><Pill kind={st as any}>{st === 'live' ? '● live' : '○ dev'}</Pill></td>
-                    <td style={{ padding: '12px 16px', color: TEXT_FAINT, fontSize: 12 }}>{by}</td>
+                  <tr key={svc} className="docs-services-row" style={{ borderTop: `1px solid ${BORDER}` }}>
+                    <td data-label="Service" style={{ padding: '12px 16px', color: TEXT }}>{svc}</td>
+                    <td data-label="Cost"    style={{ padding: '12px 16px', color: LILAC }}>{cost}</td>
+                    <td data-label="Status"  style={{ padding: '12px 16px' }}><Pill kind={st as any}>{st === 'live' ? '● live' : '○ dev'}</Pill></td>
+                    <td data-label="Backed by" style={{ padding: '12px 16px', color: TEXT_FAINT, fontSize: 12 }}>{by}</td>
                   </tr>
                 ))}
               </tbody>
@@ -390,7 +389,7 @@ const reply = await z.computeInfer(
 // { response, model, provider, usage }
 
 // ── Phone & SMS (paid) ──
-const phone = await z.phoneProvision({ country: 'US' });       // 0.5 0G
+const phone = await z.phoneProvision({ country: 'US' });       // 3.0 0G
 //   or pass an exact number from a previous search:
 //   await z.phoneProvision({ phoneNumber: '+18164961100' })
 await z.phoneSms(phone.id, '+1...', 'Hello');                  // 0.01 0G
@@ -435,7 +434,7 @@ const resources = await z.listResources();`}</Code>
           <Endpoint method="GET" path="/phone/status" cost="free" status="live" desc="Active provider (Telnyx or Twilio) + capabilities." />
           <Endpoint method="GET" path="/phone/countries" cost="free" status="live" desc="50 curated country picks (Telnyx/Twilio support 170+; pass any 2-letter ISO code)." />
           <Endpoint method="GET" path={`/phone/search?country=US&areaCode=415`} cost="free" status="live" desc="Live inventory. Aliases like 'UK' resolve to 'GB' automatically." />
-          <Endpoint method="POST" path="/phone/provision" cost="0.5 0G" status="live" body={`{ "country", "areaCode" }  or  { "phoneNumber": "+1..." }`} desc="Country mode: rotates 5 candidates if upstream churns. Specific-number mode: validates E.164 before x402 charges." />
+          <Endpoint method="POST" path="/phone/provision" cost="3.0 0G" status="live" body={`{ "country", "areaCode" }  or  { "phoneNumber": "+1..." }`} desc="Country mode: rotates 5 candidates if upstream churns. Specific-number mode: validates E.164 before x402 charges." />
           <Endpoint method="POST" path="/phone/:id/sms" cost="0.01 0G" status="live" body={`{ "to", "body" }`} desc="Pre-flight catches To==From, missing fields, malformed E.164 BEFORE x402 charges." />
           <Endpoint method="GET" path="/phone/:id/logs?owner=0x..." cost="free" status="live" desc="SMS history (owner-scoped)." />
 
@@ -457,8 +456,8 @@ const resources = await z.listResources();`}</Code>
           title="Smart contracts"
           intro={<>Three contracts deployed on 0G Chain testnet (chain ID 16602). 98 unit + fuzz tests passing.</>}
         >
-          <div style={{ overflow: 'auto', border: `1px solid ${BORDER}` }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+          <div className="docs-services" style={{ border: `1px solid ${BORDER}` }}>
+            <table className="docs-services-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
               <thead>
                 <tr style={{ background: BG_CARD }}>
                   <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Contract</th>
@@ -472,12 +471,12 @@ const resources = await z.listResources();`}</Code>
                   ['AgentRegistry',    '0xb485D45688FE1103cC457acA62217Ba586Aec71a', 'Wallet → owned resources mapping'],
                   ['ZeroGentIdentity', '0xf8F9675B9C2dDca655AD3C10550B97266327a82C', 'ERC-721 agent NFT, metadata on 0G Storage'],
                 ] as const).map(([n, a, p]) => (
-                  <tr key={a} style={{ borderTop: `1px solid ${BORDER}` }}>
-                    <td style={{ padding: '12px 16px', color: TEXT }}>{n}</td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <a href={`https://chainscan-galileo.0g.ai/address/${a}`} target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline', fontSize: 11 }}>{a}</a>
+                  <tr key={a} className="docs-services-row" style={{ borderTop: `1px solid ${BORDER}` }}>
+                    <td data-label="Contract" style={{ padding: '12px 16px', color: TEXT }}>{n}</td>
+                    <td data-label="Address"  style={{ padding: '12px 16px' }}>
+                      <a href={`https://chainscan-galileo.0g.ai/address/${a}`} target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline', fontSize: 11, wordBreak: 'break-all' }}>{a}</a>
                     </td>
-                    <td style={{ padding: '12px 16px', color: TEXT_FAINT }}>{p}</td>
+                    <td data-label="Purpose"  style={{ padding: '12px 16px', color: TEXT_FAINT }}>{p}</td>
                   </tr>
                 ))}
               </tbody>
