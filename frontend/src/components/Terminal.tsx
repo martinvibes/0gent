@@ -851,7 +851,7 @@ export function Terminal() {
               title: `Service prices · paid in ${d.currency || '0G'}`,
               titleSize: 'lg',
               rows,
-              note: `network: ${d.network || `0G Chain ${d.chain?.chainId || 16602}`}`,
+              note: `network: ${d.network || `0G Chain ${d.chain?.chainId || 16661}`}`,
             },
           },
         ]);

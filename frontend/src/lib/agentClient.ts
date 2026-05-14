@@ -154,7 +154,7 @@ function humanizeEthersError(e: any): string {
   if (/insufficient funds/i.test(raw))    return 'Not enough 0G in your wallet to cover this payment.';
   if (/user rejected/i.test(raw))         return 'Transaction rejected.';
   if (/nonce/i.test(raw) && /low|known|already/i.test(raw)) return 'Nonce conflict — try again.';
-  if (/timeout/i.test(raw))               return 'Transaction took too long to confirm. Check chainscan-galileo.';
+  if (/timeout/i.test(raw))               return 'Transaction took too long to confirm. Check chainscan.';
   if (/no matching receipts/i.test(raw))  return '0G Chain RPC hiccup — your transaction may still settle. Refresh and retry.';
   // Strip the noisy ethers wrapper
   return raw.replace(/\(.*?version=.*?\)/g, '').trim().slice(0, 240);

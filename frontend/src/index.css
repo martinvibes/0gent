@@ -505,7 +505,7 @@ body::after {
   .terminal-stat-grid { gap: 10px !important; }
   .terminal-stat-card { padding: 14px 14px !important; }
   .terminal-stat-value { font-size: 22px !important; }
-  /* Status bar — let it wrap when "x402 · 0G testnet · chain 16602" + "5 requests · Ln 2"
+  /* Status bar — let it wrap when "x402 · 0G mainnet · chain 16661" + "5 requests · Ln 2"
      can't fit on one line. Better than truncation. */
   .terminal-status-bar { font-size: 9.5px !important; padding: 6px 10px !important; }
   /* Hide the middle dots if items wrap — they look weird at line ends */

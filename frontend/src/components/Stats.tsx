@@ -258,7 +258,7 @@ export function Stats() {
           <p style={{ fontSize: 17, color: TEXT_DIM, lineHeight: 1.7, maxWidth: 640 }}>
             Every paid endpoint settles a real transaction on 0G Chain. These numbers are aggregated from the on-chain payment log, same data
             anyone can pull from{' '}
-            <a href="https://chainscan.0g.ai" target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline' }}>chainscan-galileo</a>.
+            <a href="https://chainscan.0g.ai" target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline' }}>chainscan</a>.
           </p>
         </div>
 
