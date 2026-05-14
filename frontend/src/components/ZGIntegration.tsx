@@ -48,7 +48,7 @@ interface Item {
 }
 
 const items: Item[] = [
-  { title: '0G Chain · x402',    desc: 'Native-0G token payments via the x402 protocol. Resource registry and agent identity all on-chain.', detail: 'ZeroGentPayment.sol · 16602', icon: ChainIcon },
+  { title: '0G Chain · x402',    desc: 'Native-0G token payments via the x402 protocol. Resource registry and agent identity all on-chain.', detail: 'ZeroGentPayment.sol · 16661', icon: ChainIcon },
   { title: '0G Storage',         desc: 'Agent memory, NFT metadata, session state on decentralized storage.',                                detail: '@0glabs/0g-ts-sdk',           icon: StorageIcon },
   { title: '0G Compute Network', desc: 'Pay-per-call AI inference via the 0G Compute serving network.',                                      detail: '@0glabs/0g-serving-broker',   icon: ComputeIcon },
   { title: 'Agent Identity',     desc: 'One ERC-721 per agent on 0G Chain. Metadata on 0G Storage. Permanent.',                              detail: 'ZeroGentIdentity.sol',        icon: IdentityIcon },

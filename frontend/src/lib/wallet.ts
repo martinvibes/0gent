@@ -9,8 +9,8 @@
 import { JsonRpcProvider, Wallet, formatEther, isAddress } from 'ethers';
 
 const STORAGE_KEY = '0gent.wallet.v1';
-const RPC_URL = 'https://evmrpc-testnet.0g.ai';
-const CHAIN_ID = 16602;
+const RPC_URL = 'https://evmrpc.0g.ai';
+const CHAIN_ID = 16661;
 
 export interface GeneratedWallet {
   name: string;
@@ -156,4 +156,4 @@ export function shortAddress(a: string): string {
 }
 
 export const FAUCET_URL = 'https://faucet.0g.ai';
-export const EXPLORER_BASE = 'https://chainscan-galileo.0g.ai/address/';
+export const EXPLORER_BASE = 'https://chainscan.0g.ai/address/';

@@ -20,12 +20,12 @@ export interface Config {
 
 const DEFAULTS: Config = {
   apiEndpoint: process.env.OGENT_API || 'https://api.0gent.xyz',
-  chainId: 16602,
-  rpcUrl: 'https://evmrpc-testnet.0g.ai',
-  paymentContract: '0x28C212Ce343e6C7b75363638954AF5Fd10Ab411B',
-  registryContract: '0xb485D45688FE1103cC457acA62217Ba586Aec71a',
-  identityContract: '0xf8F9675B9C2dDca655AD3C10550B97266327a82C',
-  storageIndexer: 'https://indexer-storage-testnet-turbo.0g.ai',
+  chainId: 16661,
+  rpcUrl: 'https://evmrpc.0g.ai',
+  paymentContract: '0x124aF88c004e9df6D444a0Afc0Fe7Ef215dc02A2',
+  registryContract: '0x49589C475BBB418B0E069010C923ed18D00E275b',
+  identityContract: '0xa601C569FD008DEd545531a5d3245B2C68ac591d',
+  storageIndexer: 'https://indexer-storage-turbo.0g.ai',
 };
 
 export function ensureDirs(): void {

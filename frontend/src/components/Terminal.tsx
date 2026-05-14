@@ -46,17 +46,17 @@ const SIM: Record<string, Array<Line>> = {
     { type: 'out', text: 'pricing                        Service prices      free' },
     { type: 'out', text: 'phone countries                List supported      free' },
     { type: 'out', text: 'phone search --country US      Search numbers      free' },
-    { type: 'out', text: 'phone provision                Provision phone     3.0 0G' },
-    { type: 'out', text: 'phone sms <id>                 Send SMS            0.01 0G' },
-    { type: 'out', text: 'email create --name agent      Create inbox        0.2 0G' },
-    { type: 'out', text: 'email send <id>                Send email          0.08 0G' },
-    { type: 'out', text: 'email read <id>                Read inbox          0.02 0G' },
-    { type: 'out', text: 'identity mint                  Mint Agent NFT      0.1 0G' },
+    { type: 'out', text: 'phone provision                Provision phone     6.0 0G' },
+    { type: 'out', text: 'phone sms <id>                 Send SMS            0.1 0G' },
+    { type: 'out', text: 'email create --name agent      Create inbox        2.0 0G' },
+    { type: 'out', text: 'email send <id>                Send email          0.1 0G' },
+    { type: 'out', text: 'email read <id>                Read inbox          0.05 0G' },
+    { type: 'out', text: 'identity mint                  Mint Agent NFT      0.5 0G' },
     { type: 'out', text: 'memory set <key> <value>       Write to 0G Storage free' },
   ],
   'phone provision': [
     { type: 'out', text: '→ POST /phone/provision' },
-    { type: 'err', text: '402 Payment Required — 3.0 0G' },
+    { type: 'err', text: '402 Payment Required — 6.0 0G' },
     { type: 'out', text: '→ ZeroGentPayment.pay(nonce, "phone")' },
     { type: 'ok', text: 'Payment verified on 0G Chain' },
     { type: 'ok', text: 'Provisioned via Telnyx' },
@@ -68,7 +68,7 @@ const SIM: Record<string, Array<Line>> = {
   ],
   'identity mint': [
     { type: 'out', text: '→ POST /identity/mint' },
-    { type: 'err', text: '402 Payment Required — 0.1 0G' },
+    { type: 'err', text: '402 Payment Required — 0.5 0G' },
     { type: 'out', text: '→ ZeroGentPayment.pay(nonce, "identity")' },
     { type: 'ok', text: 'Payment verified' },
     { type: 'ok', text: 'Metadata → 0G Storage: 0g://0x73fa973e...' },
@@ -78,7 +78,7 @@ const SIM: Record<string, Array<Line>> = {
   ],
   'email create --name agent': [
     { type: 'out', text: '→ POST /email/provision' },
-    { type: 'err', text: '402 Payment Required — 0.2 0G' },
+    { type: 'err', text: '402 Payment Required — 2.0 0G' },
     { type: 'out', text: '→ ZeroGentPayment.pay(nonce, "email")' },
     { type: 'ok', text: 'Payment verified' },
     { type: 'ok', text: 'Cloudflare routing rule created' },
@@ -259,9 +259,9 @@ function StatusBar({ requests, lineNum }: { requests: number; lineNum: number })
         >
           x402
         </span>
-        <span style={{ color: 'rgba(254,254,254,0.4)' }}>0G testnet</span>
+        <span style={{ color: 'rgba(254,254,254,0.4)' }}>0G mainnet</span>
         <span className="terminal-status-dot" style={{ color: 'rgba(254,254,254,0.25)' }}>·</span>
-        <span style={{ color: 'rgba(254,254,254,0.4)' }}>chain 16602</span>
+        <span style={{ color: 'rgba(254,254,254,0.4)' }}>chain 16661</span>
       </div>
       <div className="terminal-status-right" style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
         <span>{requests} {requests === 1 ? 'request' : 'requests'}</span>
@@ -934,7 +934,7 @@ export function Terminal() {
                 title: `${d.numbers.length} numbers in ${d.country?.name || country}`,
                 titleSize: 'lg',
                 rows,
-                note: `provider: ${d.provider} · run "phone provision" to claim one for 3.0 0G`,
+                note: `provider: ${d.provider} · run "phone provision" to claim one for 6.0 0G`,
                 badge: { text: 'LIVE', kind: 'ok' },
               },
             },
@@ -991,7 +991,7 @@ export function Terminal() {
             rows: [
               { label: 'address', value: addr },
               { label: 'balance', value: wallet.balance ? `${Number(wallet.balance.zg).toFixed(4)} 0G` : '…', valueColor: LILAC },
-              { label: 'chain',   value: '0G Chain · 16602' },
+              { label: 'chain',   value: '0G Chain · 16661' },
               { label: 'storage', value: 'browser localStorage · AES-256-GCM' },
             ],
             badge: wallet.state.kind === 'unlocked'

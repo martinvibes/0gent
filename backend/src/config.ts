@@ -9,13 +9,13 @@ export const config = {
   port: parseInt(optional("PORT", "3000"), 10),
   nodeEnv: optional("NODE_ENV", "development"),
 
-  // 0G Chain
-  zgRpcUrl: optional("ZG_RPC_URL", "https://evmrpc-testnet.0g.ai"),
-  zgChainId: parseInt(optional("ZG_CHAIN_ID", "16602"), 10),
+  // 0G Chain (mainnet)
+  zgRpcUrl: optional("ZG_RPC_URL", "https://evmrpc.0g.ai"),
+  zgChainId: parseInt(optional("ZG_CHAIN_ID", "16661"), 10),
   deployerPrivateKey: optional("DEPLOYER_PRIVATE_KEY", ""),
-  paymentContractAddress: optional("PAYMENT_CONTRACT_ADDRESS", ""),
-  registryContractAddress: optional("REGISTRY_CONTRACT_ADDRESS", ""),
-  identityContractAddress: optional("IDENTITY_CONTRACT_ADDRESS", ""),
+  paymentContractAddress: optional("PAYMENT_CONTRACT_ADDRESS", "0x124aF88c004e9df6D444a0Afc0Fe7Ef215dc02A2"),
+  registryContractAddress: optional("REGISTRY_CONTRACT_ADDRESS", "0x49589C475BBB418B0E069010C923ed18D00E275b"),
+  identityContractAddress: optional("IDENTITY_CONTRACT_ADDRESS", "0xa601C569FD008DEd545531a5d3245B2C68ac591d"),
 
   // 0G Storage
   zgStorageIndexerUrl: optional("ZG_STORAGE_INDEXER_URL", "https://indexer-storage-turbo.0g.ai"),
@@ -48,14 +48,14 @@ export const config = {
   namecheapApiKey: optional("NAMECHEAP_API_KEY", ""),
   namecheapApiUser: optional("NAMECHEAP_API_USER", ""),
 
-  // Pricing (in 0G tokens, human-readable)
-  pricePhoneProvision: optional("PRICE_PHONE", "3.0"),
-  priceSmsSend: optional("PRICE_SMS", "0.01"),
-  priceEmailProvision: optional("PRICE_EMAIL", "0.2"),
-  priceEmailSend: optional("PRICE_EMAIL_SEND", "0.08"),
-  priceEmailRead: optional("PRICE_EMAIL_READ", "0.02"),
+  // Pricing (in 0G tokens, human-readable — mainnet rates)
+  pricePhoneProvision: optional("PRICE_PHONE", "6.0"),
+  priceSmsSend: optional("PRICE_SMS", "0.1"),
+  priceEmailProvision: optional("PRICE_EMAIL", "2.0"),
+  priceEmailSend: optional("PRICE_EMAIL_SEND", "0.1"),
+  priceEmailRead: optional("PRICE_EMAIL_READ", "0.05"),
   priceComputeProvision: optional("PRICE_COMPUTE", "1.0"),
-  priceComputeInfer: optional("PRICE_COMPUTE_INFER", "0.05"),
+  priceComputeInfer: optional("PRICE_COMPUTE_INFER", "0.2"),
   priceDomainRegister: optional("PRICE_DOMAIN", "2.0"),
-  priceIdentityMint: optional("PRICE_IDENTITY_MINT", "0.1"),
+  priceIdentityMint: optional("PRICE_IDENTITY_MINT", "0.5"),
 } as const;

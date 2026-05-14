@@ -27,10 +27,10 @@ Token: 0G (native)
 
 **Mint Agent Identity**
 POST /identity/mint
-Cost: 0.1 0G
+Cost: 0.5 0G
 Body: { "name": "optional agent name" }
 Returns: { tokenId, agent, metadataURI, txHash }
-Note: One identity per wallet. Standard ERC-721 deployed on 0G Chain (`ZeroGentIdentity` at `0xf8F9675B9C2dDca655AD3C10550B97266327a82C`). Metadata pinned on 0G Storage.
+Note: One identity per wallet. Standard ERC-721 deployed on 0G Chain (`ZeroGentIdentity` at `0xa601C569FD008DEd545531a5d3245B2C68ac591d`). Metadata pinned on 0G Storage.
 
 **Get Agent Identity**
 GET /identity/:walletAddress
@@ -49,26 +49,26 @@ Aggregates the agent's identity NFT, all on-chain resources from `AgentRegistry`
 
 **Provision Email Inbox**
 POST /email/provision
-Cost: 0.2 0G
+Cost: 2.0 0G
 Body: { "name": "my-agent" }
 Returns: { id, address, localPart, owner, resourceId }
 
 **Send Email**
 POST /email/:id/send
-Cost: 0.08 0G
+Cost: 0.1 0G
 Body: { "to": "user@example.com", "subject": "...", "body": "..." }
 Returns: { messageId, from, to, subject, sentAt }
 Sent via Resend; outbound deliverability already verified.
 
 **Read Inbox**
 GET /email/:id/inbox
-Cost: 0.02 0G
+Cost: 0.05 0G
 Returns: { messages: [{ id, direction, from, to, subject, text, html, receivedAt }] }
 Inbound email is captured by a Cloudflare Email Worker that parses MIME with `postal-mime` and posts to our backend webhook.
 
 **List Threads**
 GET /email/:id/threads
-Cost: 0.02 0G
+Cost: 0.05 0G
 Returns: { threads: [{ subject, count, lastReceivedAt }] }
 
 ### Compute (AI Inference) ✅
@@ -89,7 +89,7 @@ Returns: { operator, providersAvailable, sampleProviders[], ledger: { exists, to
 
 **Run Inference**
 POST /compute/infer
-Cost: 0.05 0G
+Cost: 0.2 0G
 Body: { "prompt": "...", "model": "<optional>", "maxTokens": 500, "system": "<optional system prompt>" }
 Returns: { response, model, provider, usage: { promptTokens, completionTokens, totalTokens } }
 Hits an OpenAI-compatible `/chat/completions` endpoint at the chosen 0G Compute provider with broker-signed headers, returns the completion to the agent.
@@ -135,7 +135,7 @@ Returns: { countries: [{ code, name, region, popular }], count, note }
 
 **Provision Phone Number**
 POST /phone/provision
-Cost: 3.0 0G
+Cost: 6.0 0G
 Body: { "country": "US", "areaCode": "415" }            ← any-available mode
    or  { "phoneNumber": "+18164961100" }                ← exact-number mode
 Returns: { id, phoneNumber, country, owner, resourceId, expiresAt }
@@ -143,7 +143,7 @@ Pre-flight validates E.164 BEFORE x402 charges, so typos cost nothing. Country m
 
 **Send SMS**
 POST /phone/:id/sms
-Cost: 0.01 0G
+Cost: 0.1 0G
 Body: { "to": "+15551234567", "body": "Hello from 0GENT" }
 Returns: { id, from, to, body, timestamp }
 Pre-flight catches To==From, missing fields, and malformed E.164 BEFORE x402 charges. Telnyx-specific errors (caller-ID restrictions, region locks) translate to actionable messages instead of raw upstream JSON.

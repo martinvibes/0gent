@@ -38,7 +38,7 @@ const GREEN      = '#7DEFB1';
 const AMBER      = '#FFC97A';
 const RED        = '#f85149';
 
-const CHAIN_EXPLORER_TX = 'https://chainscan-galileo.0g.ai/tx/';
+const CHAIN_EXPLORER_TX = 'https://chainscan.0g.ai/tx/';
 
 // ─── Shared UI ────────────────────────────────────────────────────────
 
@@ -424,9 +424,9 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
 type TabId = 'ask' | 'identity' | 'email' | 'phone' | 'memory';
 
 const TABS: { id: TabId; label: string; icon: ReactNode; cost?: string }[] = [
-  { id: 'ask',      label: 'Ask AI',        icon: <BrainIcon    size={14} />, cost: '0.05 0G' },
-  { id: 'identity', label: 'Identity',      icon: <IdentityIcon size={14} />, cost: '0.1 0G' },
-  { id: 'email',    label: 'Email',         icon: <EmailIcon    size={14} />, cost: 'from 0.02 0G' },
+  { id: 'ask',      label: 'Ask AI',        icon: <BrainIcon    size={14} />, cost: '0.2 0G' },
+  { id: 'identity', label: 'Identity',      icon: <IdentityIcon size={14} />, cost: '0.5 0G' },
+  { id: 'email',    label: 'Email',         icon: <EmailIcon    size={14} />, cost: 'from 0.05 0G' },
   { id: 'phone',    label: 'Phone & SMS',   icon: <PhoneIcon    size={14} /> },
   { id: 'memory',   label: 'Memory',        icon: <DatabaseIcon size={14} />, cost: 'free' },
 ];
@@ -544,7 +544,7 @@ function IdentityCard({ client }: { client: AgentClient }) {
         </div>
       ) : (
         <button style={{ ...primaryBtn, width: '100%' }} className={primaryClass} onClick={mint} disabled={state.kind !== 'idle' && state.kind !== 'error' && state.kind !== 'success'}>
-          {state.kind === 'idle' || state.kind === 'error' || state.kind === 'success' ? 'Mint identity (0.1 0G)' : 'Minting…'}
+          {state.kind === 'idle' || state.kind === 'error' || state.kind === 'success' ? 'Mint identity (0.5 0G)' : 'Minting…'}
         </button>
       )}
       <ProgressLine status={state} />
@@ -645,7 +645,7 @@ function EmailCard({ client }: { client: AgentClient }) {
               }}
               className={ghostClass}
             >
-              + provision a new inbox · 0.2 0G
+              + provision a new inbox · 2.0 0G
             </button>
           ) : (
             <div className="dash-result-in" style={{ padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.04)' }}>

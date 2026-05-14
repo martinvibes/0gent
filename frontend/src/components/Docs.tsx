@@ -221,10 +221,10 @@ npm i -g @0gent/core
 
           <Code lang="bash">{`0gent wallet fund            # opens a faucet link + QR
 0gent balance                # confirm the testnet 0G arrived
-0gent identity mint          # mint your Agent NFT (0.1 0G)
-0gent email create scout     # claim scout@0gent.xyz (0.2 0G)
-0gent compute infer "explain x402 in one sentence"  # paid LLM call (0.05 0G)
-0gent phone provision --country US -y               # real US number (3.0 0G + ~$2)
+0gent identity mint          # mint your Agent NFT (0.5 0G)
+0gent email create scout     # claim scout@0gent.xyz (2.0 0G)
+0gent compute infer "explain x402 in one sentence"  # paid LLM call (0.2 0G)
+0gent phone provision --country US -y               # real US number (6.0 0G + ~$2)
 0gent phone sms <id> --to +<your-mobile> --body "from my agent"`}</Code>
         </Section>
 
@@ -283,13 +283,13 @@ npm i -g @0gent/core
               </thead>
               <tbody style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                 {([
-                  ['Identity NFT mint',     '0.1 0G',     'live', '0G Chain · ZeroGentIdentity'],
-                  ['Email inbox provision', '0.2 0G',     'live', 'Cloudflare Email Workers'],
-                  ['Send email',            '0.08 0G',    'live', 'Resend'],
-                  ['Read inbox',            '0.02 0G',    'live', 'Cloudflare Worker → backend webhook'],
-                  ['AI inference (LLM)',    '0.05 0G',    'live', '0G Compute Network · qwen-2.5-7b'],
-                  ['Phone number',          '3.0 0G',     'live', 'Telnyx'],
-                  ['Send SMS',              '0.01 0G',    'live', 'Telnyx'],
+                  ['Identity NFT mint',     '0.5 0G',     'live', '0G Chain · ZeroGentIdentity'],
+                  ['Email inbox provision', '2.0 0G',     'live', 'Cloudflare Email Workers'],
+                  ['Send email',            '0.1 0G',     'live', 'Resend'],
+                  ['Read inbox',            '0.05 0G',    'live', 'Cloudflare Worker → backend webhook'],
+                  ['AI inference (LLM)',    '0.2 0G',     'live', '0G Compute Network · qwen-2.5-7b'],
+                  ['Phone number',          '6.0 0G',     'live', 'Telnyx'],
+                  ['Send SMS',              '0.1 0G',     'live', 'Telnyx'],
                   ['Persistent memory',     'free',       'live', '0G Storage'],
                   ['Domain registration',   '2.0 0G',     'dev',  'Namecheap'],
                   ['Compute VPS',           '1.0 0G/mo',  'dev',  'Hetzner Cloud'],
@@ -306,8 +306,7 @@ npm i -g @0gent/core
             </table>
           </div>
           <p style={{ fontSize: 12, color: TEXT_GHOST, marginTop: 14, fontStyle: 'italic' }}>
-            Live pricing is always at <a href="/pricing" style={{ color: LILAC }}>/pricing</a> — never hardcode. Prices are set for testnet
-            with mainnet-realistic adjustment planned at launch.
+            Live pricing is always at <a href="/pricing" style={{ color: LILAC }}>/pricing</a> — never hardcode. Prices are set for mainnet.
           </p>
         </Section>
 
@@ -326,7 +325,7 @@ npm i -g @0gent/core
   │    {contract, nonce, amount}     │                                │
   │                                  │                                │
   │  ZeroGentPayment.pay(nonce,      │                                │
-  │   "compute-infer") with 0.05 0G  │                                │
+  │   "compute-infer") with 0.2 0G   │                                │
   ├──────────────────────────────────┼───────────────────────────────▶│
   │                                  │                       ✓ Event  │
   │  POST /compute/infer +           │                                │
@@ -375,24 +374,24 @@ await z.phoneCountries();
 await z.phoneSearch('US', '415');
 
 // ── Identity (paid) ──
-const id = await z.identityMint('support-bot');                // 0.1 0G
+const id = await z.identityMint('support-bot');                // 0.5 0G
 
 // ── Email (paid) ──
-const inbox = await z.emailCreate('support');                  // 0.2 0G
+const inbox = await z.emailCreate('support');                  // 2.0 0G
 await z.emailSend(inbox.id,
-  'user@example.com', 'Receipt', 'Thanks!');                   // 0.08 0G
-const messages = await z.emailRead(inbox.id);                  // 0.02 0G
+  'user@example.com', 'Receipt', 'Thanks!');                   // 0.1 0G
+const messages = await z.emailRead(inbox.id);                  // 0.05 0G
 
 // ── 0G Compute (paid) ──
 const reply = await z.computeInfer(
-  'What is 0G Chain in one sentence?', { maxTokens: 80 });     // 0.05 0G
+  'What is 0G Chain in one sentence?', { maxTokens: 80 });     // 0.2 0G
 // { response, model, provider, usage }
 
 // ── Phone & SMS (paid) ──
-const phone = await z.phoneProvision({ country: 'US' });       // 3.0 0G
+const phone = await z.phoneProvision({ country: 'US' });       // 6.0 0G
 //   or pass an exact number from a previous search:
 //   await z.phoneProvision({ phoneNumber: '+18164961100' })
-await z.phoneSms(phone.id, '+1...', 'Hello');                  // 0.01 0G
+await z.phoneSms(phone.id, '+1...', 'Hello');                  // 0.1 0G
 
 // ── Memory (free) ──
 await z.memory.set('last_conv', { user: 'alice' });
@@ -415,27 +414,27 @@ const resources = await z.listResources();`}</Code>
           <Endpoint method="GET" path="/skill.md" cost="free" status="live" desc="LLM-readable manifest of every endpoint." />
 
           <h3 style={{ fontSize: 16, fontWeight: 500, color: LILAC, margin: '24px 0 12px' }}>Identity</h3>
-          <Endpoint method="POST" path="/identity/mint" cost="0.1 0G" status="live" body={`{ "name": "scout" }`} desc="ERC-721 NFT, one per wallet, metadata pinned to 0G Storage." />
+          <Endpoint method="POST" path="/identity/mint" cost="0.5 0G" status="live" body={`{ "name": "scout" }`} desc="ERC-721 NFT, one per wallet, metadata pinned to 0G Storage." />
           <Endpoint method="GET" path="/identity/:walletAddress" cost="free" status="live" desc="Lookup any agent's identity." />
           <Endpoint method="GET" path="/agent/:address" cost="free" status="live" desc="Aggregated public profile — identity + resources + balance — useful for inter-agent introspection." />
 
           <h3 style={{ fontSize: 16, fontWeight: 500, color: LILAC, margin: '24px 0 12px' }}>Email</h3>
-          <Endpoint method="POST" path="/email/provision" cost="0.2 0G" status="live" body={`{ "name": "scout" }`} desc="Provision <name>@0gent.xyz inbox, owned by your wallet." />
-          <Endpoint method="POST" path="/email/:id/send" cost="0.08 0G" status="live" body={`{ "to", "subject", "body" }`} desc="Send via Resend, with on-chain receipt." />
-          <Endpoint method="GET" path="/email/:id/inbox" cost="0.02 0G" status="live" desc="Read inbound replies (Cloudflare Worker captures inbound MIME)." />
-          <Endpoint method="GET" path="/email/:id/threads" cost="0.02 0G" status="live" desc="Conversation-grouped view of the inbox." />
+          <Endpoint method="POST" path="/email/provision" cost="2.0 0G" status="live" body={`{ "name": "scout" }`} desc="Provision <name>@0gent.xyz inbox, owned by your wallet." />
+          <Endpoint method="POST" path="/email/:id/send" cost="0.1 0G" status="live" body={`{ "to", "subject", "body" }`} desc="Send via Resend, with on-chain receipt." />
+          <Endpoint method="GET" path="/email/:id/inbox" cost="0.05 0G" status="live" desc="Read inbound replies (Cloudflare Worker captures inbound MIME)." />
+          <Endpoint method="GET" path="/email/:id/threads" cost="0.05 0G" status="live" desc="Conversation-grouped view of the inbox." />
 
           <h3 style={{ fontSize: 16, fontWeight: 500, color: LILAC, margin: '24px 0 12px' }}>0G Compute (AI inference)</h3>
           <Endpoint method="GET" path="/compute/providers" cost="free" status="live" desc="Live discovery of upstream inference providers on 0G Compute Network." />
           <Endpoint method="GET" path="/compute/status" cost="free" status="live" desc="Operator ledger balance, providers count, ready flag." />
-          <Endpoint method="POST" path="/compute/infer" cost="0.05 0G" status="live" body={`{ "prompt", "model?", "maxTokens?", "system?" }`} desc="Pay-per-call LLM. Returns OpenAI-shape { response, model, provider, usage }." />
+          <Endpoint method="POST" path="/compute/infer" cost="0.2 0G" status="live" body={`{ "prompt", "model?", "maxTokens?", "system?" }`} desc="Pay-per-call LLM. Returns OpenAI-shape { response, model, provider, usage }." />
 
           <h3 style={{ fontSize: 16, fontWeight: 500, color: LILAC, margin: '24px 0 12px' }}>Phone & SMS</h3>
           <Endpoint method="GET" path="/phone/status" cost="free" status="live" desc="Active provider (Telnyx or Twilio) + capabilities." />
           <Endpoint method="GET" path="/phone/countries" cost="free" status="live" desc="50 curated country picks (Telnyx/Twilio support 170+; pass any 2-letter ISO code)." />
           <Endpoint method="GET" path={`/phone/search?country=US&areaCode=415`} cost="free" status="live" desc="Live inventory. Aliases like 'UK' resolve to 'GB' automatically." />
-          <Endpoint method="POST" path="/phone/provision" cost="3.0 0G" status="live" body={`{ "country", "areaCode" }  or  { "phoneNumber": "+1..." }`} desc="Country mode: rotates 5 candidates if upstream churns. Specific-number mode: validates E.164 before x402 charges." />
-          <Endpoint method="POST" path="/phone/:id/sms" cost="0.01 0G" status="live" body={`{ "to", "body" }`} desc="Pre-flight catches To==From, missing fields, malformed E.164 BEFORE x402 charges." />
+          <Endpoint method="POST" path="/phone/provision" cost="6.0 0G" status="live" body={`{ "country", "areaCode" }  or  { "phoneNumber": "+1..." }`} desc="Country mode: rotates 5 candidates if upstream churns. Specific-number mode: validates E.164 before x402 charges." />
+          <Endpoint method="POST" path="/phone/:id/sms" cost="0.1 0G" status="live" body={`{ "to", "body" }`} desc="Pre-flight catches To==From, missing fields, malformed E.164 BEFORE x402 charges." />
           <Endpoint method="GET" path="/phone/:id/logs?owner=0x..." cost="free" status="live" desc="SMS history (owner-scoped)." />
 
           <h3 style={{ fontSize: 16, fontWeight: 500, color: LILAC, margin: '24px 0 12px' }}>Memory (0G Storage)</h3>
@@ -454,7 +453,7 @@ const resources = await z.listResources();`}</Code>
           id="contracts"
           kicker="07"
           title="Smart contracts"
-          intro={<>Three contracts deployed on 0G Chain testnet (chain ID 16602). 98 unit + fuzz tests passing.</>}
+          intro={<>Three contracts deployed on 0G Chain mainnet (chain ID 16661). 98 unit + fuzz tests passing.</>}
         >
           <div className="docs-services" style={{ border: `1px solid ${BORDER}` }}>
             <table className="docs-services-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
@@ -467,14 +466,14 @@ const resources = await z.listResources();`}</Code>
               </thead>
               <tbody style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                 {([
-                  ['ZeroGentPayment',  '0x28C212Ce343e6C7b75363638954AF5Fd10Ab411B', 'x402 treasury, nonce-replay protected'],
-                  ['AgentRegistry',    '0xb485D45688FE1103cC457acA62217Ba586Aec71a', 'Wallet → owned resources mapping'],
-                  ['ZeroGentIdentity', '0xf8F9675B9C2dDca655AD3C10550B97266327a82C', 'ERC-721 agent NFT, metadata on 0G Storage'],
+                  ['ZeroGentPayment',  '0x124aF88c004e9df6D444a0Afc0Fe7Ef215dc02A2', 'x402 treasury, nonce-replay protected'],
+                  ['AgentRegistry',    '0x49589C475BBB418B0E069010C923ed18D00E275b', 'Wallet → owned resources mapping'],
+                  ['ZeroGentIdentity', '0xa601C569FD008DEd545531a5d3245B2C68ac591d', 'ERC-721 agent NFT, metadata on 0G Storage'],
                 ] as const).map(([n, a, p]) => (
                   <tr key={a} className="docs-services-row" style={{ borderTop: `1px solid ${BORDER}` }}>
                     <td data-label="Contract" style={{ padding: '12px 16px', color: TEXT }}>{n}</td>
                     <td data-label="Address"  style={{ padding: '12px 16px' }}>
-                      <a href={`https://chainscan-galileo.0g.ai/address/${a}`} target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline', fontSize: 11, wordBreak: 'break-all' }}>{a}</a>
+                      <a href={`https://chainscan.0g.ai/address/${a}`} target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline', fontSize: 11, wordBreak: 'break-all' }}>{a}</a>
                     </td>
                     <td data-label="Purpose"  style={{ padding: '12px 16px', color: TEXT_FAINT }}>{p}</td>
                   </tr>
@@ -496,7 +495,7 @@ const resources = await z.listResources();`}</Code>
           {([
             ['Is this real or a simulation?', <>Real. Real on-chain payments, real emails delivered, real phone numbers, real LLM completions. Just on testnet for now, where 0G has no dollar value.</>],
             ['What if I lose my mnemonic?', <>You lose access — same as MetaMask. Save it when <code style={{ color: LILAC }}>0gent setup</code> shows it. There is no reset.</>],
-            ['Can I run this on 0G mainnet?', <>Mainnet support coming after the hackathon. Testnet (chain 16602) for now.</>],
+            ['Can I run this on 0G mainnet?', <>Live on 0G mainnet (chain 16661).</>],
             ['How does the server verify my payment?', <>By reading <code style={{ color: LILAC }}>PaymentReceived</code> events from <code style={{ color: LILAC }}>ZeroGentPayment</code> on-chain, matching the nonce you signed. No cookies, no API keys, no sessions.</>],
             ['Why ERC-721 and not ERC-7857 (INFT)?', <>ERC-7857 wasn't documented in 0G's docs when this project shipped. We use vanilla ERC-721 on 0G Chain with metadata on 0G Storage. Migration to ERC-7857 is a one-contract swap when the standard is finalized.</>],
             ['What happens if a paid call fails upstream?', <>Pre-flight checks (E.164 shape, To==From, missing fields) reject *before* x402 charges, so most user errors cost zero 0G. Other upstream rejections (Telnyx region locks, etc.) currently cost the agent the call fee — automatic on-chain refunds are on the roadmap.</>],
@@ -519,8 +518,8 @@ const resources = await z.listResources();`}</Code>
               ['Skill manifest (LLM)', '/skill.md'],
               ['Live API health',      'https://api.0gent.xyz/health'],
               ['Live pricing',         'https://api.0gent.xyz/pricing'],
-              ['0G testnet faucet',    'https://faucet.0g.ai'],
-              ['0G testnet explorer',  'https://chainscan-galileo.0g.ai'],
+              ['0G faucet',            'https://faucet.0g.ai'],
+              ['0G explorer',          'https://chainscan.0g.ai'],
               ['Hackathon (HackQuest)','https://www.hackquest.io/hackathons/0G-APAC-Hackathon'],
             ] as const).map(([l, h]) => (
               <a key={h} href={h} target={h.startsWith('http') ? '_blank' : undefined} rel="noreferrer" style={{

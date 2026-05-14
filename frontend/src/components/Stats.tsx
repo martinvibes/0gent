@@ -129,8 +129,8 @@ function StatRow({ label, icon, value }: { label: string; icon?: ReactNode; valu
   );
 }
 
-const EXPLORER_TX = 'https://chainscan-galileo.0g.ai/tx/';
-const EXPLORER_ADDR = 'https://chainscan-galileo.0g.ai/address/';
+const EXPLORER_TX = 'https://chainscan.0g.ai/tx/';
+const EXPLORER_ADDR = 'https://chainscan.0g.ai/address/';
 
 function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
   const meta = ENDPOINT_META[tx.endpoint] || { label: tx.endpoint, icon: <PackageIcon size={14} color={LILAC} />, color: LILAC };
@@ -258,7 +258,7 @@ export function Stats() {
           <p style={{ fontSize: 17, color: TEXT_DIM, lineHeight: 1.7, maxWidth: 640 }}>
             Every paid endpoint settles a real transaction on 0G Chain. These numbers are aggregated from the on-chain payment log, same data
             anyone can pull from{' '}
-            <a href="https://chainscan-galileo.0g.ai" target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline' }}>chainscan-galileo</a>.
+            <a href="https://chainscan.0g.ai" target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline' }}>chainscan-galileo</a>.
           </p>
         </div>
 

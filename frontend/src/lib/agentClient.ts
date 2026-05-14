@@ -15,7 +15,7 @@
 import { ethers } from 'ethers';
 import { API_URL } from './api';
 
-const RPC_URL = (import.meta.env.VITE_ZG_RPC_URL as string) || 'https://evmrpc-testnet.0g.ai';
+const RPC_URL = (import.meta.env.VITE_ZG_RPC_URL as string) || 'https://evmrpc.0g.ai';
 
 const PAYMENT_ABI = [
   'function pay(bytes32 nonce, string calldata resourceType) external payable',
