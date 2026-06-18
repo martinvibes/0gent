@@ -3,7 +3,9 @@ dist/
 data/
 .env
 out/
+out-celo/
 cache/
+broadcast/
 reference/
 
 .claude

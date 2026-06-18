@@ -6,7 +6,7 @@
  * with skill.md and the README).
  */
 
-import { type ReactNode, type CSSProperties } from 'react';
+import { type ReactNode, type CSSProperties, useState } from 'react';
 import { Nav } from './Nav';
 import { Footer } from './Footer';
 import { LogoLockup } from './Logo';
@@ -152,6 +152,28 @@ function Endpoint({
 // ─── Page ────────────────────────────────────────────────────────────
 
 export function Docs() {
+  const [pricingChain, setPricingChain] = useState<"0g" | "celo">("0g");
+
+  const prices = pricingChain === "celo" ? {
+    identity: "$0.50 USDC",
+    emailProvision: "$2.00 USDC",
+    emailSend: "$0.08 USDC",
+    emailRead: "$0.02 USDC",
+    phone: "$3.00 USDC",
+    sms: "$0.05 USDC",
+    compute: "$0.10 USDC",
+    memory: "free",
+  } : {
+    identity: "0.5 0G",
+    emailProvision: "2.0 0G",
+    emailSend: "0.1 0G",
+    emailRead: "0.05 0G",
+    phone: "6.0 0G",
+    sms: "0.1 0G",
+    compute: "0.2 0G",
+    memory: "free",
+  };
+
   return (
     <div style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
       <Nav />
@@ -271,6 +293,26 @@ npm i -g @0gent/core
           title="Services & pricing"
           intro={<>What an agent can buy from the live API today.</>}
         >
+          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+            {(["0g", "celo"] as const).map(chain => (
+              <button
+                key={chain}
+                onClick={() => setPricingChain(chain)}
+                style={{
+                  padding: "6px 16px",
+                  borderRadius: 6,
+                  border: `1px solid ${pricingChain === chain ? LILAC : "#333"}`,
+                  background: pricingChain === chain ? LILAC + "22" : "transparent",
+                  color: pricingChain === chain ? LILAC : "#888",
+                  cursor: "pointer",
+                  fontSize: 13,
+                  fontWeight: 500,
+                }}
+              >
+                {chain === "0g" ? "0G Chain" : "Celo"}
+              </button>
+            ))}
+          </div>
           <div className="docs-services" style={{ border: `1px solid ${BORDER}` }}>
             <table className="docs-services-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
@@ -283,18 +325,18 @@ npm i -g @0gent/core
               </thead>
               <tbody style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                 {([
-                  ['Identity NFT mint',     '0.5 0G',     'live', '0G Chain · ZeroGentIdentity'],
-                  ['Email inbox provision', '2.0 0G',     'live', 'Cloudflare Email Workers'],
-                  ['Send email',            '0.1 0G',     'live', 'Resend'],
-                  ['Read inbox',            '0.05 0G',    'live', 'Cloudflare Worker → backend webhook'],
-                  ['AI inference (LLM)',    '0.2 0G',     'live', '0G Compute Network · qwen-2.5-7b'],
-                  ['Phone number',          '6.0 0G',     'live', 'Telnyx'],
-                  ['Send SMS',              '0.1 0G',     'live', 'Telnyx'],
-                  ['Persistent memory',     'free',       'live', '0G Storage'],
-                  ['Domain registration',   '2.0 0G',     'dev',  'Namecheap'],
-                  ['Compute VPS',           '1.0 0G/mo',  'dev',  'Hetzner Cloud'],
-                  ['X account ops',         '5.0 0G',     'dev',  'Roadmap Q3'],
-                ] as const).map(([svc, cost, st, by]) => (
+                  ['Identity NFT mint',     prices.identity,       'live', '0G Chain · ZeroGentIdentity'],
+                  ['Email inbox provision', prices.emailProvision,  'live', 'Cloudflare Email Workers'],
+                  ['Send email',            prices.emailSend,       'live', 'Resend'],
+                  ['Read inbox',            prices.emailRead,       'live', 'Cloudflare Worker → backend webhook'],
+                  ['AI inference (LLM)',    prices.compute,         'live', '0G Compute Network · qwen-2.5-7b'],
+                  ['Phone number',          prices.phone,           'live', 'Telnyx'],
+                  ['Send SMS',              prices.sms,             'live', 'Telnyx'],
+                  ['Persistent memory',     prices.memory,          'live', '0G Storage'],
+                  ['Domain registration',   pricingChain === "celo" ? "$2.00 USDC" : '2.0 0G',    'dev',  'Namecheap'],
+                  ['Compute VPS',           pricingChain === "celo" ? "$1.00 USDC/mo" : '1.0 0G/mo', 'dev',  'Hetzner Cloud'],
+                  ['X account ops',         pricingChain === "celo" ? "$5.00 USDC" : '5.0 0G',    'dev',  'Roadmap Q3'],
+                ] as [string, string, string, string][]).map(([svc, cost, st, by]) => (
                   <tr key={svc} className="docs-services-row" style={{ borderTop: `1px solid ${BORDER}` }}>
                     <td data-label="Service" style={{ padding: '12px 16px', color: TEXT }}>{svc}</td>
                     <td data-label="Cost"    style={{ padding: '12px 16px', color: LILAC }}>{cost}</td>

@@ -129,3 +129,11 @@ export function initDatabase(): void {
 }
 
 initDatabase();
+
+try {
+  db.exec("ALTER TABLE used_payments ADD COLUMN chain TEXT DEFAULT '0g'");
+} catch {}
+
+try {
+  db.exec("ALTER TABLE memory_index ADD COLUMN value_json TEXT");
+} catch {}

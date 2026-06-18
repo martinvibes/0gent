@@ -7,6 +7,16 @@ evm_version = "cancun"
 optimizer = true
 optimizer_runs = 200
 
+[profile.celo]
+src = "src-celo"
+test = "test-celo"
+out = "out-celo"
+libs = ["lib"]
+solc_version = "0.8.24"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+
 [rpc_endpoints]
 0g_testnet = "${ZG_TESTNET_RPC}"
 0g_mainnet = "${ZG_MAINNET_RPC}"
