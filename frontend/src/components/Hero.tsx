@@ -116,7 +116,7 @@ export function Hero() {
           pointerEvents: 'auto',
         }}>
           <span className="pulse" style={{ width:6, height:6, borderRadius:'50%', background:'#B75FFF', display:'inline-block' }} />
-          Built on 0G Chain
+          Built on 0G Chain & Celo
         </div>
 
         {/* Heading */}

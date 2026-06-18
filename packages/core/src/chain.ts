@@ -7,6 +7,19 @@ export const PAYMENT_ABI = [
   'event PaymentReceived(address indexed payer, uint256 amount, bytes32 indexed nonce, string resourceType, uint256 timestamp)',
 ];
 
+export const PAYMENT_ERC20_ABI = [
+  'function pay(bytes32 nonce, string calldata resourceType, uint256 amount) external',
+  'function isNonceUsed(bytes32 nonce) external view returns (bool)',
+  'event PaymentReceived(address indexed payer, uint256 amount, bytes32 indexed nonce, string resourceType, uint256 timestamp)',
+];
+
+export const ERC20_ABI = [
+  'function approve(address spender, uint256 amount) external returns (bool)',
+  'function allowance(address owner, address spender) external view returns (uint256)',
+  'function balanceOf(address account) external view returns (uint256)',
+  'function decimals() external view returns (uint8)',
+];
+
 export const REGISTRY_ABI = [
   'function getAgentResourceIds(address agent) external view returns (uint256[])',
   'function getResource(uint256 resourceId) external view returns (tuple(uint256 id, uint8 resourceType, uint8 status, string providerRef, uint256 createdAt, uint256 expiresAt))',
@@ -54,12 +67,10 @@ export function getIdentityContract(signerOrProvider: Wallet | JsonRpcProvider):
 
 export function explorerTx(txHash: string): string {
   const cfg = load();
-  const base = cfg.chainId === 16661 ? 'https://chainscan.0g.ai' : 'https://chainscan-galileo.0g.ai';
-  return `${base}/tx/${txHash}`;
+  return `${cfg.explorer}/tx/${txHash}`;
 }
 
 export function explorerAddress(addr: string): string {
   const cfg = load();
-  const base = cfg.chainId === 16661 ? 'https://chainscan.0g.ai' : 'https://chainscan-galileo.0g.ai';
-  return `${base}/address/${addr}`;
+  return `${cfg.explorer}/address/${addr}`;
 }

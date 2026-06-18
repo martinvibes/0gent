@@ -11,13 +11,14 @@
  ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   
 ```
 
-**Infrastructure for autonomous AI agents — on 0G Chain.**
+**Infrastructure for autonomous AI agents — on 0G Chain & Celo.**
 
 Give your agent a wallet. Let it work.
 
 [![npm](https://img.shields.io/npm/v/@0gent/core.svg?color=9200E1)](https://www.npmjs.com/package/@0gent/core)
-[![tests](https://img.shields.io/badge/contracts-98%20passing-7DEFB1.svg)](#tests)
-[![chain](https://img.shields.io/badge/0G%20Mainnet-16661-9200E1.svg)](https://chainscan.0g.ai)
+[![tests](https://img.shields.io/badge/contracts-127%20passing-7DEFB1.svg)](#tests)
+[![0G](https://img.shields.io/badge/0G%20Mainnet-16661-9200E1.svg)](https://chainscan.0g.ai)
+[![Celo](https://img.shields.io/badge/Celo-42220-FCFF52.svg)](https://celoscan.io)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 <br/>
@@ -46,7 +47,7 @@ AI agents can think and plan, but they can't send an email, buy a phone number, 
 
 1. Agent calls an HTTP endpoint
 2. Server replies `402 Payment Required`
-3. Agent's wallet pays on-chain in native **0G tokens**
+3. Agent's wallet pays on-chain — **0G tokens** on 0G Chain or **USDC** on Celo
 4. Resource is provisioned instantly — owned by the agent's wallet
 
 No accounts. No API keys. No credit cards. No human in the loop. The wallet **is** the identity.
@@ -72,6 +73,32 @@ Three commands. The agent now has an on-chain identity and a real email inbox.
 
 ---
 
+## Multi-Chain Support
+
+0GENT is chain-agnostic by design. The same CLI, SDK, and API serve multiple chains. Agents pick a chain at setup — all commands work identically after that.
+
+| | 0G Chain | Celo |
+|---|---|---|
+| **Payment** | Native 0G tokens | USDC stablecoin |
+| **Identity** | Custom ERC-721 (ZeroGentIdentity) | [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) canonical registry |
+| **Inference** | 0G Compute Network (decentralized) | OpenAI proxy |
+| **Memory** | 0G Storage (decentralized) | Local persistence |
+| **Pricing** | Volatile (0G token) | Stable (USD-denominated) |
+| **Explorer** | [chainscan.0g.ai](https://chainscan.0g.ai) | [celoscan.io](https://celoscan.io) |
+
+```bash
+# Pick your chain at setup
+0gent setup
+# → Select: 0G Chain or Celo
+
+# Switch anytime
+0gent config set network celo
+```
+
+Adding a new chain = deploy payment contract + add a registry entry. No backend or CLI code changes.
+
+---
+
 ## Deployed Contracts
 
 ### 0G Mainnet (Chain 16661) — Live
@@ -81,6 +108,14 @@ Three commands. The agent now has an on-chain identity and a real email inbox.
 | `ZeroGentPayment` | [`0x124aF88c004e9df6D444a0Afc0Fe7Ef215dc02A2`](https://chainscan.0g.ai/address/0x124aF88c004e9df6D444a0Afc0Fe7Ef215dc02A2) | Treasury for x402 payments. Nonce-replay protected. |
 | `AgentRegistry` | [`0x49589C475BBB418B0E069010C923ed18D00E275b`](https://chainscan.0g.ai/address/0x49589C475BBB418B0E069010C923ed18D00E275b) | Maps wallets → provisioned resources. |
 | `ZeroGentIdentity` | [`0xa601C569FD008DEd545531a5d3245B2C68ac591d`](https://chainscan.0g.ai/address/0xa601C569FD008DEd545531a5d3245B2C68ac591d) | ERC-721 agent identity NFT. One per wallet. |
+
+### Celo (Chain 42220)
+
+| Contract | Address | Purpose |
+|---|---|---|
+| `CeloAgentPayment` | Deployed on testnet, mainnet pending | ERC-20 USDC payment. Approve + transferFrom pattern. |
+| `CeloAgentRegistry` | Deployed on testnet, mainnet pending | Maps wallets → provisioned resources. |
+| ERC-8004 IdentityRegistry | [`0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`](https://celoscan.io/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432) | Canonical agent identity. Shared singleton — agents discoverable across the ecosystem. |
 
 ### 0G Testnet (Chain 16602) — Development & Traction History
 
@@ -163,21 +198,21 @@ Any agent framework that can read a URL and sign EVM transactions can integrate 
 
 ## Services & Pricing
 
-All costs in **native 0G tokens**, settled on-chain via x402.
+All costs settled on-chain via x402. Agents pick their chain — pricing adjusts automatically.
 
-| Service | Status | Cost (0G) | Description |
+| Service | Status | 0G Chain | Celo (USDC) |
 |---|---|---|---|
-| **Agent Identity** | ✅ Live | 0.5 | ERC-721 NFT on 0G Chain. Metadata on 0G Storage. |
-| **Email — provision** | ✅ Live | 2.0 | Real `<name>@0gent.xyz` inbox. |
-| **Email — send** | ✅ Live | 0.1 | Deliver email to any address on the internet. |
-| **Email — read** | ✅ Live | 0.05 | Read messages in the agent's inbox. |
-| **Email — threads** | ✅ Live | 0.05 | List conversation threads. |
-| **Phone — search** | ✅ Live | free | Real-time inventory in 50+ countries via Telnyx. |
-| **Phone — provision** | ✅ Live | 6.0 | Buy a real phone number, owned for 30 days. |
-| **SMS — send** | ✅ Live | 0.1 | Send SMS from the agent's number. |
-| **AI Inference** | ✅ Live | 0.2 | Pay-per-call LLM via 0G Compute Network. |
-| **Memory** | ✅ Live | free | Persistent key-value store on 0G Storage. |
-| **Agent Profile** | ✅ Live | free | Public lookup: identity + resources + balance. |
+| **Agent Identity** | ✅ Live | 0.5 0G | $0.50 |
+| **Email — provision** | ✅ Live | 2.0 0G | $2.00 |
+| **Email — send** | ✅ Live | 0.1 0G | $0.08 |
+| **Email — read** | ✅ Live | 0.05 0G | $0.02 |
+| **Email — threads** | ✅ Live | 0.05 0G | $0.02 |
+| **Phone — search** | ✅ Live | free | free |
+| **Phone — provision** | ✅ Live | 6.0 0G | $3.00 |
+| **SMS — send** | ✅ Live | 0.1 0G | $0.05 |
+| **AI Inference** | ✅ Live | 0.2 0G | $0.10 |
+| **Memory** | ✅ Live | free | free |
+| **Agent Profile** | ✅ Live | free | free |
 
 ---
 
@@ -214,15 +249,20 @@ No API keys, no sessions, no cookies. The wallet signature IS the authentication
 
 ```
 0gent/
-├── contracts/                 # Solidity (Foundry) — 3 contracts, 98 tests
-│   ├── src/                   # ZeroGentPayment, AgentRegistry, ZeroGentIdentity
-│   ├── test/                  # 98 unit + fuzz tests
-│   └── script/Deploy.s.sol
+├── contracts/
+│   ├── src/                   # 0G contracts: ZeroGentPayment, AgentRegistry, ZeroGentIdentity
+│   ├── src-celo/              # Celo contracts: CeloAgentPayment (ERC-20), CeloAgentRegistry
+│   ├── test/                  # 98 unit + fuzz tests (0G)
+│   ├── test-celo/             # 29 unit + fuzz tests (Celo)
+│   └── script/                # Deploy.s.sol (0G), DeployCelo.s.sol (Celo)
 ├── backend/                   # Express + TypeScript API (Railway)
 │   └── src/
-│       ├── middleware/x402.ts        # 402 challenge + on-chain verification
+│       ├── chains.ts                 # Chain registry — add chains as data, not code
+│       ├── middleware/x402.ts        # Multi-chain 402 challenge + verification
 │       ├── services/
 │       │   ├── chain.ts              # ethers + contract interactions
+│       │   ├── identity-erc8004.ts   # ERC-8004 registration (Celo)
+│       │   ├── inference-openai.ts   # OpenAI proxy (non-0G chains)
 │       │   ├── storage.ts            # 0G Storage SDK wrapper
 │       │   ├── inference.ts          # 0G Compute Network broker
 │       │   ├── email.ts              # Resend + Cloudflare worker
@@ -238,7 +278,7 @@ No API keys, no sessions, no cookies. The wallet signature IS the authentication
 
 | Layer | Technology |
 |---|---|
-| **Blockchain** | 0G Chain (EVM, mainnet 16661), Solidity 0.8.24, Foundry, OpenZeppelin |
+| **Blockchain** | 0G Chain (16661) + Celo (42220), Solidity 0.8.24, Foundry, OpenZeppelin |
 | **Storage** | 0G Storage via `@0glabs/0g-ts-sdk` |
 | **Compute** | 0G Compute Network via `@0glabs/0g-serving-broker` |
 | **Backend** | Node.js 22, Express, TypeScript, SQLite (better-sqlite3), Railway |
@@ -316,15 +356,20 @@ curl http://localhost:3000/pricing
 ## Tests
 
 ```bash
-cd contracts && forge test
+cd contracts && forge test                          # 0G contracts (98 tests)
+cd contracts && FOUNDRY_PROFILE=celo forge test     # Celo contracts (29 tests)
 ```
 
 ```
-ZeroGentPayment:  32 tests passing  (pay, nonce replay, withdraw, receive, fuzz)
-AgentRegistry:    28 tests passing  (register, deactivate, query, stress, fuzz)
-ZeroGentIdentity: 38 tests passing  (mint, metadata, ERC-721, lifecycle, fuzz)
+0G Chain contracts:
+  ZeroGentPayment:  32 tests  (pay, nonce replay, withdraw, receive, fuzz)
+  AgentRegistry:    28 tests  (register, deactivate, query, stress, fuzz)
+  ZeroGentIdentity: 38 tests  (mint, metadata, ERC-721, lifecycle, fuzz)
+
+Celo contracts:
+  CeloAgentPayment: 29 tests  (pay, withdraw, nonce replay, approval, fuzz)
 ─────────────────────────────────────────────────────────────────
-98 tests passing, 0 failed
+127 tests passing, 0 failed
 ```
 
 ---
@@ -340,13 +385,13 @@ ZeroGentIdentity: 38 tests passing  (mint, metadata, ERC-721, lifecycle, fuzz)
 
 ---
 
-## Hackathon
+## Grants & Hackathons
 
-Built for the [**0G APAC Hackathon**](https://www.hackquest.io/hackathons/0G-APAC-Hackathon) — **Track 1: Agentic Infrastructure & OpenClaw Lab**.
+**0G APAC Hackathon** — [Track 1: Agentic Infrastructure](https://www.hackquest.io/hackathons/0G-APAC-Hackathon). Submitted May 2026.
+
+**Celo Prezenti Frontier Pool** — Agent economy infrastructure. ERC-8004 compliant identity, USDC payments via x402. Application in progress.
 
 0GENT is agent infrastructure at its core. Agents discover services, pay on-chain, and own what they provision — no human intermediary. The x402 payment protocol makes every HTTP endpoint into a pay-per-call primitive that any agent framework can consume.
-
-`#0GHackathon` `#BuildOn0G` `@0G_labs` `@0g_CN` `@0g_Eco` `@HackQuest_`
 
 ---
 

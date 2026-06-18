@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { config } from "../config";
+import { getAllChains } from "../chains";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.get("/", (_req, res) => {
       indexer: config.zgStorageIndexerUrl,
       flowContract: config.zgStorageFlowContract,
     },
+    supportedChains: getAllChains().map((c) => c.id),
     timestamp: new Date().toISOString(),
   });
 });

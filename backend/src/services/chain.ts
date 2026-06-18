@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import { config } from "../config";
+import { type ChainConfig } from "../chains";
 
 const PAYMENT_ABI = [
   "function pay(bytes32 nonce, string calldata resourceType) external payable",
@@ -49,6 +50,14 @@ export function getSigner(): ethers.Wallet {
   return _signer;
 }
 
+export function getProviderForChain(chainConfig: ChainConfig): ethers.JsonRpcProvider {
+  return new ethers.JsonRpcProvider(chainConfig.rpc);
+}
+
+export function getSignerForChain(chainConfig: ChainConfig): ethers.Wallet {
+  return new ethers.Wallet(config.deployerPrivateKey, getProviderForChain(chainConfig));
+}
+
 export function getPaymentContract(): ethers.Contract {
   if (!config.paymentContractAddress) throw new Error("PAYMENT_CONTRACT_ADDRESS not set");
   return new ethers.Contract(config.paymentContractAddress, PAYMENT_ABI, getSigner());
@@ -67,9 +76,13 @@ export function getIdentityContract(): ethers.Contract {
 export async function verifyPayment(
   txHash: string,
   expectedNonce: string,
-  minAmount: bigint
+  minAmount: bigint,
+  chainConfig?: ChainConfig
 ): Promise<{ valid: boolean; payer: string; amount: bigint; reason?: string }> {
-  const provider = getProvider();
+  const provider = chainConfig ? getProviderForChain(chainConfig) : getProvider();
+  const paymentContract = chainConfig ? chainConfig.paymentContract : config.paymentContractAddress;
+  const isERC20 = chainConfig ? chainConfig.paymentType === "erc20" : false;
+
   const receipt = await provider.getTransactionReceipt(txHash);
 
   if (!receipt) {
@@ -78,12 +91,19 @@ export async function verifyPayment(
   if (receipt.status !== 1) {
     return { valid: false, payer: receipt.from, amount: 0n, reason: "tx_reverted" };
   }
-  if (receipt.to?.toLowerCase() !== config.paymentContractAddress.toLowerCase()) {
+  // For native payments, the tx must be sent directly to the payment contract.
+  // For ERC-20 payments, the tx may go to the token contract, so we verify
+  // via the event log address instead of receipt.to.
+  if (!isERC20 && receipt.to?.toLowerCase() !== paymentContract.toLowerCase()) {
     return { valid: false, payer: receipt.from, amount: 0n, reason: "wrong_contract" };
   }
 
   const iface = new ethers.Interface(PAYMENT_ABI);
   for (const log of receipt.logs) {
+    // For ERC-20, confirm the event originated from our payment contract
+    if (isERC20 && log.address.toLowerCase() !== paymentContract.toLowerCase()) {
+      continue;
+    }
     try {
       const parsed = iface.parseLog({ topics: log.topics as string[], data: log.data });
       if (parsed && parsed.name === "PaymentReceived") {

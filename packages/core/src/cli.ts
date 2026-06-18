@@ -42,7 +42,8 @@ import {
   computeStatusCmd,
   computeInferCmd,
 } from './commands/compute.js';
-import { c } from './ui.js';
+import { c, success, info, fail } from './ui.js';
+import { save, load } from './config.js';
 
 const program = new Command();
 
@@ -202,6 +203,27 @@ program.command('balance').description('Show wallet balance').action(withErr(bal
 program.command('pricing').description('Show service prices').action(withErr(pricingCmd));
 program.command('health').description('API + chain health').action(withErr(healthCmd));
 program.command('doctor').description('Diagnose setup').action(withErr(doctorCmd));
+
+// ── config ──
+const configCmd = program.command('config').description('Manage configuration');
+configCmd
+  .command('set <key> <value>')
+  .description('Set a config value (e.g. network celo)')
+  .action(withErr(async (key: string, value: string) => {
+    if (key === 'network') {
+      if (!['0g', 'celo'].includes(value)) {
+        fail(`Unknown network: ${value}. Use "0g" or "celo".`);
+        return;
+      }
+      save({ network: value });
+      const cfg = load();
+      success(`Switched to ${value === '0g' ? '0G Chain' : 'Celo'}`);
+      info(`Payment token: ${cfg.currency}`);
+    } else {
+      save({ [key]: value } as any);
+      success(`Set ${key} = ${value}`);
+    }
+  }));
 
 // Apply colored help formatting now that all commands are registered.
 styleHelp(program);

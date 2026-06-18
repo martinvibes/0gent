@@ -23,6 +23,19 @@ export async function setupCmd(): Promise<void> {
     }
   }
 
+  const { network } = await inquirer.prompt([{
+    type: 'list',
+    name: 'network',
+    message: 'Which network do you want to use?',
+    choices: [
+      { name: '0G Chain  — pay with 0G tokens', value: '0g' },
+      { name: 'Celo      — pay with USDC (stablecoins)', value: 'celo' },
+    ],
+    default: '0g',
+  }]);
+
+  save({ network });
+
   const { mode } = await inquirer.prompt([
     {
       type: 'list',
@@ -118,9 +131,15 @@ export async function setupCmd(): Promise<void> {
   kv('Address', summary.address);
   kv('Label', summary.label);
   kv('API', apiEndpoint);
+  kv('Network', network === 'celo' ? 'Celo (USDC)' : '0G Chain (0G tokens)');
   blank();
   info('Next steps:');
-  info(`  1. Fund this address with 0G tokens (testnet faucet: https://faucet.0g.ai)`);
+  if (network === 'celo') {
+    info(`  1. Fund this address with USDC on Celo`);
+    info(`     Bridge USDC at: ${c.accent('https://app.squidrouter.com')} or use Celo faucet for testnet`);
+  } else {
+    info(`  1. Fund this address with 0G tokens (testnet faucet: ${c.accent('https://faucet.0g.ai')})`);
+  }
   info(`  2. Run: ${c.accent('0gent identity mint')}`);
   info(`  3. Run: ${c.accent('0gent provision phone')}`);
   blank();

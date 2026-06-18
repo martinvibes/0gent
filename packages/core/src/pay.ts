@@ -2,8 +2,9 @@
  * 0GENT x402 payment client.
  * Flow: call endpoint → get 402 → send 0G token payment on-chain → retry with X-Payment header.
  */
-import { Wallet, parseEther, formatEther } from 'ethers';
-import { getPaymentContract } from './chain.js';
+import { Wallet, parseEther, formatEther, Contract } from 'ethers';
+import { getPaymentContract, PAYMENT_ERC20_ABI, ERC20_ABI } from './chain.js';
+import { load } from './config.js';
 
 export interface PaymentRequired {
   x402Version: number;
@@ -75,19 +76,39 @@ export async function paidRequest<T = any>(opts: PaidRequestOpts): Promise<PaidR
   const amountWei = BigInt(req.payment.value);
   const resourceType = req.payment.args.resourceType;
 
+  const cfg = load();
+  const isNative = !req.payment.token || req.payment.token === 'native';
+
   // Balance precheck
   const provider = signer.provider!;
-  const balance = await provider.getBalance(signer.address);
-  if (balance < amountWei) {
-    throw new Error(
-      `Insufficient 0G balance: need ${formatEther(amountWei)} 0G, have ${formatEther(balance)} 0G`
-    );
+  if (isNative) {
+    const balance = await provider.getBalance(signer.address);
+    if (balance < amountWei) {
+      throw new Error(
+        `Insufficient 0G balance: need ${formatEther(amountWei)} 0G, have ${formatEther(balance)} 0G`
+      );
+    }
   }
 
-  // 3) Call ZeroGentPayment.pay() on-chain
-  onStatus?.(`Paying ${req.amountHuman} on 0G Chain...`);
-  const payment = getPaymentContract(signer);
-  const tx = await payment.pay(req.nonce, resourceType, { value: amountWei });
+  // 3) Call payment contract on-chain
+  let tx: any;
+  if (isNative) {
+    // Native token flow
+    onStatus?.(`Paying ${req.amountHuman} on 0G Chain...`);
+    const payment = getPaymentContract(signer);
+    tx = await payment.pay(req.nonce, resourceType, { value: amountWei });
+  } else {
+    // ERC-20 flow: approve then pay
+    onStatus?.(`[x402] Approving ${req.payment.tokenSymbol || 'token'} spend...`);
+    const tokenContract = new Contract(req.payment.token, ERC20_ABI, signer);
+    const approveTx = await tokenContract.approve(req.payment.contract, amountWei);
+    await approveTx.wait();
+
+    onStatus?.(`Paying ${req.amountHuman} with ${req.payment.tokenSymbol || 'token'}...`);
+    const payContract = new Contract(req.payment.contract, PAYMENT_ERC20_ABI, signer);
+    tx = await payContract.pay(req.nonce, resourceType, amountWei);
+  }
+
   onStatus?.(`Waiting for confirmation (${tx.hash.slice(0, 10)}...)`);
   const receipt = await tx.wait();
   if (!receipt || receipt.status !== 1) {
@@ -96,7 +117,7 @@ export async function paidRequest<T = any>(opts: PaidRequestOpts): Promise<PaidR
 
   // 4) Retry with X-Payment header
   onStatus?.('Verifying payment with API...');
-  const paymentHeader = JSON.stringify({ txHash: tx.hash, nonce: req.nonce });
+  const paymentHeader = JSON.stringify({ txHash: tx.hash, nonce: req.nonce, chain: cfg.network });
   const retryInit: RequestInit = {
     method,
     headers: { ...headers, 'X-Payment': paymentHeader },

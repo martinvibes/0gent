@@ -72,22 +72,36 @@ export async function balanceCmd(): Promise<void> {
     return;
   }
   const provider = getProvider();
-  const bal = await provider.getBalance(cfg.defaultWalletAddress);
-  console.log(
-    '  ' +
-      c.dim('Wallet: ') +
-      c.addr(cfg.defaultWalletAddress) +
-      c.dim('  |  Balance: ') +
-      c.ok(formatEther(bal) + ' 0G') +
-      c.dim(' on 0G Chain')
-  );
+
+  if (cfg.paymentType === "erc20" && cfg.paymentToken) {
+    const { Contract, formatUnits } = await import('ethers');
+    const ERC20_ABI = [
+      "function balanceOf(address) view returns (uint256)",
+      "function decimals() view returns (uint8)",
+    ];
+    const token = new Contract(cfg.paymentToken, ERC20_ABI, provider);
+    const bal = await token.balanceOf(cfg.defaultWalletAddress);
+    const decimals = await token.decimals();
+    console.log(
+      '  ' + c.dim('Wallet: ') + c.addr(cfg.defaultWalletAddress) +
+      c.dim('  |  Balance: ') + c.ok(formatUnits(bal, decimals) + ' ' + cfg.currency) +
+      c.dim(' on ' + (cfg.network === 'celo' ? 'Celo' : cfg.network))
+    );
+  } else {
+    const bal = await provider.getBalance(cfg.defaultWalletAddress);
+    console.log(
+      '  ' + c.dim('Wallet: ') + c.addr(cfg.defaultWalletAddress) +
+      c.dim('  |  Balance: ') + c.ok(formatEther(bal) + ' ' + cfg.currency) +
+      c.dim(' on ' + (cfg.network === '0g' ? '0G Chain' : cfg.network))
+    );
+  }
 }
 
 export async function pricingCmd(): Promise<void> {
   const cfg = load();
   let live: any = null;
   try {
-    const res = await fetch(cfg.apiEndpoint + '/pricing');
+    const res = await fetch(cfg.apiEndpoint + '/pricing?chain=' + (cfg.network || '0g'));
     if (res.ok) live = await res.json();
   } catch {}
 
@@ -120,16 +134,29 @@ export async function pricingCmd(): Promise<void> {
     }
   } else {
     // Fallback if API is down
-    rows.push(
-      { service: 'Identity mint', price: '0.5 0G' },
-      { service: 'Email inbox', price: '2.0 0G' },
-      { service: 'Email send', price: '0.1 0G' },
-      { service: 'Email read', price: '0.05 0G' },
-      { service: 'Phone provision', price: '6.0 0G' },
-      { service: 'SMS send', price: '0.1 0G' },
-      { service: 'Compute infer', price: '0.2 0G' },
-      { service: 'Memory r/w', price: 'free' }
-    );
+    if (cfg.network === 'celo') {
+      rows.push(
+        { service: 'Identity mint', price: '$0.50 USDC' },
+        { service: 'Email inbox', price: '$2.00 USDC' },
+        { service: 'Email send', price: '$0.08 USDC' },
+        { service: 'Email read', price: '$0.02 USDC' },
+        { service: 'Phone provision', price: '$3.00 USDC' },
+        { service: 'SMS send', price: '$0.05 USDC' },
+        { service: 'Compute infer', price: '$0.10 USDC' },
+        { service: 'Memory r/w', price: 'free' }
+      );
+    } else {
+      rows.push(
+        { service: 'Identity mint', price: '0.5 0G' },
+        { service: 'Email inbox', price: '2.0 0G' },
+        { service: 'Email send', price: '0.1 0G' },
+        { service: 'Email read', price: '0.05 0G' },
+        { service: 'Phone provision', price: '6.0 0G' },
+        { service: 'SMS send', price: '0.1 0G' },
+        { service: 'Compute infer', price: '0.2 0G' },
+        { service: 'Memory r/w', price: 'free' }
+      );
+    }
   }
 
   const network = live?.network || `0G Chain (${cfg.chainId})`;

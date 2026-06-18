@@ -12,13 +12,21 @@ router.post("/:address", async (req: AuthenticatedRequest, res: Response) => {
     const value = req.body.value;
     if (!key) { res.status(400).json({ error: "key field required" }); return; }
 
-    const rootHash = await uploadMemory(String(agent), key, value);
+    const chain = (req.headers["x-chain"] as string) || "0g";
+    const valueJson = JSON.stringify({ agent, key, value, updatedAt: new Date().toISOString() });
 
-    db.prepare(
-      "INSERT OR REPLACE INTO memory_index (agent, key, root_hash, updated_at) VALUES (?, ?, ?, ?)"
-    ).run(agent, key, rootHash, new Date().toISOString());
-
-    res.json({ agent, key, rootHash, message: "Memory stored on 0G Storage" });
+    if (chain === "0g") {
+      const rootHash = await uploadMemory(String(agent), key, value);
+      db.prepare(
+        "INSERT OR REPLACE INTO memory_index (agent, key, root_hash, value_json, updated_at) VALUES (?, ?, ?, ?, ?)"
+      ).run(agent, key, rootHash, valueJson, new Date().toISOString());
+      res.json({ agent, key, rootHash, message: "Memory stored on 0G Storage" });
+    } else {
+      db.prepare(
+        "INSERT OR REPLACE INTO memory_index (agent, key, root_hash, value_json, updated_at) VALUES (?, ?, ?, ?, ?)"
+      ).run(agent, key, "", valueJson, new Date().toISOString());
+      res.json({ agent, key, rootHash: null, message: "Memory stored" });
+    }
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -33,8 +41,13 @@ router.get("/:address", async (req: AuthenticatedRequest, res: Response) => {
       const row = db.prepare("SELECT * FROM memory_index WHERE agent = ? AND key = ?").get(agent, key) as any;
       if (!row) { res.status(404).json({ error: "Memory key not found" }); return; }
 
-      const data = await downloadByHash(row.root_hash);
-      res.json({ agent, key, value: JSON.parse(data.toString()), rootHash: row.root_hash });
+      if (row.root_hash) {
+        const data = await downloadByHash(row.root_hash);
+        res.json({ agent, key, value: JSON.parse(data.toString()), rootHash: row.root_hash });
+      } else {
+        const value = row.value_json ? JSON.parse(row.value_json) : null;
+        res.json({ agent, key, value, rootHash: null });
+      }
     } else {
       const rows = db.prepare("SELECT key, root_hash, updated_at FROM memory_index WHERE agent = ?").all(agent);
       res.json({ agent, keys: rows });
