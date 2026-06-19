@@ -520,8 +520,8 @@ function IdentityCard({ client }: { client: AgentClient }) {
       title="Identity NFT"
       badge={identity ? <LiveBadge label="minted" /> : undefined}
       sub={identity
-        ? <>Your agent NFT is on 0G Chain, metadata pinned to 0G Storage.</>
-        : <>Mint an ERC-721 that proves you are <em>this agent</em> on 0G Chain. One per wallet.</>
+        ? <>Your agent NFT is on-chain. Permanent identity.</>
+        : <>Mint an identity NFT that proves you are <em>this agent</em>. One per wallet.</>
       }
     >
       {!loaded ? (
@@ -1187,7 +1187,7 @@ export function Dashboard() {
 
         {/* Footnote */}
         <div style={{ marginTop: 48, fontSize: 12, color: TEXT_GHOST, lineHeight: 1.7, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>
-          Live on 0G Chain testnet · all transactions visible at <a href="/stats" style={{ color: LILAC }}>0gent.xyz/stats</a>
+          Live on-chain · all transactions visible at <a href="/stats" style={{ color: LILAC }}>0gent.xyz/stats</a>
         </div>
       </div>
 

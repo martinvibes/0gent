@@ -64,14 +64,14 @@ interface Feature {
 }
 
 const features: Feature[] = [
-  { icon: IdentityIcon, title: 'Agent Identity',     desc: 'On-chain ERC-721 NFT minted on 0G Chain, metadata pinned to 0G Storage. The token is the agent\'s permanent identity.', code: 'POST /identity/mint\n→ 402: pay 0.5 0G\n→ token #1 (your agent NFT)',   tag: '0G Chain · ERC-721',  status: 'live' },
-  { icon: EmailIcon,    title: 'Email Inboxes',      desc: 'Dedicated <name>@0gent.xyz inbox. Send via Resend. Inbound replies parsed by Cloudflare Worker, full thread preserved.', code: 'POST /email/provision\n→ 402: pay 2.0 0G\n→ scout@0gent.xyz',           tag: 'Cloudflare · Resend', status: 'live' },
-  { icon: SparkIcon,    title: 'AI Inference',       desc: 'Pay-per-call LLM inference via the 0G Compute Network. Real on-chain micropayments, returns OpenAI-format completions.', code: 'POST /compute/infer\n→ 402: pay 0.2 0G\n→ qwen-2.5-7b reply',          tag: '0G Compute Network', status: 'live' },
+  { icon: IdentityIcon, title: 'Agent Identity',     desc: 'On-chain ERC-721 NFT. The token is the agent\'s permanent identity.', code: 'POST /identity/mint\n→ 402: pay $0.50 USDC\n→ token #1 (your agent NFT)',   tag: 'ERC-721 · ERC-8004',  status: 'live' },
+  { icon: EmailIcon,    title: 'Email Inboxes',      desc: 'Dedicated <name>@0gent.xyz inbox. Send via Resend. Inbound replies parsed by Cloudflare Worker, full thread preserved.', code: 'POST /email/provision\n→ 402: pay $1.00 USDC\n→ scout@0gent.xyz',           tag: 'Cloudflare · Resend', status: 'live' },
+  { icon: SparkIcon,    title: 'AI Inference',       desc: 'Pay-per-call LLM inference via the 0G Compute Network. Real on-chain micropayments, returns OpenAI-format completions.', code: 'POST /compute/infer\n→ 402: pay $0.10 USDC\n→ qwen-2.5-7b reply',          tag: '0G Compute Network', status: 'live' },
   { icon: ServerIcon,   title: 'Memory (Storage)',   desc: 'Persistent agent memory backed by 0G Storage — write once, read forever, indexed by your wallet.',                       code: 'POST /memory/<wallet>\n→ free\n→ 0G Storage rootHash',                  tag: '0G Storage',          status: 'live' },
-  { icon: PhoneIcon,    title: 'Phone & SMS',        desc: 'Real phone numbers across 170+ countries. Send SMS to anywhere. Provisioning + SMS verified end-to-end on Telnyx.',         code: 'POST /phone/provision\n→ 402: pay 6.0 0G\n→ +1 (816) 496-1100',       tag: 'Telnyx',              status: 'live' },
-  { icon: GlobeIcon,    title: 'Domains',            desc: 'Register domains with full DNS control. .com, .dev, .ai — hundreds of TLDs.',                                              code: 'POST /domain/register\n→ 402: pay 2.0 0G\n→ agent-alpha.dev',           tag: 'Namecheap',           status: 'dev'  },
-  { icon: ServerIcon,   title: 'Compute VPS',        desc: 'Hardened VPS instances. SSH key-only, UFW firewall, Node.js 22 pre-installed. Wired to Hetzner Cloud, awaiting credit.',  code: 'POST /compute/provision\n→ 402: pay 1.0 0G\n→ 49.12.218.44 (cx22)',    tag: 'Hetzner',             status: 'dev'  },
-  { icon: SocialIcon,   title: 'X Account',          desc: 'Agents own and operate their own X accounts — post, reply, follow, build an audience. Each action paid for and authenticated on-chain.', code: 'POST /x/buy\n→ 402: pay 5.0 0G\n→ ready X account, posting',    tag: 'Coming soon',         status: 'dev'  },
+  { icon: PhoneIcon,    title: 'Phone & SMS',        desc: 'Real phone numbers across 170+ countries. Send SMS to anywhere. Provisioning + SMS verified end-to-end on Telnyx.',         code: 'POST /phone/provision\n→ 402: pay $3.00 USDC\n→ +1 (816) 496-1100',       tag: 'Telnyx',              status: 'live' },
+  { icon: GlobeIcon,    title: 'Domains',            desc: 'Register domains with full DNS control. .com, .dev, .ai — hundreds of TLDs.',                                              code: 'POST /domain/register\n→ 402: pay $1.00 USDC\n→ agent-alpha.dev',           tag: 'Namecheap',           status: 'dev'  },
+  { icon: ServerIcon,   title: 'Compute VPS',        desc: 'Hardened VPS instances. SSH key-only, UFW firewall, Node.js 22 pre-installed. Wired to Hetzner Cloud, awaiting credit.',  code: 'POST /compute/provision\n→ 402: pay $0.50 USDC\n→ 49.12.218.44 (cx22)',    tag: 'Hetzner',             status: 'dev'  },
+  { icon: SocialIcon,   title: 'X Account',          desc: 'Agents own and operate their own X accounts — post, reply, follow, build an audience. Each action paid for and authenticated on-chain.', code: 'POST /x/buy\n→ 402: pay $2.50 USDC\n→ ready X account, posting',    tag: 'Coming soon',         status: 'dev'  },
 ];
 
 const S = {
@@ -108,7 +108,7 @@ export function Features() {
       <div style={{ ...S.container, position: 'relative' }}>
         <div className="reveal-up" style={S.label}>Services</div>
         <h2 className="reveal-up section-h2" style={S.h2}>Everything an agent needs</h2>
-        <p className="reveal-up" style={S.sub}>Real-world infrastructure via API, paid with 0G tokens, owned by your wallet.</p>
+        <p className="reveal-up" style={S.sub}>Real-world infrastructure via API, paid on-chain, owned by your wallet.</p>
 
         <div style={S.grid}>
           {features.map((f, i) => (

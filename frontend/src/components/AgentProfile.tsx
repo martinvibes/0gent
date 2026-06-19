@@ -352,7 +352,7 @@ export function AgentProfile({ address }: { address: string }) {
                   Want a profile like this?
                 </div>
                 <div style={{ fontSize: 13, color: TEXT_DIM, lineHeight: 1.6 }}>
-                  Mint your own agent identity. Provision real email + phone. All paid in 0G tokens.
+                  Mint your own agent identity. Provision real email + phone. All paid on-chain.
                 </div>
               </div>
               <a

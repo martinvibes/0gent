@@ -27,29 +27,6 @@ export interface ChainConfig {
 }
 
 const chains: Record<string, ChainConfig> = {
-  "0g": {
-    id: "0g",
-    name: "0G Chain",
-    chainId: 16661,
-    rpc: process.env.ZG_RPC_URL || "https://evmrpc.0g.ai",
-    paymentContract: process.env.PAYMENT_CONTRACT_ADDRESS || "0x124aF88c004e9df6D444a0Afc0Fe7Ef215dc02A2",
-    registryContract: process.env.REGISTRY_CONTRACT_ADDRESS || "0x49589C475BBB418B0E069010C923ed18D00E275b",
-    identityContract: process.env.IDENTITY_CONTRACT_ADDRESS || "0xa601C569FD008DEd545531a5d3245B2C68ac591d",
-    identityType: "custom",
-    paymentType: "native",
-    paymentDecimals: 18,
-    explorer: "https://chainscan.0g.ai",
-    currency: "0G",
-    pricing: {
-      identity: process.env.PRICE_IDENTITY_MINT || "0.5",
-      emailProvision: process.env.PRICE_EMAIL || "2.0",
-      emailSend: process.env.PRICE_EMAIL_SEND || "0.1",
-      emailRead: process.env.PRICE_EMAIL_READ || "0.05",
-      phoneProvision: process.env.PRICE_PHONE || "6.0",
-      smsSend: process.env.PRICE_SMS || "0.1",
-      computeInfer: process.env.PRICE_COMPUTE_INFER || "0.2",
-    },
-  },
   celo: {
     id: "celo",
     name: "Celo",
@@ -74,6 +51,29 @@ const chains: Record<string, ChainConfig> = {
       computeInfer: "0.10",
     },
   },
+  "0g": {
+    id: "0g",
+    name: "0G Chain",
+    chainId: 16661,
+    rpc: process.env.ZG_RPC_URL || "https://evmrpc.0g.ai",
+    paymentContract: process.env.PAYMENT_CONTRACT_ADDRESS || "0x124aF88c004e9df6D444a0Afc0Fe7Ef215dc02A2",
+    registryContract: process.env.REGISTRY_CONTRACT_ADDRESS || "0x49589C475BBB418B0E069010C923ed18D00E275b",
+    identityContract: process.env.IDENTITY_CONTRACT_ADDRESS || "0xa601C569FD008DEd545531a5d3245B2C68ac591d",
+    identityType: "custom",
+    paymentType: "native",
+    paymentDecimals: 18,
+    explorer: "https://chainscan.0g.ai",
+    currency: "0G",
+    pricing: {
+      identity: process.env.PRICE_IDENTITY_MINT || "0.5",
+      emailProvision: process.env.PRICE_EMAIL || "2.0",
+      emailSend: process.env.PRICE_EMAIL_SEND || "0.1",
+      emailRead: process.env.PRICE_EMAIL_READ || "0.05",
+      phoneProvision: process.env.PRICE_PHONE || "6.0",
+      smsSend: process.env.PRICE_SMS || "0.1",
+      computeInfer: process.env.PRICE_COMPUTE_INFER || "0.2",
+    },
+  },
 };
 
 export function getChain(id: string): ChainConfig {
@@ -87,5 +87,5 @@ export function getAllChains(): ChainConfig[] {
 }
 
 export function getDefaultChain(): ChainConfig {
-  return chains["0g"];
+  return chains["celo"];
 }

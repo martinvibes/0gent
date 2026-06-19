@@ -3,7 +3,7 @@ import { XIcon, TelegramIcon } from './Icons';
 
 // Telegram URL is a placeholder — swap when the real group link is ready.
 // Keep `#tg` so the link renders but doesn't go anywhere unexpected.
-const TG_URL = '#tg';
+const TG_URL = 'https://t.me/Ogentss/1';
 const X_URL  = 'https://x.com/0xgents';
 
 export function Footer() {
@@ -14,7 +14,7 @@ export function Footer() {
           Give your agent superpowers
         </h2>
         <p style={{ fontSize: 17, color: 'rgba(254,254,254,0.5)', maxWidth: 500, margin: '0 auto 36px', lineHeight: 1.7 }}>
-          Real infrastructure. On-chain identity. Decentralized memory. All on 0G.
+          Real infrastructure. On-chain identity. Persistent memory. Multi-chain.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', padding: '0 24px' }}>
           <a

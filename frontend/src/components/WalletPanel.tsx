@@ -633,7 +633,7 @@ export function WalletPanel() {
         <h2 className="reveal-up" style={{ ...h2Style, transitionDelay: '60ms' }}>{w.name}</h2>
         <p className="reveal-up" style={{ ...subStyle, transitionDelay: '120ms' }}>
           Wallet unlocked in this browser. Use it from the terminal below or via the CLI / SDK
-          to provision real resources on 0G Chain.
+          to provision real resources on-chain.
         </p>
 
         <div className="reveal-up wallet-card" style={{ ...cardStyle, transitionDelay: '180ms' }}>

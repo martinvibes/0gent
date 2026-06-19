@@ -5,25 +5,30 @@ import { getAllChains } from "../chains";
 const router = Router();
 
 router.get("/", (_req, res) => {
+  const chains = getAllChains().map((c) => ({
+    id: c.id,
+    name: c.name,
+    chainId: c.chainId,
+    rpc: c.rpc,
+    currency: c.currency,
+    paymentType: c.paymentType,
+    contracts: {
+      payment: c.paymentContract,
+      registry: c.registryContract,
+      identity: c.identityContract,
+    },
+    ...(c.paymentToken ? { paymentToken: c.paymentToken } : {}),
+  }));
+
   res.json({
     status: "ok",
     service: "0GENT",
-    version: "0.2.5",
-    chain: {
-      name: "0G Chain",
-      chainId: config.zgChainId,
-      rpc: config.zgRpcUrl,
-    },
-    contracts: {
-      payment: config.paymentContractAddress || "not deployed",
-      registry: config.registryContractAddress || "not deployed",
-      identity: config.identityContractAddress || "not deployed",
-    },
+    version: "0.3.0",
+    chains,
     storage: {
       indexer: config.zgStorageIndexerUrl,
       flowContract: config.zgStorageFlowContract,
     },
-    supportedChains: getAllChains().map((c) => c.id),
     timestamp: new Date().toISOString(),
   });
 });

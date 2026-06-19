@@ -48,10 +48,10 @@ interface Item {
 }
 
 const items: Item[] = [
-  { title: '0G Chain · x402',    desc: 'Native-0G token payments via the x402 protocol. Resource registry and agent identity all on-chain.', detail: 'ZeroGentPayment.sol · 16661', icon: ChainIcon },
-  { title: '0G Storage',         desc: 'Agent memory, NFT metadata, session state on decentralized storage.',                                detail: '@0glabs/0g-ts-sdk',           icon: StorageIcon },
-  { title: '0G Compute Network', desc: 'Pay-per-call AI inference via the 0G Compute serving network.',                                      detail: '@0glabs/0g-serving-broker',   icon: ComputeIcon },
-  { title: 'Agent Identity',     desc: 'One ERC-721 per agent on 0G Chain. Metadata on 0G Storage. Permanent.',                              detail: 'ZeroGentIdentity.sol',        icon: IdentityIcon },
+  { title: 'On-Chain Payments · x402', desc: 'Token payments via the x402 protocol. USDC on Celo, native tokens on 0G.',                  detail: 'Celo · 0G Chain',            icon: ChainIcon },
+  { title: '0G Storage',               desc: 'Agent memory, NFT metadata, session state on decentralized storage.',                        detail: '@0glabs/0g-ts-sdk',          icon: StorageIcon },
+  { title: '0G Compute Network',       desc: 'Pay-per-call AI inference via the 0G Compute serving network.',                              detail: '@0glabs/0g-serving-broker',  icon: ComputeIcon },
+  { title: 'Agent Identity',           desc: 'ERC-8004 on Celo, ERC-721 on 0G Chain. On-chain and permanent.',                             detail: 'ERC-8004 · ERC-721',         icon: IdentityIcon },
 ];
 
 export function ZGIntegration() {
@@ -78,10 +78,10 @@ export function ZGIntegration() {
           Deep Integration
         </div>
         <h2 className="reveal-up section-h2" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 20 }}>
-          Native 0G integration
+          Deep Chain Integration
         </h2>
         <p className="reveal-up" style={{ fontSize: 16, color: 'rgba(254,254,254,0.5)', maxWidth: 540, margin: '0 auto 56px', lineHeight: 1.7 }}>
-          Three of 0G's pillars — Chain, Storage, Compute — anchored by an on-chain agent identity NFT.
+          Multi-chain infrastructure — payments, storage, compute, identity — all on-chain.
         </p>
 
         <div className="zg-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, textAlign: 'left' }}>
@@ -125,7 +125,7 @@ export function ZGIntegration() {
                 textTransform: 'uppercase',
                 color: 'rgba(254,254,254,0.3)',
                 marginBottom: 10, fontWeight: 500,
-              }}>0G Component</div>
+              }}>Component</div>
 
               <h3 style={{
                 fontSize: 18, fontWeight: 600,

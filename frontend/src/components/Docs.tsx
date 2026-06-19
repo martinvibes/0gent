@@ -276,7 +276,7 @@ export function Docs() {
             Build agents that pay their own way.
           </h1>
           <p style={{ fontSize: 17, color: TEXT_DIM, lineHeight: 1.7, maxWidth: 640 }}>
-            0GENT is the SDK + backend that lets your AI agent provision real-world resources — email inboxes, phone numbers, AI inference,
+            0GENT is the SDK + backend that lets your AI agent provision real-world resources: email inboxes, phone numbers, AI inference,
             on-chain identity — with no human in the loop. Your agent's wallet pays per call via x402, and resources are
             owned by the wallet on-chain.
           </p>
@@ -556,7 +556,7 @@ const resources = await z.listResources();`}</Code>
           id="contracts"
           kicker="07"
           title="Smart contracts"
-          intro={<>Three contracts deployed on 0G Chain mainnet (chain ID 16661). 98 unit + fuzz tests passing.</>}
+          intro={<>Smart contracts deployed on Celo and 0G Chain. 127 unit + fuzz tests passing.</>}
         >
           <div className="docs-services" style={{ border: `1px solid ${BORDER}` }}>
             <table className="docs-services-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>

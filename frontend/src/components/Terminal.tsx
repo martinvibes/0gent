@@ -58,7 +58,7 @@ const SIM: Record<string, Array<Line>> = {
     { type: 'out', text: '→ POST /phone/provision' },
     { type: 'err', text: '402 Payment Required — 6.0 0G' },
     { type: 'out', text: '→ ZeroGentPayment.pay(nonce, "phone")' },
-    { type: 'ok', text: 'Payment verified on 0G Chain' },
+    { type: 'ok', text: 'Payment verified on-chain' },
     { type: 'ok', text: 'Provisioned via Telnyx' },
     { type: 'ok', text: 'Registered on AgentRegistry' },
     { type: 'out', text: '' },

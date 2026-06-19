@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 const STEP_DURATION_MS = 4500;
 
 const steps = [
-  { n: '01', title: 'Agent reads skill.md',     body: 'Fetches GET /skill.md — a plain text file describing every endpoint, cost, and how to pay.', code: 'GET /skill.md\n\n# 0GENT — Real-World Infrastructure\n# for AI Agents on 0G Chain\n#\n# Wallet = identity. Pay via x402.' },
+  { n: '01', title: 'Agent reads skill.md',     body: 'Fetches GET /skill.md — a plain text file describing every endpoint, cost, and how to pay.', code: 'GET /skill.md\n\n# 0GENT — Real-World Infrastructure\n# for AI Agents\n#\n# Wallet = identity. Pay via x402.' },
   { n: '02', title: 'Agent calls paid endpoint', body: 'Requests a resource. Without payment, server responds HTTP 402 with payment instructions.',  code: 'POST /phone/provision\n\n← 402 Payment Required\n{\n  "contract": "0x3F2a...91cB",\n  "value": "500000000000000000",\n  "nonce": "0xf7a3..."\n}' },
-  { n: '03', title: 'Payment on 0G Chain',      body: 'Agent calls ZeroGentPayment.pay() with nonce + 0G tokens. Verified on-chain.',                code: 'ZeroGentPayment.pay(\n  nonce: 0xf7a3...,\n  type: "phone"\n) → 6.0 0G\n\n✓ PaymentReceived emitted\n✓ Nonce marked used' },
+  { n: '03', title: 'Payment on-chain',         body: 'Agent calls the payment contract with nonce + tokens. Verified on-chain.',                     code: 'ZeroGentPayment.pay(\n  nonce: 0xf7a3...,\n  type: "phone"\n) → $3.00 USDC\n\n✓ PaymentReceived emitted\n✓ Nonce marked used' },
   { n: '04', title: 'Resource provisioned',     body: 'Backend verifies payment, provisions via Web2 API, registers on AgentRegistry.',              code: '✓ Payment verified on-chain\n✓ Telnyx: +1 (415) 555-0142\n✓ AgentRegistry.registerResource()\n\n→ owner: 0x742d...bD18\n→ resourceId: 3' },
 ];
 
@@ -91,7 +91,7 @@ export function HowItWorks() {
           fontSize: 16, color: 'rgba(254,254,254,0.5)', lineHeight: 1.7,
           transitionDelay: '120ms',
         }}>
-          <span>Call API → get 402 → pay on 0G Chain → resource is yours.</span>
+          <span>Call API → get 402 → pay on-chain → resource is yours.</span>
           <button
             type="button"
             onClick={() => setIsPlaying((p) => !p)}

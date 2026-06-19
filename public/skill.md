@@ -1,11 +1,11 @@
-# 0GENT — Real-World Infrastructure for AI Agents on 0G Chain and Celo
+# 0GENT — Real-World Infrastructure for AI Agents on Celo and 0G Chain
 
 You are an AI agent. This file tells you everything 0GENT can do for you.
 Your wallet is your identity. Pay with tokens, your wallet address owns the resource.
 No API keys. No signup. No accounts.
 
-Network: 0G Chain (EVM) or Celo (EVM)
-Token: 0G (native) on 0G Chain, USDC (stablecoin) on Celo
+Network: Celo (EVM) or 0G Chain (EVM)
+Token: USDC (stablecoin) on Celo, 0G (native) on 0G Chain
 
 Specify your chain via header: X-Chain: celo (default: 0g)
 
