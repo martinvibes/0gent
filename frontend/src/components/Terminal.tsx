@@ -6,7 +6,6 @@ import { shortAddress } from '../lib/wallet';
 // ─────────────────────────────────────────────────────────────────────────────
 //  Color tokens (0G purple palette)
 // ─────────────────────────────────────────────────────────────────────────────
-const PURPLE = '#00B8D4';
 const LILAC = '#00E5FF';
 const GREEN = '#3fb950';
 const RED = '#f85149';
@@ -46,18 +45,18 @@ const SIM: Record<string, Array<Line>> = {
     { type: 'out', text: 'pricing                        Service prices      free' },
     { type: 'out', text: 'phone countries                List supported      free' },
     { type: 'out', text: 'phone search --country US      Search numbers      free' },
-    { type: 'out', text: 'phone provision                Provision phone     6.0 0G' },
-    { type: 'out', text: 'phone sms <id>                 Send SMS            0.1 0G' },
-    { type: 'out', text: 'email create --name agent      Create inbox        2.0 0G' },
-    { type: 'out', text: 'email send <id>                Send email          0.1 0G' },
-    { type: 'out', text: 'email read <id>                Read inbox          0.05 0G' },
-    { type: 'out', text: 'identity mint                  Mint Agent NFT      0.5 0G' },
-    { type: 'out', text: 'memory set <key> <value>       Write to 0G Storage free' },
+    { type: 'out', text: 'phone provision                Provision phone     $3.00 USDC' },
+    { type: 'out', text: 'phone sms <id>                 Send SMS            $0.05 USDC' },
+    { type: 'out', text: 'email create --name agent      Create inbox        $2.00 USDC' },
+    { type: 'out', text: 'email send <id>                Send email          $0.08 USDC' },
+    { type: 'out', text: 'email read <id>                Read inbox          $0.02 USDC' },
+    { type: 'out', text: 'identity mint                  Mint Agent NFT      $0.50 USDC' },
+    { type: 'out', text: 'memory set <key> <value>       Persistent storage  free' },
   ],
   'phone provision': [
     { type: 'out', text: '→ POST /phone/provision' },
-    { type: 'err', text: '402 Payment Required — 6.0 0G' },
-    { type: 'out', text: '→ ZeroGentPayment.pay(nonce, "phone")' },
+    { type: 'err', text: '402 Payment Required — $3.00 USDC' },
+    { type: 'out', text: '→ USDC.approve → CeloAgentPayment.pay(nonce, "phone", 3000000)' },
     { type: 'ok', text: 'Payment verified on-chain' },
     { type: 'ok', text: 'Provisioned via Telnyx' },
     { type: 'ok', text: 'Registered on AgentRegistry' },
@@ -68,18 +67,17 @@ const SIM: Record<string, Array<Line>> = {
   ],
   'identity mint': [
     { type: 'out', text: '→ POST /identity/mint' },
-    { type: 'err', text: '402 Payment Required — 0.5 0G' },
-    { type: 'out', text: '→ ZeroGentPayment.pay(nonce, "identity")' },
+    { type: 'err', text: '402 Payment Required — $0.50 USDC' },
+    { type: 'out', text: '→ USDC.approve → CeloAgentPayment.pay(nonce, "identity", 500000)' },
     { type: 'ok', text: 'Payment verified' },
-    { type: 'ok', text: 'Metadata → 0G Storage: 0g://0x73fa973e...' },
-    { type: 'ok', text: 'ERC-721 minted on ZeroGentIdentity' },
+    { type: 'ok', text: 'ERC-8004 identity registered on Celo' },
     { type: 'out', text: '' },
-    { type: 'out', text: '  Token #1  |  0x742d...bD18  |  0g://0x73fa…' },
+    { type: 'out', text: '  Agent ID  |  0x742d...bD18  |  celoscan.io/tx/0x73fa…' },
   ],
   'email create --name agent': [
     { type: 'out', text: '→ POST /email/provision' },
-    { type: 'err', text: '402 Payment Required — 2.0 0G' },
-    { type: 'out', text: '→ ZeroGentPayment.pay(nonce, "email")' },
+    { type: 'err', text: '402 Payment Required — $2.00 USDC' },
+    { type: 'out', text: '→ USDC.approve → CeloAgentPayment.pay(nonce, "email", 2000000)' },
     { type: 'ok', text: 'Payment verified' },
     { type: 'ok', text: 'Cloudflare routing rule created' },
     { type: 'ok', text: 'Registered on AgentRegistry' },
@@ -259,9 +257,9 @@ function StatusBar({ requests, lineNum }: { requests: number; lineNum: number })
         >
           x402
         </span>
-        <span style={{ color: 'rgba(254,254,254,0.4)' }}>0G mainnet</span>
+        <span style={{ color: 'rgba(254,254,254,0.4)' }}>Celo · 0G Chain</span>
         <span className="terminal-status-dot" style={{ color: 'rgba(254,254,254,0.25)' }}>·</span>
-        <span style={{ color: 'rgba(254,254,254,0.4)' }}>chain 16661</span>
+        <span style={{ color: 'rgba(254,254,254,0.4)' }}>multi-chain</span>
       </div>
       <div className="terminal-status-right" style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
         <span>{requests} {requests === 1 ? 'request' : 'requests'}</span>
@@ -741,7 +739,7 @@ export function Terminal() {
   const [tab, setTab] = useState<TabKey>('shell');
   const [connected, setConnected] = useState(false);
   const [lines, setLines] = useState<Line[]>([
-    { type: 'dim', text: '0GENT v0.1.0 — try a command below, or type one' },
+    { type: 'dim', text: '0GENT v0.3.0 — try a command below, or type one' },
   ]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -784,6 +782,19 @@ export function Terminal() {
       const { status, data } = await apiCall('GET', '/health');
       const d = data as any;
       if (status === 200 && d) {
+        const chainRows: CardRow[] = [];
+        for (const c of d.chains || []) {
+          chainRows.push(
+            { label: 'chain',    value: `${c.name} · ${c.chainId}`, valueColor: LILAC },
+            { label: 'currency', value: `${c.currency} (${c.paymentType})` },
+            { label: 'payment',  value: c.contracts.payment },
+            { label: 'registry', value: c.contracts.registry },
+            { label: 'identity', value: c.contracts.identity },
+            ...(c.paymentToken ? [{ label: 'token', value: c.paymentToken }] : []),
+            { label: '', value: '' },
+          );
+        }
+        if (chainRows.length) chainRows.pop();
         setLines(p => [
           ...p,
           {
@@ -794,13 +805,7 @@ export function Terminal() {
               icon: '🟢',
               title: `${d.service} · v${d.version}`,
               titleSize: 'lg',
-              rows: [
-                { label: 'chain',    value: `0G Chain · ${d.chain.chainId}`, valueColor: LILAC },
-                { label: 'rpc',      value: d.chain.rpc },
-                { label: 'payment',  value: d.contracts.payment },
-                { label: 'registry', value: d.contracts.registry },
-                { label: 'identity', value: d.contracts.identity },
-              ],
+              rows: chainRows,
               badge: { text: 'ONLINE', kind: 'ok' },
             },
           },
@@ -829,32 +834,35 @@ export function Terminal() {
       setBusy(true);
       const { status, data } = await apiCall('GET', '/pricing');
       const d = data as any;
-      if (status === 200 && d?.services) {
-        const fmt = (v: any) => (typeof v === 'string' ? v : `${v} 0G`);
-        const rows: CardRow[] = [
-          { label: 'identity mint',  value: fmt(d.services.identity?.mint),    valueColor: LILAC },
-          { label: 'phone provision',value: fmt(d.services.phone?.provision),  valueColor: LILAC },
-          { label: 'sms send',       value: fmt(d.services.phone?.sms),        valueColor: LILAC },
-          { label: 'email inbox',    value: fmt(d.services.email?.provision),  valueColor: LILAC },
-          { label: 'email send',     value: fmt(d.services.email?.send),       valueColor: LILAC },
-          { label: 'email read',     value: fmt(d.services.email?.read),       valueColor: LILAC },
-          { label: 'memory r/w',     value: fmt(d.services.memory?.read),      valueColor: GREEN },
-        ];
-        setLines(p => [
-          ...p,
-          {
-            type: 'card',
-            card: {
-              payment: 'free',
-              status,
-              icon: '💰',
-              title: `Service prices · paid in ${d.currency || '0G'}`,
-              titleSize: 'lg',
-              rows,
-              note: `network: ${d.network || `0G Chain ${d.chain?.chainId || 16661}`}`,
+      if (status === 200 && d?.chains) {
+        for (const chain of d.chains) {
+          const s = chain.services;
+          const cur = chain.currency;
+          const rows: CardRow[] = [
+            { label: 'identity mint',  value: `${s.identity?.mint} ${cur}`,   valueColor: LILAC },
+            { label: 'phone provision',value: `${s.phone?.provision} ${cur}`, valueColor: LILAC },
+            { label: 'sms send',       value: `${s.phone?.sms} ${cur}`,       valueColor: LILAC },
+            { label: 'email inbox',    value: `${s.email?.provision} ${cur}`, valueColor: LILAC },
+            { label: 'email send',     value: `${s.email?.send} ${cur}`,      valueColor: LILAC },
+            { label: 'email read',     value: `${s.email?.read} ${cur}`,      valueColor: LILAC },
+            { label: 'compute infer',  value: `${s.compute?.infer} ${cur}`,   valueColor: LILAC },
+            { label: 'memory r/w',     value: s.memory?.read,                 valueColor: GREEN },
+          ];
+          setLines(p => [
+            ...p,
+            {
+              type: 'card',
+              card: {
+                payment: 'free',
+                status,
+                icon: '💰',
+                title: `${chain.network} · paid in ${cur}`,
+                titleSize: 'lg',
+                rows,
+              },
             },
-          },
-        ]);
+          ]);
+        }
       } else {
         setLines(p => [...p, { type: 'err', text: 'pricing unavailable' }]);
       }
@@ -934,7 +942,7 @@ export function Terminal() {
                 title: `${d.numbers.length} numbers in ${d.country?.name || country}`,
                 titleSize: 'lg',
                 rows,
-                note: `provider: ${d.provider} · run "phone provision" to claim one for 6.0 0G`,
+                note: `provider: ${d.provider} · run "phone provision" to claim one for $3.00 USDC`,
                 badge: { text: 'LIVE', kind: 'ok' },
               },
             },
@@ -990,8 +998,8 @@ export function Terminal() {
             titleSize: 'lg',
             rows: [
               { label: 'address', value: addr },
-              { label: 'balance', value: wallet.balance ? `${Number(wallet.balance.zg).toFixed(4)} 0G` : '…', valueColor: LILAC },
-              { label: 'chain',   value: '0G Chain · 16661' },
+              { label: 'balance', value: wallet.balance ? `${Number(wallet.balance.zg).toFixed(4)} native` : '…', valueColor: LILAC },
+              { label: 'chains',  value: 'Celo (USDC) · 0G Chain (0G)' },
               { label: 'storage', value: 'browser localStorage · AES-256-GCM' },
             ],
             badge: wallet.state.kind === 'unlocked'
