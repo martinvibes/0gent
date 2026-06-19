@@ -28,10 +28,10 @@ export async function setupCmd(): Promise<void> {
     name: 'network',
     message: 'Which network do you want to use?',
     choices: [
-      { name: '0G Chain  — pay with 0G tokens', value: '0g' },
       { name: 'Celo      — pay with USDC (stablecoins)', value: 'celo' },
+      { name: '0G Chain  — pay with 0G tokens', value: '0g' },
     ],
-    default: '0g',
+    default: 'celo',
   }]);
 
   save({ network });

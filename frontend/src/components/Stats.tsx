@@ -18,16 +18,16 @@ import {
 const API = (import.meta.env.VITE_API_URL as string) || 'https://api.0gent.xyz';
 
 // ─── Tokens ───────────────────────────────────────────────────────────
-const LILAC = '#B75FFF';
+const LILAC = '#00E5FF';
 const TEXT = '#fefefe';
 const TEXT_DIM = 'rgba(254,254,254,0.7)';
 const TEXT_FAINT = 'rgba(254,254,254,0.5)';
 const TEXT_GHOST = 'rgba(254,254,254,0.35)';
 const BG_PAGE = '#050508';
 const BG_CARD = '#0c0c14';
-const BG_ROW = 'rgba(146,0,225,0.025)';
-const BORDER = 'rgba(183,95,255,0.12)';
-const BORDER_HOVER = 'rgba(183,95,255,0.30)';
+const BG_ROW = 'rgba(0,229,255,0.025)';
+const BORDER = 'rgba(0,229,255,0.12)';
+const BORDER_HOVER = 'rgba(0,229,255,0.30)';
 const GREEN = '#7DEFB1';
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -59,8 +59,8 @@ const ENDPOINT_META: Record<string, { label: string; icon: ReactNode; color: str
   'email-threads': { label: 'Email threads',      icon: <ThreadIcon   size={14} color="#7DEFB1" />,      color: '#7DEFB1' },
   phone:           { label: 'Phone number',       icon: <PhoneIcon    size={14} color="#FFC97A" />,      color: '#FFC97A' },
   sms:             { label: 'SMS sent',           icon: <SmsIcon      size={14} color="#FFC97A" />,      color: '#FFC97A' },
-  'compute-infer': { label: 'AI inference',       icon: <BrainIcon    size={14} color="#CB8AFF" />,      color: '#CB8AFF' },
-  compute:         { label: 'Compute VPS',        icon: <ServerIcon   size={14} color="#CB8AFF" />,      color: '#CB8AFF' },
+  'compute-infer': { label: 'AI inference',       icon: <BrainIcon    size={14} color="#4DD0E1" />,      color: '#4DD0E1' },
+  compute:         { label: 'Compute VPS',        icon: <ServerIcon   size={14} color="#4DD0E1" />,      color: '#4DD0E1' },
   domain:          { label: 'Domain register',    icon: <GlobeIcon    size={14} color="#FFC97A" />,      color: '#FFC97A' },
 };
 
@@ -332,7 +332,7 @@ export function Stats() {
               style={{
                 fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
                 padding: '10px 18px', cursor: 'pointer',
-                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.06)',
+                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.06)',
                 color: LILAC, fontWeight: 500,
               }}
             >
@@ -375,7 +375,7 @@ export function Stats() {
               style={{
                 fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
                 padding: '12px 22px', cursor: 'pointer',
-                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.04)',
+                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.04)',
                 color: LILAC, fontWeight: 500,
               }}
             >
@@ -511,7 +511,7 @@ function TransactionsModal({ open, onClose }: { open: boolean; onClose: () => vo
                   fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
                   padding: '6px 12px',
                   border: `1px solid ${active ? BORDER_HOVER : BORDER}`,
-                  background: active ? 'rgba(146,0,225,0.10)' : 'transparent',
+                  background: active ? 'rgba(0,229,255,0.10)' : 'transparent',
                   color: active ? LILAC : TEXT_DIM,
                   cursor: 'pointer', transition: 'all 0.15s',
                 }}

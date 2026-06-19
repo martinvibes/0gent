@@ -11,14 +11,14 @@
  ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   
 ```
 
-**Infrastructure for autonomous AI agents — on 0G Chain & Celo.**
+**Infrastructure for autonomous AI agents — on Celo & 0G Chain.**
 
 Give your agent a wallet. Let it work.
 
 [![npm](https://img.shields.io/npm/v/@0gent/core.svg?color=9200E1)](https://www.npmjs.com/package/@0gent/core)
 [![tests](https://img.shields.io/badge/contracts-127%20passing-7DEFB1.svg)](#tests)
-[![0G](https://img.shields.io/badge/0G%20Mainnet-16661-9200E1.svg)](https://chainscan.0g.ai)
 [![Celo](https://img.shields.io/badge/Celo-42220-FCFF52.svg)](https://celoscan.io)
+[![0G](https://img.shields.io/badge/0G%20Mainnet-16661-9200E1.svg)](https://chainscan.0g.ai)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 <br/>
@@ -77,14 +77,14 @@ Three commands. The agent now has an on-chain identity and a real email inbox.
 
 0GENT is chain-agnostic by design. The same CLI, SDK, and API serve multiple chains. Agents pick a chain at setup — all commands work identically after that.
 
-| | 0G Chain | Celo |
+| | Celo | 0G Chain |
 |---|---|---|
-| **Payment** | Native 0G tokens | USDC stablecoin |
-| **Identity** | Custom ERC-721 (ZeroGentIdentity) | [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) canonical registry |
-| **Inference** | 0G Compute Network (decentralized) | OpenAI proxy |
-| **Memory** | 0G Storage (decentralized) | Local persistence |
-| **Pricing** | Volatile (0G token) | Stable (USD-denominated) |
-| **Explorer** | [chainscan.0g.ai](https://chainscan.0g.ai) | [celoscan.io](https://celoscan.io) |
+| **Payment** | USDC stablecoin | Native 0G tokens |
+| **Identity** | [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) canonical registry | Custom ERC-721 (ZeroGentIdentity) |
+| **Inference** | OpenAI proxy | 0G Compute Network (decentralized) |
+| **Memory** | Local persistence | 0G Storage (decentralized) |
+| **Pricing** | Stable (USD-denominated) | Volatile (0G token) |
+| **Explorer** | [celoscan.io](https://celoscan.io) | [chainscan.0g.ai](https://chainscan.0g.ai) |
 
 ```bash
 # Pick your chain at setup
@@ -113,8 +113,8 @@ Adding a new chain = deploy payment contract + add a registry entry. No backend 
 
 | Contract | Address | Purpose |
 |---|---|---|
-| `CeloAgentPayment` | Deployed on testnet, mainnet pending | ERC-20 USDC payment. Approve + transferFrom pattern. |
-| `CeloAgentRegistry` | Deployed on testnet, mainnet pending | Maps wallets → provisioned resources. |
+| `CeloAgentPayment` | [`0x45568d8939795c1Ec86656f571325011f3A67da8`](https://celoscan.io/address/0x45568d8939795c1Ec86656f571325011f3A67da8) | ERC-20 USDC payment. Approve + transferFrom pattern. |
+| `CeloAgentRegistry` | [`0x0745e722819B86841dCB4E223204a9AfA815A394`](https://celoscan.io/address/0x0745e722819B86841dCB4E223204a9AfA815A394) | Maps wallets → provisioned resources. |
 | ERC-8004 IdentityRegistry | [`0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`](https://celoscan.io/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432) | Canonical agent identity. Shared singleton — agents discoverable across the ecosystem. |
 
 ### 0G Testnet (Chain 16602) — Development & Traction History
@@ -200,17 +200,17 @@ Any agent framework that can read a URL and sign EVM transactions can integrate 
 
 All costs settled on-chain via x402. Agents pick their chain — pricing adjusts automatically.
 
-| Service | Status | 0G Chain | Celo (USDC) |
+| Service | Status | Celo (USDC) | 0G Chain |
 |---|---|---|---|
-| **Agent Identity** | ✅ Live | 0.5 0G | $0.50 |
-| **Email — provision** | ✅ Live | 2.0 0G | $2.00 |
-| **Email — send** | ✅ Live | 0.1 0G | $0.08 |
-| **Email — read** | ✅ Live | 0.05 0G | $0.02 |
-| **Email — threads** | ✅ Live | 0.05 0G | $0.02 |
+| **Agent Identity** | ✅ Live | $0.50 | 0.5 0G |
+| **Email — provision** | ✅ Live | $2.00 | 2.0 0G |
+| **Email — send** | ✅ Live | $0.08 | 0.1 0G |
+| **Email — read** | ✅ Live | $0.02 | 0.05 0G |
+| **Email — threads** | ✅ Live | $0.02 | 0.05 0G |
 | **Phone — search** | ✅ Live | free | free |
-| **Phone — provision** | ✅ Live | 6.0 0G | $3.00 |
-| **SMS — send** | ✅ Live | 0.1 0G | $0.05 |
-| **AI Inference** | ✅ Live | 0.2 0G | $0.10 |
+| **Phone — provision** | ✅ Live | $3.00 | 6.0 0G |
+| **SMS — send** | ✅ Live | $0.05 | 0.1 0G |
+| **AI Inference** | ✅ Live | $0.10 | 0.2 0G |
 | **Memory** | ✅ Live | free | free |
 | **Agent Profile** | ✅ Live | free | free |
 

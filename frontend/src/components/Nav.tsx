@@ -6,7 +6,7 @@ export function Nav() {
       <div className="nav-pill" style={{
         display: 'inline-flex', alignItems: 'center', gap: 28, padding: '12px 22px',
         background: 'rgba(12,12,20,0.9)', backdropFilter: 'blur(24px)',
-        border: '1px solid rgba(183,95,255,0.15)', borderRadius: 100,
+        border: '1px solid rgba(0, 229, 255,0.15)', borderRadius: 100,
       }}>
         <a
           href="/"
@@ -17,7 +17,7 @@ export function Nav() {
             color: '#fefefe', textDecoration: 'none',
           }}
         >
-          <Glyph0G size={22} color="#B75FFF" strokeWidth={3.6} />
+          <Glyph0G size={22} color="#00E5FF" strokeWidth={3.6} />
           0GENT
         </a>
 
@@ -46,7 +46,7 @@ export function Nav() {
           className="nav-cta"
           style={{
             display: 'inline-flex', alignItems: 'center', height: 32, padding: '0 16px',
-            background: '#9200E1', color: '#fff', fontSize: 11, fontWeight: 600,
+            background: '#00B8D4', color: '#fff', fontSize: 11, fontWeight: 600,
             textTransform: 'uppercase', letterSpacing: '0.06em', borderRadius: 100, border: 'none',
             transition: 'filter 0.2s',
             whiteSpace: 'nowrap',

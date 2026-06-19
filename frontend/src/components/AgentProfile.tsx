@@ -5,8 +5,8 @@ import { API_URL } from '../lib/api';
 
 // ─── Tokens (matches the rest of the page) ─────────────────────────────
 
-const PURPLE = '#9200E1';
-const LILAC = '#B75FFF';
+const PURPLE = '#00B8D4';
+const LILAC = '#00E5FF';
 const GREEN = '#3fb950';
 const TEXT = '#fefefe';
 const TEXT_DIM = 'rgba(254,254,254,0.55)';
@@ -14,8 +14,8 @@ const TEXT_FAINT = 'rgba(254,254,254,0.32)';
 const TEXT_GHOST = 'rgba(254,254,254,0.20)';
 const BG_PAGE = '#08080d';
 const BG_CARD = '#0a0a12';
-const BORDER = 'rgba(183,95,255,0.10)';
-const BORDER_HOVER = 'rgba(183,95,255,0.28)';
+const BORDER = 'rgba(0,229,255,0.10)';
+const BORDER_HOVER = 'rgba(0,229,255,0.28)';
 
 // ─── Types matching the backend response ──────────────────────────────
 
@@ -145,7 +145,7 @@ export function AgentProfile({ address }: { address: string }) {
       {/* Section bg glow */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 50% 35% at 50% 0%, rgba(146,0,225,0.12), transparent 70%)',
+        background: 'radial-gradient(ellipse 50% 35% at 50% 0%, rgba(0,229,255,0.12), transparent 70%)',
       }} />
 
       {/* Mini nav */}
@@ -291,7 +291,7 @@ export function AgentProfile({ address }: { address: string }) {
                   <div style={{
                     width: 56, height: 56,
                     border: `1px solid ${BORDER}`,
-                    background: 'linear-gradient(135deg, rgba(146,0,225,0.10), rgba(146,0,225,0.02))',
+                    background: 'linear-gradient(135deg, rgba(0,229,255,0.10), rgba(0,229,255,0.02))',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>
@@ -343,7 +343,7 @@ export function AgentProfile({ address }: { address: string }) {
             {/* CTA at the bottom */}
             <div style={{
               marginTop: 56, padding: '24px 28px',
-              background: 'linear-gradient(135deg, rgba(146,0,225,0.06), rgba(146,0,225,0.01))',
+              background: 'linear-gradient(135deg, rgba(0,229,255,0.06), rgba(0,229,255,0.01))',
               border: `1px solid ${BORDER}`,
               display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap',
             }}>
@@ -401,7 +401,7 @@ function StatCard({
     <div style={{
       padding: '18px 20px',
       background: BG_CARD,
-      border: `1px solid ${accent ? 'rgba(183,95,255,0.20)' : BORDER}`,
+      border: `1px solid ${accent ? 'rgba(0,229,255,0.20)' : BORDER}`,
     }}>
       <div style={{
         fontSize: 11, color: TEXT_FAINT,
@@ -450,7 +450,7 @@ function ResourceRow({ resource }: { resource: AgentResource }) {
       <div style={{
         width: 40, height: 40,
         border: `1px solid ${BORDER}`,
-        background: 'rgba(146,0,225,0.04)',
+        background: 'rgba(0,229,255,0.04)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         flexShrink: 0,
       }}>

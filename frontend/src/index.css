@@ -4,18 +4,18 @@
   --color-bg: #050508;
   --color-surface: #0c0c14;
   --color-surface-2: #121220;
-  --color-accent: #9200E1;
-  --color-accent-light: #B75FFF;
-  --color-accent-soft: #CB8AFF;
-  --color-accent-glow: rgba(146, 0, 225, 0.15);
-  --color-accent-pale: #E3C1FF;
+  --color-accent: #00B8D4;
+  --color-accent-light: #00E5FF;
+  --color-accent-soft: #4DD0E1;
+  --color-accent-glow: rgba(0, 229, 255, 0.15);
+  --color-accent-pale: #80DEEA;
   --color-green: #3fb950;
   --color-red: #f85149;
   --color-text: #FEFEFE;
   --color-dim: rgba(254, 254, 254, 0.5);
   --color-muted: rgba(254, 254, 254, 0.3);
   --color-faint: rgba(254, 254, 254, 0.12);
-  --color-line: rgba(183, 95, 255, 0.12);
+  --color-line: rgba(0, 229, 255, 0.12);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,10 +29,10 @@ body {
   overflow-x: hidden;
 }
 
-::selection { background: #9200E1; color: #000; }
+::selection { background: #00B8D4; color: #000; }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(183,95,255,0.2); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(0, 229, 255,0.2); border-radius: 4px; }
 
 a { color: inherit; text-decoration: none; }
 .mono { font-family: 'JetBrains Mono', 'Geist Mono', ui-monospace, monospace; }
@@ -66,7 +66,7 @@ body::after {
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: conic-gradient(from var(--angle, 0deg), transparent 35%, #B75FFF 50%, transparent 65%);
+  background: conic-gradient(from var(--angle, 0deg), transparent 35%, #00E5FF 50%, transparent 65%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -105,12 +105,12 @@ body::after {
 /* ─── Card (legacy class, still used by some panels) ─── */
 .card {
   background: #0c0c14;
-  border: 1px solid rgba(183,95,255,0.1);
+  border: 1px solid rgba(0, 229, 255,0.1);
   border-radius: 12px;
   transition: border-color 0.3s, transform 0.3s;
 }
 .card:hover {
-  border-color: rgba(183,95,255,0.25);
+  border-color: rgba(0, 229, 255,0.25);
   transform: translateY(-2px);
 }
 
@@ -122,20 +122,20 @@ body::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at top right, rgba(146,0,225,0.08), transparent 50%);
+  background: radial-gradient(ellipse at top right, rgba(0, 229, 255,0.08), transparent 50%);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
 .feature-card:hover::after { opacity: 1; }
 .feature-card:hover .feature-icon {
-  border-color: rgba(183,95,255,0.4);
-  background: linear-gradient(135deg, rgba(146,0,225,0.18) 0%, rgba(146,0,225,0.04) 100%);
+  border-color: rgba(0, 229, 255,0.4);
+  background: linear-gradient(135deg, rgba(0, 229, 255,0.18) 0%, rgba(0, 229, 255,0.04) 100%);
 }
 
 /* ─── ZGIntegration card — subtle border + edge glow on hover ─── */
 .zg-card:hover {
-  border-color: rgba(183,95,255,0.3);
+  border-color: rgba(0, 229, 255,0.3);
   transform: translateY(-3px);
 }
 .zg-card:hover .zg-top-edge { opacity: 1; }
@@ -147,9 +147,9 @@ body::after {
   justify-content: center;
   width: 28px;
   height: 28px;
-  border: 1px solid rgba(183,95,255,0.3);
-  background: linear-gradient(135deg, rgba(146,0,225,0.10) 0%, rgba(146,0,225,0.02) 100%);
-  color: #B75FFF;
+  border: 1px solid rgba(0, 229, 255,0.3);
+  background: linear-gradient(135deg, rgba(0, 229, 255,0.10) 0%, rgba(0, 229, 255,0.02) 100%);
+  color: #00E5FF;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   font-weight: 600;
@@ -167,7 +167,7 @@ body::after {
   inset: -1px;
   border-radius: 0;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(183,95,255,0.18), transparent 40%, transparent 60%, rgba(183,95,255,0.10));
+  background: linear-gradient(135deg, rgba(0, 229, 255,0.18), transparent 40%, transparent 60%, rgba(0, 229, 255,0.10));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -177,7 +177,7 @@ body::after {
 
 /* ─── Section divider ─── */
 .section-line {
-  border-top: 1px solid rgba(183,95,255,0.1);
+  border-top: 1px solid rgba(0, 229, 255,0.1);
 }
 
 /* ════════════════════════════════════════════════════════════════════ */
@@ -188,6 +188,8 @@ body::after {
 /* Tablet — hide secondary nav copy, soften big paddings */
 @media (max-width: 1024px) {
   .hide-tablet { display: none !important; }
+  .docs-sidebar { display: none !important; }
+  .docs-layout { padding-left: 24px !important; padding-right: 24px !important; }
 }
 
 /* Mobile (< 768px) — most fixes happen here */
@@ -269,7 +271,7 @@ body::after {
 .dash-card:nth-child(5) { animation-delay: 320ms; }
 .dash-card:nth-child(6) { animation-delay: 390ms; }
 .dash-card:hover {
-  border-color: rgba(183, 95, 255, 0.30);
+  border-color: rgba(0, 229, 255, 0.30);
   transform: translateY(-2px);
 }
 
@@ -301,7 +303,7 @@ body::after {
 }
 .dash-btn-primary:hover:not(:disabled) {
   filter: brightness(1.1);
-  box-shadow: 0 4px 18px rgba(146, 0, 225, 0.30);
+  box-shadow: 0 4px 18px rgba(0, 229, 255, 0.30);
 }
 .dash-btn-primary:active:not(:disabled) {
   transform: translateY(1px) scale(0.99);
@@ -317,9 +319,9 @@ body::after {
   transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
 }
 .dash-btn-ghost:hover:not(:disabled) {
-  border-color: rgba(183, 95, 255, 0.35);
+  border-color: rgba(0, 229, 255, 0.35);
   color: #fefefe;
-  background: rgba(183, 95, 255, 0.05);
+  background: rgba(0, 229, 255, 0.05);
 }
 .dash-btn-ghost:disabled {
   opacity: 0.45;
@@ -328,11 +330,11 @@ body::after {
 
 /* Inputs — focus ring */
 .dash-input { transition: border-color 0.18s ease, background 0.18s ease; }
-.dash-input:focus { border-color: rgba(183, 95, 255, 0.45); background: rgba(0, 0, 0, 0.65); }
+.dash-input:focus { border-color: rgba(0, 229, 255, 0.45); background: rgba(0, 0, 0, 0.65); }
 
 /* Inbox / list-item rows — hoverable */
 .dash-row { transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease; }
-.dash-row:hover { border-color: rgba(183, 95, 255, 0.28); background: rgba(146, 0, 225, 0.03); }
+.dash-row:hover { border-color: rgba(0, 229, 255, 0.28); background: rgba(0, 229, 255, 0.03); }
 
 /* "Live" indicator strip used in the Phone card */
 .dash-live-stripe {
@@ -410,7 +412,7 @@ body::after {
       "hash hash" !important;
     gap: 4px 12px !important;
     padding: 14px 14px !important;
-    border-bottom: 1px solid rgba(183,95,255,0.10);
+    border-bottom: 1px solid rgba(0, 229, 255,0.10);
   }
   .stats-tx-row > :nth-child(1) { grid-area: service; }
   .stats-tx-row > :nth-child(2) { grid-area: payer; font-size: 11.5px !important; }
@@ -454,7 +456,7 @@ body::after {
     display: grid !important;
     grid-template-columns: 1fr auto !important;
     gap: 6px 12px !important;
-    border-top: 1px solid rgba(183,95,255,0.10) !important;
+    border-top: 1px solid rgba(0, 229, 255,0.10) !important;
   }
   .docs-services-row td {
     padding: 0 !important;

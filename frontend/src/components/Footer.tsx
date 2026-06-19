@@ -23,7 +23,7 @@ export function Footer() {
             rel="noreferrer"
             style={{
               display: 'inline-flex', alignItems: 'center', height: 48, padding: '0 28px',
-              background: '#9200E1', color: '#fff', fontSize: 14, fontWeight: 500, borderRadius: 100,
+              background: '#00B8D4', color: '#fff', fontSize: 14, fontWeight: 500, borderRadius: 100,
               border: 'none', transition: 'filter 0.2s', textDecoration: 'none',
             }}
           >
@@ -36,26 +36,26 @@ export function Footer() {
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8, height: 48, padding: '0 24px',
               background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 500,
-              borderRadius: 100, border: '1px solid rgba(183,95,255,0.25)',
+              borderRadius: 100, border: '1px solid rgba(0, 229, 255,0.25)',
               transition: 'border-color 0.2s', textDecoration: 'none',
               fontFamily: 'JetBrains Mono, monospace',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#B75FFF'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(183,95,255,0.25)'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#00E5FF'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.25)'; }}
           >
             npm i -g @0gent/core
           </a>
         </div>
       </section>
 
-      <footer className="footer-row" style={{ borderTop: '1px solid rgba(183,95,255,0.1)', padding: '48px 24px' }}>
+      <footer className="footer-row" style={{ borderTop: '1px solid rgba(0, 229, 255,0.1)', padding: '48px 24px' }}>
         <div style={{
           maxWidth: 1100, margin: '0 auto',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           gap: 24, flexWrap: 'wrap',
         }}>
           <a href="/" style={{ textDecoration: 'none' }}>
-            <LogoLockup size={22} color="#B75FFF" />
+            <LogoLockup size={22} color="#00E5FF" />
           </a>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
             {[
@@ -93,12 +93,12 @@ export function Footer() {
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 width: 34, height: 34,
                 color: 'rgba(254,254,254,0.45)',
-                border: '1px solid rgba(183,95,255,0.15)',
+                border: '1px solid rgba(0, 229, 255,0.15)',
                 transition: 'all 0.2s ease',
                 textDecoration: 'none',
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.40)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.45)'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.15)'; }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.40)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.45)'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.15)'; }}
             >
               <XIcon size={13} />
             </a>
@@ -112,12 +112,12 @@ export function Footer() {
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 width: 34, height: 34,
                 color: 'rgba(254,254,254,0.45)',
-                border: '1px solid rgba(183,95,255,0.15)',
+                border: '1px solid rgba(0, 229, 255,0.15)',
                 transition: 'all 0.2s ease',
                 textDecoration: 'none',
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.40)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.45)'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.15)'; }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.40)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.45)'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.15)'; }}
             >
               <TelegramIcon size={14} />
             </a>

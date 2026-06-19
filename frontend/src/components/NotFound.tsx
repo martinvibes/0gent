@@ -7,14 +7,14 @@ import { Nav } from './Nav';
 import { Footer } from './Footer';
 import { LogoLockup } from './Logo';
 
-const LILAC = '#B75FFF';
+const LILAC = '#00E5FF';
 const TEXT = '#fefefe';
 const TEXT_DIM = 'rgba(254,254,254,0.7)';
 const TEXT_FAINT = 'rgba(254,254,254,0.5)';
 const BG_PAGE = '#050508';
 const BG_CARD = '#0c0c14';
-const BORDER = 'rgba(183,95,255,0.12)';
-const PURPLE = '#9200E1';
+const BORDER = 'rgba(0,229,255,0.12)';
+const PURPLE = '#00B8D4';
 
 export function NotFound() {
   const path = typeof window !== 'undefined' ? window.location.pathname : '';
@@ -41,7 +41,7 @@ export function NotFound() {
           letterSpacing: '-0.04em',
           lineHeight: 1,
           marginBottom: 12,
-          background: 'linear-gradient(180deg, #B75FFF 30%, rgba(146,0,225,0.4))',
+          background: 'linear-gradient(180deg, #00E5FF 30%, rgba(0,229,255,0.4))',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
@@ -112,8 +112,8 @@ export function NotFound() {
                 transition: 'all 0.18s ease',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'rgba(183,95,255,0.40)';
-                e.currentTarget.style.background = 'rgba(146,0,225,0.04)';
+                e.currentTarget.style.borderColor = 'rgba(0,229,255,0.40)';
+                e.currentTarget.style.background = 'rgba(0,229,255,0.04)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = BORDER;

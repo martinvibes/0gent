@@ -3,16 +3,16 @@ import { Glyph0G as SharedGlyph0G } from './Logo';
 
 // ─── Color tokens ─────────────────────────────────────────────────────
 
-const PURPLE = '#9200E1';
-const LILAC = '#B75FFF';
+const PURPLE = '#00B8D4';
+const LILAC = '#00E5FF';
 const TEXT = '#fefefe';
 const TEXT_DIM = 'rgba(254,254,254,0.55)';
 const TEXT_FAINT = 'rgba(254,254,254,0.32)';
 const BG_PAGE = '#08080d';
 const BG_CARD = '#0a0a12';
 const BG_INVERT = '#fefefe';
-const BORDER = 'rgba(183,95,255,0.14)';
-const BORDER_HOVER = 'rgba(183,95,255,0.45)';
+const BORDER = 'rgba(0,229,255,0.14)';
+const BORDER_HOVER = 'rgba(0,229,255,0.45)';
 
 // ─────────────────────────────────────────────────────────────────────────
 //  Eight logo concepts. Each is a React component that takes `size` and
@@ -204,7 +204,7 @@ function LogoCard({
             marginLeft: 'auto',
             fontSize: 10,
             color: LILAC,
-            background: 'rgba(146,0,225,0.14)',
+            background: 'rgba(0,229,255,0.14)',
             padding: '3px 9px',
             border: `1px solid ${LILAC}`,
             fontFamily: 'JetBrains Mono, monospace',
@@ -304,7 +304,7 @@ export function Logos() {
       {/* Subtle bg glow */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 50% 35% at 50% 20%, rgba(146,0,225,0.10), transparent 70%)',
+        background: 'radial-gradient(ellipse 50% 35% at 50% 20%, rgba(0,229,255,0.10), transparent 70%)',
       }} />
 
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative' }}>
@@ -355,7 +355,7 @@ export function Logos() {
         {/* Selected banner */}
         {chosen && (
           <div style={{
-            background: 'rgba(146,0,225,0.08)',
+            background: 'rgba(0,229,255,0.08)',
             border: `1px solid ${LILAC}`,
             padding: '14px 20px',
             marginBottom: 32,

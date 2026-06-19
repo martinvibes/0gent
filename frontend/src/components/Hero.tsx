@@ -93,14 +93,14 @@ export function Hero() {
       <div style={{
         position:'absolute', top:-300, left:'50%', transform:'translateX(-50%)',
         width:1200, height:900, pointerEvents:'none',
-        background:'radial-gradient(ellipse 50% 50%, rgba(146,0,225,0.12) 0%, rgba(183,95,255,0.04) 40%, transparent 70%)',
+        background:'radial-gradient(ellipse 50% 50%, rgba(0, 229, 255,0.12) 0%, rgba(0, 229, 255,0.04) 40%, transparent 70%)',
         zIndex: 0,
       }} />
 
       {/* Grid lines */}
       <div style={{
         position:'absolute', inset:0, pointerEvents:'none',
-        backgroundImage:'linear-gradient(rgba(183,95,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(183,95,255,0.04) 1px, transparent 1px)',
+        backgroundImage:'linear-gradient(rgba(0, 229, 255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255,0.04) 1px, transparent 1px)',
         backgroundSize:'60px 60px',
         maskImage:'linear-gradient(to bottom, transparent 10%, black 30%, black 70%, transparent 90%)',
         WebkitMaskImage:'linear-gradient(to bottom, transparent 10%, black 30%, black 70%, transparent 90%)',
@@ -111,12 +111,12 @@ export function Hero() {
         {/* Badge */}
         <div style={{
           display:'inline-flex', alignItems:'center', gap:8, padding:'8px 18px', marginBottom:32,
-          background:'rgba(146,0,225,0.1)', border:'1px solid rgba(183,95,255,0.25)', borderRadius:100,
-          fontSize:13, fontWeight:500, color:'#B75FFF',
+          background:'rgba(0, 229, 255,0.1)', border:'1px solid rgba(0, 229, 255,0.25)', borderRadius:100,
+          fontSize:13, fontWeight:500, color:'#00E5FF',
           pointerEvents: 'auto',
         }}>
-          <span className="pulse" style={{ width:6, height:6, borderRadius:'50%', background:'#B75FFF', display:'inline-block' }} />
-          Built on 0G Chain & Celo
+          <span className="pulse" style={{ width:6, height:6, borderRadius:'50%', background:'#00E5FF', display:'inline-block' }} />
+          Built on Celo & 0G Chain
         </div>
 
         {/* Heading */}
@@ -139,13 +139,13 @@ export function Hero() {
         <div className="hero-buttons" style={{ display:'flex', gap:14, justifyContent:'center', marginBottom:56, pointerEvents: 'auto', flexWrap: 'wrap' }}>
           <a href="/dashboard" style={{
             display:'inline-flex', alignItems:'center', gap:8, height:48, padding:'0 28px',
-            background:'#9200E1', color:'#fff', fontSize:14, fontWeight:500, borderRadius:100,
+            background:'#00B8D4', color:'#fff', fontSize:14, fontWeight:500, borderRadius:100,
             transition:'all 0.2s', border:'none', textDecoration: 'none'
           }}>Open Dashboard →</a>
           <a href="#terminal" style={{
             display:'inline-flex', alignItems:'center', gap:8, height:48, padding:'0 28px',
             background:'rgba(254,254,254,0.04)', color:'#fff', fontSize:14, fontWeight:500,
-            borderRadius:100, border:'1px solid rgba(183,95,255,0.15)', transition:'all 0.2s', textDecoration: 'none'
+            borderRadius:100, border:'1px solid rgba(0, 229, 255,0.15)', transition:'all 0.2s', textDecoration: 'none'
           }}>See it run</a>
         </div>
 
@@ -167,12 +167,12 @@ export function Hero() {
                 fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
                 padding: '6px 12px',
                 color: 'rgba(254,254,254,0.55)',
-                border: '1px solid rgba(183,95,255,0.18)',
+                border: '1px solid rgba(0, 229, 255,0.18)',
                 textDecoration: 'none',
                 transition: 'all 0.2s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.4)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.55)'; e.currentTarget.style.borderColor = 'rgba(183,95,255,0.18)'; }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.4)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.55)'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.18)'; }}
             >
               {l}
             </a>
@@ -187,7 +187,7 @@ export function Hero() {
             [stats ? `${fmt0G(volume)} 0G`       : '—', '0G Processed'],
           ] as const).map(([v, l]) => (
             <a key={l} href="/stats" style={{ textAlign:'center', textDecoration:'none' }}>
-              <div className="mono hero-stats-num" style={{ fontSize:28, fontWeight:600, color:'#B75FFF', fontVariantNumeric:'tabular-nums' }}>{v}</div>
+              <div className="mono hero-stats-num" style={{ fontSize:28, fontWeight:600, color:'#00E5FF', fontVariantNumeric:'tabular-nums' }}>{v}</div>
               <div style={{ fontSize:11, color:'rgba(254,254,254,0.4)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:4 }}>{l}</div>
             </a>
           ))}

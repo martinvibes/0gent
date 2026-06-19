@@ -56,11 +56,11 @@ const items: Item[] = [
 
 export function ZGIntegration() {
   return (
-    <section id="stack" className="section-pad" style={{ padding: '120px 0', borderTop: '1px solid rgba(183,95,255,0.1)', position: 'relative', overflow: 'hidden' }}>
+    <section id="stack" className="section-pad" style={{ padding: '120px 0', borderTop: '1px solid rgba(0,229,255,0.1)', position: 'relative', overflow: 'hidden' }}>
       {/* subtle decorative grid in the background */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        backgroundImage: 'linear-gradient(rgba(183,95,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(183,95,255,0.03) 1px, transparent 1px)',
+        backgroundImage: 'linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px)',
         backgroundSize: '80px 80px',
         maskImage: 'radial-gradient(ellipse at center, black 0%, transparent 70%)',
         WebkitMaskImage: 'radial-gradient(ellipse at center, black 0%, transparent 70%)',
@@ -70,11 +70,11 @@ export function ZGIntegration() {
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 50% 40% at 50% 35%, rgba(146,0,225,0.08), transparent 70%)',
+        background: 'radial-gradient(ellipse 50% 40% at 50% 35%, rgba(0,229,255,0.08), transparent 70%)',
       }} />
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', textAlign: 'center', position: 'relative' }}>
-        <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#B75FFF', marginBottom: 16, fontWeight: 500 }}>
+        <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#00E5FF', marginBottom: 16, fontWeight: 500 }}>
           Deep Integration
         </div>
         <h2 className="reveal-up section-h2" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 20 }}>
@@ -91,7 +91,7 @@ export function ZGIntegration() {
               className="reveal-up zg-card"
               style={{
                 background: 'linear-gradient(180deg, #0c0c14 0%, #08080d 100%)',
-                border: '1px solid rgba(183,95,255,0.10)',
+                border: '1px solid rgba(0,229,255,0.10)',
                 borderRadius: 12,
                 padding: 28,
                 position: 'relative',
@@ -105,7 +105,7 @@ export function ZGIntegration() {
                 position: 'absolute',
                 top: 0, left: 0, right: 0,
                 height: 1,
-                background: 'linear-gradient(90deg, transparent, rgba(183,95,255,0.5), transparent)',
+                background: 'linear-gradient(90deg, transparent, rgba(0,229,255,0.5), transparent)',
                 opacity: 0.3,
                 transition: 'opacity 0.3s',
               }} />
@@ -114,9 +114,9 @@ export function ZGIntegration() {
                 width: 44, height: 44,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 marginBottom: 20,
-                border: '1px solid rgba(183,95,255,0.18)',
-                background: 'linear-gradient(135deg, rgba(146,0,225,0.10) 0%, rgba(146,0,225,0.02) 100%)',
-                color: '#B75FFF',
+                border: '1px solid rgba(0,229,255,0.18)',
+                background: 'linear-gradient(135deg, rgba(0,229,255,0.10) 0%, rgba(0,229,255,0.02) 100%)',
+                color: '#00E5FF',
                 borderRadius: 10,
               }}>{it.icon}</div>
 
@@ -141,9 +141,9 @@ export function ZGIntegration() {
               <div style={{
                 fontFamily: 'JetBrains Mono, monospace',
                 fontSize: 10,
-                color: 'rgba(183,95,255,0.55)',
+                color: 'rgba(0,229,255,0.55)',
                 paddingTop: 14,
-                borderTop: '1px solid rgba(183,95,255,0.08)',
+                borderTop: '1px solid rgba(0,229,255,0.08)',
                 wordBreak: 'break-all',
               }}>{it.detail}</div>
             </div>

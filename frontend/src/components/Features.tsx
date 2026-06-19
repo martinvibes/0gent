@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-// ─── Inline SVG icons (purple, stroke-based, consistent line weight) ──
+// ─── Inline SVG icons (cyan, stroke-based, consistent line weight) ──
 
 const PhoneIcon = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -77,22 +77,22 @@ const features: Feature[] = [
 const S = {
   section: { padding: '120px 0' } as const,
   container: { maxWidth: 1100, margin: '0 auto', padding: '0 24px' } as const,
-  label: { fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#B75FFF', marginBottom: 16, fontWeight: 500 },
+  label: { fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#00E5FF', marginBottom: 16, fontWeight: 500 },
   h2: { fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, maxWidth: 600, marginBottom: 20 },
   sub: { fontSize: 16, color: 'rgba(254,254,254,0.5)', maxWidth: 500, lineHeight: 1.7, marginBottom: 56 },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 2, background: 'rgba(183,95,255,0.06)' } as const,
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 2, background: 'rgba(0,229,255,0.06)' } as const,
   card: { background: '#050508', padding: 0, position: 'relative' as const, overflow: 'hidden' as const, transition: 'all 0.3s' },
   inner: { padding: 32, display: 'flex', flexDirection: 'column' as const, height: '100%' },
   iconBox: {
     width: 40, height: 40,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    border: '1px solid rgba(183,95,255,0.18)',
-    background: 'linear-gradient(135deg, rgba(146,0,225,0.08) 0%, rgba(146,0,225,0.02) 100%)',
-    color: '#B75FFF',
+    border: '1px solid rgba(0,229,255,0.18)',
+    background: 'linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(0,229,255,0.02) 100%)',
+    color: '#00E5FF',
     transition: 'all 0.3s',
   },
-  code: { marginTop: 'auto', paddingTop: 20, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'rgba(254,254,254,0.4)', lineHeight: 1.8, padding: 16, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(183,95,255,0.08)', marginBlockStart: 24 },
-  tag: { display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'rgba(254,254,254,0.35)', textTransform: 'uppercase' as const, letterSpacing: '0.05em', border: '1px solid rgba(183,95,255,0.08)', padding: '3px 10px', width: 'fit-content' },
+  code: { marginTop: 'auto', paddingTop: 20, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'rgba(254,254,254,0.4)', lineHeight: 1.8, padding: 16, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(0,229,255,0.08)', marginBlockStart: 24 },
+  tag: { display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'rgba(254,254,254,0.35)', textTransform: 'uppercase' as const, letterSpacing: '0.05em', border: '1px solid rgba(0,229,255,0.08)', padding: '3px 10px', width: 'fit-content' },
 };
 
 export function Features() {
@@ -103,7 +103,7 @@ export function Features() {
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 45% 35% at 25% 55%, rgba(146,0,225,0.06), transparent 70%)',
+        background: 'radial-gradient(ellipse 45% 35% at 25% 55%, rgba(0,229,255,0.06), transparent 70%)',
       }} />
       <div style={{ ...S.container, position: 'relative' }}>
         <div className="reveal-up" style={S.label}>Services</div>
@@ -147,18 +147,18 @@ export function Features() {
                     <div key={idx}>
                       {line.startsWith('→') ? (
                         <>
-                          <span style={{ color: '#B75FFF', fontWeight: 700 }}>→</span>
+                          <span style={{ color: '#00E5FF', fontWeight: 700 }}>→</span>
                           {line.slice(1)}
                         </>
                       ) : (
-                        <span style={{ color: '#B75FFF', fontWeight: 700 }}>{line}</span>
+                        <span style={{ color: '#00E5FF', fontWeight: 700 }}>{line}</span>
                       )}
                     </div>
                   ))}
                 </div>
 
                 <div style={S.tag}>
-                  <span style={{ width: 5, height: 5, background: '#9200E1', display: 'inline-block' }} />
+                  <span style={{ width: 5, height: 5, background: '#00B8D4', display: 'inline-block' }} />
                   Powered by {f.tag}
                 </div>
               </div>

@@ -23,8 +23,8 @@ import {
 } from './Icons';
 
 // ─── Tokens ───────────────────────────────────────────────────────────
-const LILAC      = '#B75FFF';
-const PURPLE     = '#9200E1';
+const LILAC      = '#00E5FF';
+const PURPLE     = '#00B8D4';
 const TEXT       = '#fefefe';
 const TEXT_DIM   = 'rgba(254,254,254,0.7)';
 const TEXT_FAINT = 'rgba(254,254,254,0.5)';
@@ -32,8 +32,8 @@ const TEXT_GHOST = 'rgba(254,254,254,0.30)';
 const BG_PAGE    = '#050508';
 const BG_CARD    = '#0c0c14';
 const BG_INPUT   = 'rgba(0,0,0,0.45)';
-const BORDER     = 'rgba(183,95,255,0.12)';
-const BORDER_HOVER = 'rgba(183,95,255,0.30)';
+const BORDER     = 'rgba(0,229,255,0.12)';
+const BORDER_HOVER = 'rgba(0,229,255,0.30)';
 const GREEN      = '#7DEFB1';
 const AMBER      = '#FFC97A';
 const RED        = '#f85149';
@@ -139,8 +139,8 @@ function ProgressLine({ status }: { status: PaymentStatus }) {
   return (
     <div style={{
       marginTop: 12, padding: '8px 12px',
-      border: `1px solid ${isErr ? 'rgba(248,81,73,0.30)' : 'rgba(183,95,255,0.20)'}`,
-      background: isErr ? 'rgba(248,81,73,0.05)' : 'rgba(183,95,255,0.04)',
+      border: `1px solid ${isErr ? 'rgba(248,81,73,0.30)' : 'rgba(0,229,255,0.20)'}`,
+      background: isErr ? 'rgba(248,81,73,0.05)' : 'rgba(0,229,255,0.04)',
       fontSize: 12, color, fontFamily: 'JetBrains Mono, monospace',
       display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
     }}>
@@ -213,7 +213,7 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
             ...ghostBtn,
             color: mode === 'create' ? LILAC : TEXT_DIM,
             borderColor: mode === 'create' ? BORDER_HOVER : BORDER,
-            background: mode === 'create' ? 'rgba(183,95,255,0.06)' : 'transparent',
+            background: mode === 'create' ? 'rgba(0,229,255,0.06)' : 'transparent',
           }}
           className={ghostClass}
         >Create new</button>
@@ -224,7 +224,7 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
             ...ghostBtn,
             color: mode === 'unlock' ? LILAC : (state.kind !== 'locked' ? TEXT_GHOST : TEXT_DIM),
             borderColor: mode === 'unlock' ? BORDER_HOVER : BORDER,
-            background: mode === 'unlock' ? 'rgba(183,95,255,0.06)' : 'transparent',
+            background: mode === 'unlock' ? 'rgba(0,229,255,0.06)' : 'transparent',
           }}
           className={ghostClass}
         >Unlock existing</button>
@@ -256,7 +256,7 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
               this is, so spell it out before they need to type one. */}
           <div style={{
             marginBottom: 14, padding: '12px 14px',
-            border: `1px solid ${BORDER}`, background: 'rgba(146,0,225,0.04)',
+            border: `1px solid ${BORDER}`, background: 'rgba(0,229,255,0.04)',
             fontSize: 12.5, color: TEXT_DIM, lineHeight: 1.6,
           }}>
             <div style={{ fontSize: 11, color: LILAC, fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
@@ -464,7 +464,7 @@ function TabStrip({ active, onChange }: { active: TabId; onChange: (id: TabId) =
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
               color: isActive ? TEXT : TEXT_FAINT,
-              background: isActive ? 'rgba(146,0,225,0.12)' : 'transparent',
+              background: isActive ? 'rgba(0,229,255,0.12)' : 'transparent',
               border: 'none',
               cursor: 'pointer',
               transition: 'background 0.18s ease, color 0.18s ease',
@@ -615,7 +615,7 @@ function EmailCard({ client }: { client: AgentClient }) {
                       style={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                         padding: '10px 14px', border: `1px solid ${open ? BORDER_HOVER : BORDER}`,
-                        background: open ? 'rgba(146,0,225,0.05)' : BG_INPUT,
+                        background: open ? 'rgba(0,229,255,0.05)' : BG_INPUT,
                         fontFamily: 'JetBrains Mono, monospace', fontSize: 13,
                         cursor: 'pointer',
                       }}
@@ -648,7 +648,7 @@ function EmailCard({ client }: { client: AgentClient }) {
               + provision a new inbox · 2.0 0G
             </button>
           ) : (
-            <div className="dash-result-in" style={{ padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.04)' }}>
+            <div className="dash-result-in" style={{ padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.04)' }}>
               <Label
                 action={
                   <button
@@ -686,7 +686,7 @@ function InboxActions({ client, inboxId }: { client: AgentClient; inboxId: strin
   const [mode, setMode] = useState<'send' | 'read'>('send');
 
   return (
-    <div className="dash-result-in" style={{ marginTop: 8, padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.04)' }}>
+    <div className="dash-result-in" style={{ marginTop: 8, padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.04)' }}>
       {/* Sub-tabs: Send vs Read */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
         <button
@@ -697,7 +697,7 @@ function InboxActions({ client, inboxId }: { client: AgentClient; inboxId: strin
             height: 30, padding: '0 14px', fontSize: 11,
             color: mode === 'send' ? LILAC : TEXT_DIM,
             borderColor: mode === 'send' ? BORDER_HOVER : BORDER,
-            background: mode === 'send' ? 'rgba(146,0,225,0.08)' : 'transparent',
+            background: mode === 'send' ? 'rgba(0,229,255,0.08)' : 'transparent',
           }}
         >Send · 0.1 0G</button>
         <button
@@ -708,7 +708,7 @@ function InboxActions({ client, inboxId }: { client: AgentClient; inboxId: strin
             height: 30, padding: '0 14px', fontSize: 11,
             color: mode === 'read' ? LILAC : TEXT_DIM,
             borderColor: mode === 'read' ? BORDER_HOVER : BORDER,
-            background: mode === 'read' ? 'rgba(146,0,225,0.08)' : 'transparent',
+            background: mode === 'read' ? 'rgba(0,229,255,0.08)' : 'transparent',
           }}
         >Inbox · 0.05 0G</button>
       </div>
@@ -1080,7 +1080,7 @@ function MemoryCard({ client }: { client: AgentClient }) {
           {readResult && (
             <div className="dash-result-in" style={{
               marginBottom: 14, padding: 14,
-              border: `1px solid ${BORDER_HOVER}`, background: 'rgba(146,0,225,0.04)',
+              border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.04)',
               fontSize: 12, fontFamily: 'JetBrains Mono, monospace',
             }}>
               <div style={{ color: LILAC, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>

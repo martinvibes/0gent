@@ -75,11 +75,11 @@ export function HowItWorks() {
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 50% 40% at 80% 70%, rgba(146,0,225,0.06), transparent 70%)',
+        background: 'radial-gradient(ellipse 50% 40% at 80% 70%, rgba(0,229,255,0.06), transparent 70%)',
       }} />
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
-        <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#B75FFF', marginBottom: 16, fontWeight: 500 }}>
+        <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#00E5FF', marginBottom: 16, fontWeight: 500 }}>
           x402 Protocol
         </div>
         <h2 className="reveal-up section-h2" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 20, transitionDelay: '60ms' }}>
@@ -100,15 +100,15 @@ export function HowItWorks() {
               marginLeft: 'auto',
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: 30, height: 30,
-              border: '1px solid rgba(183,95,255,0.2)',
+              border: '1px solid rgba(0,229,255,0.2)',
               background: 'transparent',
-              color: '#B75FFF',
+              color: '#00E5FF',
               cursor: 'pointer',
               transition: 'all 0.2s',
               flexShrink: 0,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#B75FFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(183,95,255,0.2)'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#00E5FF'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(0,229,255,0.2)'; }}
           >
             {isPlaying ? (
               <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><rect x="2" y="2" width="3" height="8" /><rect x="7" y="2" width="3" height="8" /></svg>
@@ -129,9 +129,9 @@ export function HowItWorks() {
                   style={{
                     padding: '24px 0',
                     cursor: 'pointer',
-                    borderBottom: '1px solid rgba(183,95,255,0.1)',
+                    borderBottom: '1px solid rgba(0,229,255,0.1)',
                     position: 'relative',
-                    ...(i === 0 ? { borderTop: '1px solid rgba(183,95,255,0.1)' } : {}),
+                    ...(i === 0 ? { borderTop: '1px solid rgba(0,229,255,0.1)' } : {}),
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -150,8 +150,8 @@ export function HowItWorks() {
                         fontSize: 13, fontWeight: 600, fontFamily: 'JetBrains Mono, monospace',
                         transition: 'all 0.3s',
                         ...(isActive
-                          ? { background: '#9200E1', color: '#000' }
-                          : { color: '#B75FFF', border: '1px solid rgba(183,95,255,0.3)' }),
+                          ? { background: '#00B8D4', color: '#000' }
+                          : { color: '#00E5FF', border: '1px solid rgba(0,229,255,0.3)' }),
                       }}>{s.n}</div>
 
                       {/* Progress ring (active only) — keyed so it restarts on step change */}
@@ -169,7 +169,7 @@ export function HowItWorks() {
                           <circle
                             cx="20" cy="20" r="17"
                             fill="none"
-                            stroke="rgba(183,95,255,0.18)"
+                            stroke="rgba(0,229,255,0.18)"
                             strokeWidth="2"
                           />
                           {/* Filled portion */}
@@ -177,13 +177,13 @@ export function HowItWorks() {
                             className={`hiw-ring-fill ${animationsRunning ? '' : 'hiw-paused'}`}
                             cx="20" cy="20" r="17"
                             fill="none"
-                            stroke="#B75FFF"
+                            stroke="#00E5FF"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeDasharray="106.8146"
                             strokeDashoffset="106.8146"
                             style={{
-                              filter: 'drop-shadow(0 0 4px rgba(183,95,255,0.4))',
+                              filter: 'drop-shadow(0 0 4px rgba(0,229,255,0.4))',
                             }}
                           />
                         </svg>
@@ -209,7 +209,7 @@ export function HowItWorks() {
                         position: 'absolute',
                         bottom: 0, left: 0, right: 0,
                         height: 2,
-                        background: 'rgba(183,95,255,0.10)',
+                        background: 'rgba(0,229,255,0.10)',
                       }} />
                       {/* Fill — keyed so it restarts on step change. onAnimationEnd advances. */}
                       <div
@@ -223,8 +223,8 @@ export function HowItWorks() {
                           bottom: 0, left: 0,
                           height: 2,
                           width: 0,
-                          background: 'linear-gradient(90deg, rgba(146,0,225,0.4), #B75FFF, #CB8AFF)',
-                          boxShadow: '0 0 8px rgba(183,95,255,0.5)',
+                          background: 'linear-gradient(90deg, rgba(0,229,255,0.4), #00E5FF, #4DD0E1)',
+                          boxShadow: '0 0 8px rgba(0,229,255,0.5)',
                         }}
                       />
                     </>
@@ -235,7 +235,7 @@ export function HowItWorks() {
           </div>
 
           <div className="hiw-preview" style={{
-            border: '1px solid rgba(183,95,255,0.1)',
+            border: '1px solid rgba(0,229,255,0.1)',
             borderRadius: 12,
             minHeight: 380,
             display: 'flex',
@@ -249,7 +249,7 @@ export function HowItWorks() {
               position: 'absolute',
               inset: 0,
               pointerEvents: 'none',
-              background: 'radial-gradient(ellipse at top left, rgba(146,0,225,0.06), transparent 60%)',
+              background: 'radial-gradient(ellipse at top left, rgba(0,229,255,0.06), transparent 60%)',
             }} />
             <pre
               key={active}
@@ -265,7 +265,7 @@ export function HowItWorks() {
                 <div key={i}>
                   {l.startsWith('✓') ? <><span style={{ color: '#3fb950', fontWeight: 700 }}>✓</span>{l.slice(1)}</> :
                    l.startsWith('←') ? <><span style={{ color: '#f85149', fontWeight: 700 }}>←</span>{l.slice(1)}</> :
-                   l.startsWith('→') ? <><span style={{ color: '#B75FFF', fontWeight: 700 }}>→</span>{l.slice(1)}</> :
+                   l.startsWith('→') ? <><span style={{ color: '#00E5FF', fontWeight: 700 }}>→</span>{l.slice(1)}</> :
                    l.startsWith('#') ? <span style={{ color: 'rgba(254,254,254,0.2)' }}>{l}</span> : l}
                 </div>
               ))}

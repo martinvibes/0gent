@@ -2,8 +2,8 @@
  * 0GENT brand mark — "Glyph 0G" (concept #5).
  * A typographic "0" with a horizontal notch suggesting the "G".
  *
- * Use this everywhere we need the logo. `color` defaults to the brand lilac
- * `#B75FFF`; pass `color="#9200E1"` for the deeper purple, or any color when
+ * Use this everywhere we need the logo. `color` defaults to the brand cyan
+ * `#00E5FF`; pass `color="#00B8D4"` for the deeper cyan, or any color when
  * placing on light backgrounds.
  */
 
@@ -14,7 +14,7 @@ interface LogoProps {
   strokeWidth?: number;
 }
 
-export function Glyph0G({ size = 24, color = '#B75FFF', strokeWidth = 3.2 }: LogoProps) {
+export function Glyph0G({ size = 24, color = '#00E5FF', strokeWidth = 3.2 }: LogoProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-label="0GENT">
       <path
@@ -38,7 +38,7 @@ export function Glyph0G({ size = 24, color = '#B75FFF', strokeWidth = 3.2 }: Log
  */
 export function LogoLockup({
   size = 24,
-  color = '#B75FFF',
+  color = '#00E5FF',
   textColor = '#fefefe',
   gap = 10,
   fontSize,

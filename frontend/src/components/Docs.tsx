@@ -1,18 +1,18 @@
 /**
  * /docs — single-page developer documentation.
  *
- * Mirrors the dark / purple theme of the rest of the site. Single-file by
+ * Mirrors the dark / cyan theme of the rest of the site. Single-file by
  * design (one canonical source of truth, easy to scan, easy to keep in sync
  * with skill.md and the README).
  */
 
-import { type ReactNode, type CSSProperties, useState } from 'react';
+import { type ReactNode, type CSSProperties, useState, useEffect } from 'react';
 import { Nav } from './Nav';
 import { Footer } from './Footer';
 import { LogoLockup } from './Logo';
 
 // ─── Tokens (match Features.tsx vibe) ────────────────────────────────
-const LILAC = '#B75FFF';
+const LILAC = '#00E5FF';
 const TEXT = '#fefefe';
 const TEXT_DIM = 'rgba(254,254,254,0.7)';
 const TEXT_FAINT = 'rgba(254,254,254,0.5)';
@@ -20,8 +20,8 @@ const TEXT_GHOST = 'rgba(254,254,254,0.35)';
 const BG_PAGE = '#050508';
 const BG_CARD = '#0c0c14';
 const BG_CODE = 'rgba(0,0,0,0.55)';
-const BORDER = 'rgba(183,95,255,0.12)';
-const BORDER_HOVER = 'rgba(183,95,255,0.30)';
+const BORDER = 'rgba(0,229,255,0.12)';
+const BORDER_HOVER = 'rgba(0,229,255,0.30)';
 const GREEN = '#7DEFB1';
 const AMBER = '#FFC97A';
 
@@ -85,7 +85,7 @@ function Pill({ children, kind = 'live' }: { children: ReactNode; kind?: 'live' 
     live:  { color: GREEN,  border: '1px solid rgba(125,239,177,0.30)', background: 'rgba(125,239,177,0.06)' },
     dev:   { color: AMBER,  border: '1px solid rgba(255,201,122,0.30)', background: 'rgba(255,201,122,0.05)' },
     free:  { color: TEXT_FAINT, border: `1px solid ${BORDER}`,         background: 'transparent' },
-    paid:  { color: LILAC,  border: '1px solid rgba(183,95,255,0.30)', background: 'rgba(183,95,255,0.06)' },
+    paid:  { color: LILAC,  border: '1px solid rgba(0,229,255,0.30)', background: 'rgba(0,229,255,0.06)' },
   };
   return (
     <span style={{
@@ -151,8 +151,29 @@ function Endpoint({
 
 // ─── Page ────────────────────────────────────────────────────────────
 
+const SECTION_IDS = ['quick-start', 'concepts', 'services', 'x402-flow', 'sdk', 'http-api', 'contracts', 'faq', 'links'];
+
 export function Docs() {
-  const [pricingChain, setPricingChain] = useState<"0g" | "celo">("0g");
+  const [pricingChain, setPricingChain] = useState<"0g" | "celo">("celo");
+  const [activeSection, setActiveSection] = useState('quick-start');
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        }
+      },
+      { rootMargin: '-100px 0px -60% 0px', threshold: 0 }
+    );
+    for (const id of SECTION_IDS) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+    return () => observer.disconnect();
+  }, []);
 
   const prices = pricingChain === "celo" ? {
     identity: "$0.50 USDC",
@@ -178,47 +199,87 @@ export function Docs() {
     <div style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
       <Nav />
 
-      <div className="docs-page" style={{ maxWidth: 880, margin: '0 auto', padding: '120px 24px 40px' }}>
+      {/* Sidebar + Content layout */}
+      <div className="docs-layout" style={{ display: 'flex', maxWidth: 1120, margin: '0 auto', padding: '120px 24px 40px', gap: 48 }}>
+
+        {/* Sidebar */}
+        <nav className="docs-sidebar" style={{
+          width: 200, flexShrink: 0, position: 'sticky', top: 100, alignSelf: 'flex-start',
+          height: 'fit-content', display: 'flex', flexDirection: 'column', gap: 2,
+        }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: TEXT_GHOST, marginBottom: 12, fontFamily: 'JetBrains Mono, monospace' }}>
+            Documentation
+          </div>
+          {[
+            ['01', 'Quick start',    '#quick-start'],
+            ['02', 'Three rules',    '#concepts'],
+            ['03', 'Services',       '#services'],
+            ['04', 'x402 flow',      '#x402-flow'],
+            ['05', 'SDK',            '#sdk'],
+            ['06', 'HTTP API',       '#http-api'],
+            ['07', 'Contracts',      '#contracts'],
+            ['08', 'FAQ',            '#faq'],
+            ['09', 'Links',          '#links'],
+          ].map(([num, label, href]) => {
+            const sectionId = (href as string).replace('#', '');
+            const isActive = activeSection === sectionId;
+            return (
+              <a key={href} href={href as string} style={{
+                display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
+                fontSize: 13,
+                color: isActive ? LILAC : TEXT_DIM,
+                background: isActive ? 'rgba(0,229,255,0.08)' : 'transparent',
+                borderLeft: isActive ? `2px solid ${LILAC}` : '2px solid transparent',
+                textDecoration: 'none', borderRadius: '0 6px 6px 0',
+                transition: 'all 0.15s', fontFamily: 'Inter, system-ui, sans-serif',
+              }}
+                onMouseEnter={e => { if (!isActive) { e.currentTarget.style.color = LILAC; e.currentTarget.style.background = 'rgba(0,229,255,0.06)'; } }}
+                onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = TEXT_DIM; e.currentTarget.style.background = 'transparent'; } }}
+              >
+                <span style={{ fontSize: 10, color: isActive ? LILAC : TEXT_GHOST, fontFamily: 'JetBrains Mono, monospace', width: 18 }}>{num}</span>
+                {label}
+              </a>
+            );
+          })}
+
+          <div style={{ borderTop: `1px solid ${BORDER}`, marginTop: 16, paddingTop: 16 }}>
+            <a href="https://api.0gent.xyz/skill.md" target="_blank" rel="noreferrer" style={{
+              display: 'block', padding: '8px 12px', fontSize: 12, color: TEXT_GHOST,
+              textDecoration: 'none', transition: 'color 0.15s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.color = LILAC; }}
+              onMouseLeave={e => { e.currentTarget.style.color = TEXT_GHOST; }}
+            >
+              skill.md ↗
+            </a>
+            <a href="https://api.0gent.xyz/pricing" target="_blank" rel="noreferrer" style={{
+              display: 'block', padding: '8px 12px', fontSize: 12, color: TEXT_GHOST,
+              textDecoration: 'none', transition: 'color 0.15s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.color = LILAC; }}
+              onMouseLeave={e => { e.currentTarget.style.color = TEXT_GHOST; }}
+            >
+              /pricing ↗
+            </a>
+          </div>
+        </nav>
+
+        {/* Main content */}
+        <div className="docs-content" style={{ flex: 1, minWidth: 0, maxWidth: 820 }}>
 
         {/* Header */}
         <div style={{ marginBottom: 48 }}>
           <div style={{ marginBottom: 32 }}>
             <LogoLockup size={28} />
           </div>
-          <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: LILAC, marginBottom: 12, fontFamily: 'JetBrains Mono, monospace' }}>
-            documentation
-          </div>
           <h1 style={{ fontSize: 'clamp(36px, 5.5vw, 56px)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.05, marginBottom: 20 }}>
             Build agents that pay their own way.
           </h1>
           <p style={{ fontSize: 17, color: TEXT_DIM, lineHeight: 1.7, maxWidth: 640 }}>
             0GENT is the SDK + backend that lets your AI agent provision real-world resources — email inboxes, phone numbers, AI inference,
-            on-chain identity — with no human in the loop. Your agent's wallet pays per call in native 0G tokens via x402, and resources are
-            owned by the wallet on 0G Chain.
+            on-chain identity — with no human in the loop. Your agent's wallet pays per call via x402, and resources are
+            owned by the wallet on-chain.
           </p>
-
-          {/* Quick-jump pills */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 28 }}>
-            {[
-              ['Quick start', '#quick-start'],
-              ['Concepts',    '#concepts'],
-              ['Services',    '#services'],
-              ['x402 flow',   '#x402-flow'],
-              ['SDK',         '#sdk'],
-              ['HTTP API',    '#http-api'],
-              ['Contracts',   '#contracts'],
-              ['FAQ',         '#faq'],
-            ].map(([l, h]) => (
-              <a key={h} href={h} style={{
-                fontSize: 12, color: TEXT_DIM, padding: '6px 12px',
-                border: `1px solid ${BORDER}`, fontFamily: 'JetBrains Mono, monospace',
-                textDecoration: 'none', transition: 'all 0.2s',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.color = TEXT; e.currentTarget.style.borderColor = BORDER_HOVER; }}
-                onMouseLeave={e => { e.currentTarget.style.color = TEXT_DIM; e.currentTarget.style.borderColor = BORDER; }}
-              >{l}</a>
-            ))}
-          </div>
         </div>
 
         {/* ── Quick start ───────────────────────────────────────── */}
@@ -294,7 +355,7 @@ npm i -g @0gent/core
           intro={<>What an agent can buy from the live API today.</>}
         >
           <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-            {(["0g", "celo"] as const).map(chain => (
+            {(["celo", "0g"] as const).map(chain => (
               <button
                 key={chain}
                 onClick={() => setPricingChain(chain)}
@@ -309,7 +370,7 @@ npm i -g @0gent/core
                   fontWeight: 500,
                 }}
               >
-                {chain === "0g" ? "0G Chain" : "Celo"}
+                {chain === "celo" ? "Celo" : "0G Chain"}
               </button>
             ))}
           </div>
@@ -578,7 +639,8 @@ const resources = await z.listResources();`}</Code>
           </div>
         </Section>
 
-      </div>
+        </div>{/* end docs-content */}
+      </div>{/* end docs-layout */}
 
       <Footer />
     </div>

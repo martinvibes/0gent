@@ -1,0 +1,7 @@
+{"type":"server-started","port":60024,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:60024","screen_dir":"/Users/admin/.pg/0GENT/.superpowers/brainstorm/20597-1781812595/content","state_dir":"/Users/admin/.pg/0GENT/.superpowers/brainstorm/20597-1781812595/state"}
+{"type":"screen-added","file":"/Users/admin/.pg/0GENT/.superpowers/brainstorm/20597-1781812595/content/brand-colors.html"}
+{"type":"screen-added","file":"/Users/admin/.pg/0GENT/.superpowers/brainstorm/20597-1781812595/content/full-rebrand.html"}
+{"type":"screen-added","file":"/Users/admin/.pg/0GENT/.superpowers/brainstorm/20597-1781812595/content/brand-colors-v2.html"}
+{"type":"screen-added","file":"/Users/admin/.pg/0GENT/.superpowers/brainstorm/20597-1781812595/content/side-by-side.html"}
+{"type":"screen-added","file":"/Users/admin/.pg/0GENT/.superpowers/brainstorm/20597-1781812595/content/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

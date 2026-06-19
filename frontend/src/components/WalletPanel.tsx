@@ -4,7 +4,7 @@ import { shortAddress, FAUCET_URL, EXPLORER_BASE } from '../lib/wallet';
 
 // ─── Tokens (matches Features.tsx vibe — quiet, minimal, subtle accent) ──
 
-const LILAC = '#B75FFF';
+const LILAC = '#00E5FF';
 const GREEN = '#3fb950';
 const RED = '#f85149';
 const AMBER = '#febc2e';
@@ -15,8 +15,8 @@ const TEXT_GHOST = 'rgba(254,254,254,0.25)';
 const BG_PAGE = '#08080d';
 const BG_CARD = '#050508';
 const BG_INPUT = 'rgba(0,0,0,0.45)';
-const BORDER = 'rgba(183,95,255,0.10)';
-const BORDER_HOVER = 'rgba(183,95,255,0.28)';
+const BORDER = 'rgba(0,229,255,0.10)';
+const BORDER_HOVER = 'rgba(0,229,255,0.28)';
 
 // ─── Section + heading wrappers (mirrors Features.tsx layout) ───────────
 
@@ -32,7 +32,7 @@ const sectionGlow: React.CSSProperties = {
   position: 'absolute',
   inset: 0,
   pointerEvents: 'none',
-  background: 'radial-gradient(ellipse 50% 40% at 20% 30%, rgba(146,0,225,0.07), transparent 70%)',
+  background: 'radial-gradient(ellipse 50% 40% at 20% 30%, rgba(0,229,255,0.07), transparent 70%)',
 };
 
 const containerStyle: React.CSSProperties = {
@@ -111,7 +111,7 @@ const primaryBtn: React.CSSProperties = {
   fontWeight: 500,
   padding: '12px 22px',
   border: `1px solid ${LILAC}`,
-  background: 'linear-gradient(180deg, #9200E1 0%, #6a00a8 100%)',
+  background: 'linear-gradient(180deg, #00B8D4 0%, #6a00a8 100%)',
   color: TEXT,
   cursor: 'pointer',
   letterSpacing: '0.01em',
@@ -121,7 +121,7 @@ const primaryBtn: React.CSSProperties = {
 };
 
 const PRIMARY_BTN_HOVER_BG = 'linear-gradient(180deg, #a30dff 0%, #7a13c0 100%)';
-const PRIMARY_BTN_HOVER_SHADOW = '0 0 24px rgba(146,0,225,0.35)';
+const PRIMARY_BTN_HOVER_SHADOW = '0 0 24px rgba(0,229,255,0.35)';
 
 const ghostBtn: React.CSSProperties = {
   fontSize: 12,
@@ -287,7 +287,7 @@ export function WalletPanel() {
                 fontSize: 11,
                 padding: '5px 11px',
                 color: TEXT_FAINT,
-                background: 'rgba(146,0,225,0.04)',
+                background: 'rgba(0,229,255,0.04)',
                 border: `1px solid ${BORDER}`,
                 fontFamily: 'JetBrains Mono, monospace',
                 letterSpacing: '0.02em',

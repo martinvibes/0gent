@@ -6,8 +6,8 @@ import { shortAddress } from '../lib/wallet';
 // ─────────────────────────────────────────────────────────────────────────────
 //  Color tokens (0G purple palette)
 // ─────────────────────────────────────────────────────────────────────────────
-const PURPLE = '#9200E1';
-const LILAC = '#B75FFF';
+const PURPLE = '#00B8D4';
+const LILAC = '#00E5FF';
 const GREEN = '#3fb950';
 const RED = '#f85149';
 const YELLOW = '#febc2e';
@@ -17,8 +17,8 @@ const FAINT = 'rgba(254,254,254,0.25)';
 const W12 = 'rgba(254,254,254,0.12)';
 const W08 = 'rgba(254,254,254,0.08)';
 const BG = '#08080d';
-const BG2 = 'rgba(146,0,225,0.04)';
-const BORDER = 'rgba(183,95,255,0.12)';
+const BG2 = 'rgba(0,229,255,0.04)';
+const BORDER = 'rgba(0,229,255,0.12)';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Simulated commands (purely cosmetic — running these doesn't pay anything)
@@ -237,7 +237,7 @@ function StatusBar({ requests, lineNum }: { requests: number; lineNum: number })
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '6px 14px',
-        background: 'rgba(146,0,225,0.06)',
+        background: 'rgba(0,229,255,0.06)',
         borderTop: `1px solid ${BORDER}`,
         fontFamily: 'JetBrains Mono, monospace',
         fontSize: 10,
@@ -250,7 +250,7 @@ function StatusBar({ requests, lineNum }: { requests: number; lineNum: number })
         <span
           style={{
             padding: '2px 7px',
-            background: 'rgba(146,0,225,0.18)',
+            background: 'rgba(0,229,255,0.18)',
             color: LILAC,
             fontWeight: 700,
             letterSpacing: '0.04em',
@@ -447,7 +447,7 @@ function ShellTab({
               fontFamily: 'JetBrains Mono, monospace',
               fontSize: 11,
               padding: '5px 12px',
-              background: 'rgba(146,0,225,0.06)',
+              background: 'rgba(0,229,255,0.06)',
               border: `1px solid ${BORDER}`,
               color: 'rgba(254,254,254,0.55)',
               cursor: busy ? 'not-allowed' : 'pointer',
@@ -460,13 +460,13 @@ function ShellTab({
               const el = e.currentTarget;
               el.style.borderColor = LILAC;
               el.style.color = LILAC;
-              el.style.background = 'rgba(146,0,225,0.14)';
+              el.style.background = 'rgba(0,229,255,0.14)';
             }}
             onMouseLeave={e => {
               const el = e.currentTarget;
               el.style.borderColor = BORDER;
               el.style.color = 'rgba(254,254,254,0.55)';
-              el.style.background = 'rgba(146,0,225,0.06)';
+              el.style.background = 'rgba(0,229,255,0.06)';
             }}
           >
             {s}
@@ -551,7 +551,7 @@ function NetworkTab({ stats }: { stats: ReturnType<typeof summary> }) {
               flex: 1,
               minHeight: 2,
               height: `${(v / max) * 100}%`,
-              background: v > 0 ? LILAC : 'rgba(146,0,225,0.15)',
+              background: v > 0 ? LILAC : 'rgba(0,229,255,0.15)',
               opacity: v > 0 ? 0.85 : 1,
               transition: 'height 0.4s',
             }}
@@ -569,7 +569,7 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
       style={{
         border: `1px solid ${BORDER}`,
         padding: '18px 20px',
-        background: 'rgba(146,0,225,0.03)',
+        background: 'rgba(0,229,255,0.03)',
         minWidth: 0,
       }}
     >
@@ -615,7 +615,7 @@ function CardOutput({ card }: { card: Card }) {
 
   const badgeColors = {
     ok:   { fg: GREEN,  bg: 'rgba(63,185,80,0.10)',  border: 'rgba(63,185,80,0.5)' },
-    info: { fg: LILAC,  bg: 'rgba(146,0,225,0.14)', border: 'rgba(183,95,255,0.5)' },
+    info: { fg: LILAC,  bg: 'rgba(0,229,255,0.14)', border: 'rgba(0,229,255,0.5)' },
     warn: { fg: YELLOW, bg: 'rgba(254,188,46,0.10)', border: 'rgba(254,188,46,0.5)' },
     err:  { fg: RED,    bg: 'rgba(248,81,73,0.10)',  border: 'rgba(248,81,73,0.5)' },
   };
@@ -1033,7 +1033,7 @@ export function Terminal() {
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 45% 40% at 80% 25%, rgba(146,0,225,0.06), transparent 70%)',
+        background: 'radial-gradient(ellipse 45% 40% at 80% 25%, rgba(0,229,255,0.06), transparent 70%)',
       }} />
 
       {/* Section kicker — first numbered step on the page */}
@@ -1043,7 +1043,7 @@ export function Terminal() {
           fontSize: 12,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
-          color: '#B75FFF',
+          color: '#00E5FF',
           fontWeight: 500,
         }}>try it live</span>
       </div>
@@ -1067,7 +1067,7 @@ export function Terminal() {
         marginBottom: 36,
         transitionDelay: '120ms',
       }}>
-        Free commands run live against <span style={{ color: '#B75FFF' }}>api.0gent.xyz</span> right
+        Free commands run live against <span style={{ color: '#00E5FF' }}>api.0gent.xyz</span> right
         now. Paid commands work the same way once your wallet is funded.
       </p>
 
@@ -1079,7 +1079,7 @@ export function Terminal() {
             borderRadius: 14,
             overflow: 'hidden',
             textAlign: 'left',
-            boxShadow: '0 30px 80px -30px rgba(146,0,225,0.35)',
+            boxShadow: '0 30px 80px -30px rgba(0,229,255,0.35)',
           }}
         >
           {/* ─── Header bar ─── */}
