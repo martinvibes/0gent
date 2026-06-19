@@ -6,19 +6,12 @@ const API = (import.meta.env.VITE_API_URL as string) || 'https://api.0gent.xyz';
 interface HeadlineStats {
   wallets: number;
   resources: number;
-  volume_0g: number;
 }
 
 function fmtN(n: number): string {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
   if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
   return String(n);
-}
-function fmt0G(n: number): string {
-  if (n === 0) return '0';
-  if (n < 1)   return n.toFixed(2);
-  if (n < 100) return n.toFixed(1);
-  return Math.round(n).toString();
 }
 
 // Smooth count-up animation from 0 to target on first reveal.
@@ -43,6 +36,7 @@ function useCountUp(target: number, durationMs = 900): number {
 
 export function Hero() {
   const [stats, setStats] = useState<HeadlineStats | null>(null);
+  const [txCount, setTxCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,7 +45,10 @@ export function Hero() {
         const r = await fetch(API + '/stats');
         if (!r.ok) return;
         const d = await r.json();
-        if (!cancelled) setStats(d.headline);
+        if (!cancelled) {
+          setStats(d.headline);
+          setTxCount(d.totals?.transactions ?? 0);
+        }
       } catch { /* silent — Hero falls back to "—" */ }
     };
     fetchStats();
@@ -59,11 +56,9 @@ export function Hero() {
     return () => { cancelled = true; clearInterval(id); };
   }, []);
 
-  // Each headline value gets its own count-up animation. The hook reruns when
-  // `stats` arrives, so the counter animates from 0 → live value.
-  const wallets   = useCountUp(stats?.wallets   ?? 0);
-  const resources = useCountUp(stats?.resources ?? 0);
-  const volume    = useCountUp(stats?.volume_0g ?? 0);
+  const wallets      = useCountUp(stats?.wallets   ?? 0);
+  const resources    = useCountUp(stats?.resources ?? 0);
+  const transactions = useCountUp(txCount);
 
   return (
     <section className="hero-section" style={{
@@ -182,9 +177,9 @@ export function Hero() {
         {/* Stats — live counters from /stats. Each animates 0 → target on mount. */}
         <div className="hero-stats" style={{ display:'flex', justifyContent:'center', gap:56, pointerEvents: 'auto' }}>
           {([
-            [stats ? fmtN(Math.round(wallets))   : '—', 'Wallets'],
-            [stats ? fmtN(Math.round(resources)) : '—', 'Resources On-Chain'],
-            [stats ? `${fmt0G(volume)} 0G`       : '—', '0G Processed'],
+            [stats ? fmtN(Math.round(wallets))      : '—', 'Wallets'],
+            [stats ? fmtN(Math.round(resources))     : '—', 'Resources On-Chain'],
+            [stats ? fmtN(Math.round(transactions))  : '—', 'Paid Transactions'],
           ] as const).map(([v, l]) => (
             <a key={l} href="/stats" style={{ textAlign:'center', textDecoration:'none' }}>
               <div className="mono hero-stats-num" style={{ fontSize:28, fontWeight:600, color:'#00E5FF', fontVariantNumeric:'tabular-nums' }}>{v}</div>

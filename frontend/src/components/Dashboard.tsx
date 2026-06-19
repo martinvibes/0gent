@@ -390,7 +390,7 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
         <div style={{ fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'baseline', gap: 6 }}>
           <span style={{ fontSize: 10, color: TEXT_FAINT, textTransform: 'uppercase', letterSpacing: '0.08em' }}>balance</span>
           <span style={{ fontSize: 16, color: LILAC, fontWeight: 500 }}>{balance}</span>
-          <span style={{ fontSize: 11, color: TEXT_FAINT }}>0G</span>
+          <span style={{ fontSize: 11, color: TEXT_FAINT }}>tokens</span>
         </div>
         <a
           href={EXPLORER_BASE + address}
@@ -424,9 +424,9 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
 type TabId = 'ask' | 'identity' | 'email' | 'phone' | 'memory';
 
 const TABS: { id: TabId; label: string; icon: ReactNode; cost?: string }[] = [
-  { id: 'ask',      label: 'Ask AI',        icon: <BrainIcon    size={14} />, cost: '0.2 0G' },
-  { id: 'identity', label: 'Identity',      icon: <IdentityIcon size={14} />, cost: '0.5 0G' },
-  { id: 'email',    label: 'Email',         icon: <EmailIcon    size={14} />, cost: 'from 0.05 0G' },
+  { id: 'ask',      label: 'Ask AI',        icon: <BrainIcon    size={14} />, cost: '$0.10' },
+  { id: 'identity', label: 'Identity',      icon: <IdentityIcon size={14} />, cost: '$0.50' },
+  { id: 'email',    label: 'Email',         icon: <EmailIcon    size={14} />, cost: 'from $0.02' },
   { id: 'phone',    label: 'Phone & SMS',   icon: <PhoneIcon    size={14} /> },
   { id: 'memory',   label: 'Memory',        icon: <DatabaseIcon size={14} />, cost: 'free' },
 ];
@@ -544,7 +544,7 @@ function IdentityCard({ client }: { client: AgentClient }) {
         </div>
       ) : (
         <button style={{ ...primaryBtn, width: '100%' }} className={primaryClass} onClick={mint} disabled={state.kind !== 'idle' && state.kind !== 'error' && state.kind !== 'success'}>
-          {state.kind === 'idle' || state.kind === 'error' || state.kind === 'success' ? 'Mint identity (0.5 0G)' : 'Minting…'}
+          {state.kind === 'idle' || state.kind === 'error' || state.kind === 'success' ? 'Mint identity ($0.50 USDC)' : 'Minting…'}
         </button>
       )}
       <ProgressLine status={state} />
@@ -645,7 +645,7 @@ function EmailCard({ client }: { client: AgentClient }) {
               }}
               className={ghostClass}
             >
-              + provision a new inbox · 2.0 0G
+              + provision a new inbox · $2.00 USDC
             </button>
           ) : (
             <div className="dash-result-in" style={{ padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.04)' }}>
@@ -671,7 +671,7 @@ function EmailCard({ client }: { client: AgentClient }) {
                   className={primaryClass}
                   onClick={provision}
                   disabled={!name.trim() || (provState.kind !== 'idle' && provState.kind !== 'error' && provState.kind !== 'success')}
-                >Pay 2.0 0G</button>
+                >Pay $2.00 USDC</button>
               </div>
               <ProgressLine status={provState} />
             </div>
@@ -699,7 +699,7 @@ function InboxActions({ client, inboxId }: { client: AgentClient; inboxId: strin
             borderColor: mode === 'send' ? BORDER_HOVER : BORDER,
             background: mode === 'send' ? 'rgba(0,229,255,0.08)' : 'transparent',
           }}
-        >Send · 0.1 0G</button>
+        >Send · $0.08 USDC</button>
         <button
           onClick={() => setMode('read')}
           className={ghostClass}
@@ -710,7 +710,7 @@ function InboxActions({ client, inboxId }: { client: AgentClient; inboxId: strin
             borderColor: mode === 'read' ? BORDER_HOVER : BORDER,
             background: mode === 'read' ? 'rgba(0,229,255,0.08)' : 'transparent',
           }}
-        >Inbox · 0.05 0G</button>
+        >Inbox · $0.02 USDC</button>
       </div>
 
       {mode === 'send' ? <SendEmail client={client} inboxId={inboxId} /> : <ReadInbox client={client} inboxId={inboxId} />}
@@ -740,7 +740,7 @@ function SendEmail({ client, inboxId }: { client: AgentClient; inboxId: string }
         <input style={baseInput} className={inputClass} value={subject} onChange={e => setSubject(e.target.value)} placeholder="subject (optional)" />
         <textarea style={{ ...baseInput, fontFamily: 'inherit', minHeight: 70, resize: 'vertical' }} className={inputClass} value={body} onChange={e => setBody(e.target.value)} placeholder="body" />
         <button style={primaryBtn} className={primaryClass} onClick={send} disabled={!to || !body || (state.kind !== 'idle' && state.kind !== 'error' && state.kind !== 'success')}>
-          Send · 0.1 0G
+          Send · $0.08 USDC
         </button>
       </div>
       <ProgressLine status={state} />
@@ -778,10 +778,10 @@ function ReadInbox({ client, inboxId }: { client: AgentClient; inboxId: string }
     return (
       <div>
         <div style={{ fontSize: 12.5, color: TEXT_DIM, lineHeight: 1.6, marginBottom: 12 }}>
-          Reading the inbox costs 0.05 0G. You'll see all messages — both ones you've sent and any inbound replies your inbox has received.
+          Reading the inbox costs $0.02 USDC. You'll see all messages — both ones you've sent and any inbound replies your inbox has received.
         </div>
         <button style={primaryBtn} className={primaryClass} onClick={load} disabled={state.kind !== 'idle' && state.kind !== 'error' && state.kind !== 'success'}>
-          Pay 0.05 0G to read
+          Pay $0.02 USDC to read
         </button>
         <ProgressLine status={state} />
       </div>
@@ -793,7 +793,7 @@ function ReadInbox({ client, inboxId }: { client: AgentClient; inboxId: string }
       <div style={{ fontSize: 13, color: TEXT_DIM, padding: '8px 0' }}>
         No messages in this inbox yet.{' '}
         <button onClick={load} style={{ background: 'transparent', border: 'none', color: LILAC, cursor: 'pointer', textDecoration: 'underline', fontSize: 12, padding: 0 }}>
-          Refresh (0.05 0G)
+          Refresh ($0.02 USDC)
         </button>
       </div>
     );
@@ -966,7 +966,7 @@ function ComputeCard({ client }: { client: AgentClient }) {
       kicker="INFERENCE"
       title="Ask AI"
       badge={<LiveBadge />}
-      sub={<>Pay-per-call LLM via the <strong>0G Compute Network</strong>. Real on-chain micropayment, real model response.</>}
+      sub={<>Pay-per-call LLM inference. Real on-chain micropayment, real model response.</>}
     >
       <textarea
         style={{ ...baseInput, fontFamily: 'inherit', minHeight: 80, resize: 'vertical', marginBottom: 10 }}
@@ -981,7 +981,7 @@ function ComputeCard({ client }: { client: AgentClient }) {
         onClick={ask}
         disabled={!prompt.trim() || (state.kind !== 'idle' && state.kind !== 'error' && state.kind !== 'success')}
       >
-        Ask · 0.2 0G
+        Ask · $0.10 USDC
       </button>
       {reply && (
         <div className="dash-result-in" style={{
@@ -1051,7 +1051,7 @@ function MemoryCard({ client }: { client: AgentClient }) {
       kicker="STORAGE"
       title="Memory"
       badge={keys.length > 0 ? <LiveBadge label={`${keys.length} keys`} /> : undefined}
-      sub={<>Persistent key/value storage on <strong>0G Storage</strong>. Free reads + writes.</>}
+      sub={<>Persistent key/value storage. Free reads + writes.</>}
     >
       {!loaded ? (
         <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>checking…</div>
@@ -1137,7 +1137,7 @@ export function Dashboard() {
           <p style={{ fontSize: 15, color: TEXT_DIM, lineHeight: 1.7, maxWidth: 640 }}>
             {wallet.state.kind === 'unlocked'
               ? <>The same infrastructure your code-side agent uses, with buttons. Every action below is a real on-chain payment.</>
-              : <>Generate a wallet, fund it with free testnet 0G, then mint an identity, claim an email, ask AI questions, and write to persistent memory — all paid on-chain.</>
+              : <>Generate a wallet, fund it with USDC on Celo, then mint an identity, claim an email, ask AI questions, and write to persistent memory — all paid on-chain.</>
             }
           </p>
         </div>
@@ -1164,7 +1164,7 @@ export function Dashboard() {
                 border: '1px solid rgba(255,201,122,0.30)', background: 'rgba(255,201,122,0.06)',
                 fontSize: 13, color: AMBER, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap',
               }}>
-                <span>Your wallet is empty. Get free testnet 0G to start.</span>
+                <span>Your wallet is empty. Fund it with USDC on Celo to start.</span>
                 <a href={FAUCET_URL} target="_blank" rel="noreferrer" style={{ ...primaryBtn, height: 32, fontSize: 12, padding: '0 14px', textDecoration: 'none' }} className={primaryClass}>
                   Open faucet ↗
                 </a>

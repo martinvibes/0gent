@@ -24,19 +24,28 @@ interface PaymentRow {
   tx_hash: string | null;
   endpoint: string;
   verified_at: string;
+  chain: string;
 }
 
-function weiToZG(weiStr: string): number {
-  // amount column is wei as string. JS Number is fine for typical x402 amounts
-  // (0.01–3.0 0G) but BigInt → divide → Number to be safe.
+function amountToHuman(amountStr: string, chain: string): number {
   try {
-    const w = BigInt(weiStr);
-    // Divide by 1e10 first (keeps 8 decimals of precision), then Number()
+    const w = BigInt(amountStr);
+    if (chain === 'celo') {
+      return Number(w) / 1e6;
+    }
     const big = Number(w / 10n ** 10n);
     return big / 1e8;
   } catch {
     return 0;
   }
+}
+
+function chainCurrency(chain: string): string {
+  return chain === 'celo' ? 'USDC' : '0G';
+}
+
+function chainExplorer(chain: string): string {
+  return chain === 'celo' ? 'https://celoscan.io' : 'https://chainscan.0g.ai';
 }
 
 // The `endpoint` column in `used_payments` stores the raw URL path (e.g.
@@ -60,50 +69,47 @@ function normalizeEndpoint(raw: string): string {
 }
 
 function getAggregates() {
-  // Total payment counts + volume + unique wallets that paid
-  const allPayments = db.prepare("SELECT amount, endpoint, verified_at, payer FROM used_payments").all() as Array<{
+  const allPayments = db.prepare("SELECT amount, endpoint, verified_at, payer, chain FROM used_payments").all() as Array<{
     amount: string;
     endpoint: string;
     verified_at: string;
     payer: string;
+    chain: string;
   }>;
 
-  let totalVolumeWei = 0n;
+  const volumeByChain: Record<string, number> = {};
   for (const p of allPayments) {
-    try { totalVolumeWei += BigInt(p.amount); } catch {}
+    const ch = p.chain || '0g';
+    const amt = amountToHuman(p.amount, ch);
+    volumeByChain[ch] = (volumeByChain[ch] || 0) + amt;
   }
 
   const distinctPayers = new Set(allPayments.map(p => p.payer.toLowerCase()));
 
-  // 24h window
   const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const last24hPayments = allPayments.filter(p => p.verified_at >= dayAgo);
-  let last24hVolumeWei = 0n;
+  const last24hVolume: Record<string, number> = {};
   for (const p of last24hPayments) {
-    try { last24hVolumeWei += BigInt(p.amount); } catch {}
+    const ch = p.chain || '0g';
+    const amt = amountToHuman(p.amount, ch);
+    last24hVolume[ch] = (last24hVolume[ch] || 0) + amt;
   }
   const last24hPayers = new Set(last24hPayments.map(p => p.payer.toLowerCase()));
 
-  // Per-endpoint breakdown — normalize URL paths to canonical resource keys
-  // (e.g. '/email/<uuid>/send' → 'email-send') so we don't end up with one
-  // bucket per UUID.
-  const endpointMap = new Map<string, { count: number; volume_wei: bigint }>();
+  const endpointMap = new Map<string, { count: number; volume: Record<string, number> }>();
   for (const p of allPayments) {
     const key = normalizeEndpoint(p.endpoint);
-    const cur = endpointMap.get(key) || { count: 0, volume_wei: 0n };
+    const ch = p.chain || '0g';
+    const cur = endpointMap.get(key) || { count: 0, volume: {} };
     cur.count += 1;
-    try { cur.volume_wei += BigInt(p.amount); } catch {}
+    cur.volume[ch] = (cur.volume[ch] || 0) + amountToHuman(p.amount, ch);
     endpointMap.set(key, cur);
   }
-  const byEndpoint: Record<string, { count: number; volume_0g: number }> = {};
+  const byEndpoint: Record<string, { count: number; volume: Record<string, number> }> = {};
   for (const [k, v] of endpointMap.entries()) {
-    byEndpoint[k] = {
-      count: v.count,
-      volume_0g: weiToZG(v.volume_wei.toString()),
-    };
+    byEndpoint[k] = { count: v.count, volume: v.volume };
   }
 
-  // Resource-level totals (counts from concrete tables, not just payments)
   const inboxCount     = (db.prepare("SELECT COUNT(*) as n FROM email_inboxes").get() as any).n as number;
   const emailsSent     = (db.prepare("SELECT COUNT(*) as n FROM email_messages WHERE direction = 'outbound'").get() as any).n as number;
   const emailsReceived = (db.prepare("SELECT COUNT(*) as n FROM email_messages WHERE direction = 'inbound'").get()  as any).n as number;
@@ -111,23 +117,20 @@ function getAggregates() {
   const smsSent        = (db.prepare("SELECT COUNT(*) as n FROM sms_messages WHERE direction = 'outbound'").get()  as any).n as number;
   const memoryEntries  = (db.prepare("SELECT COUNT(*) as n FROM memory_index").get()  as any).n as number;
 
-  // Identity mints come from the payments log (no separate table)
   const identityMints  = byEndpoint['identity']?.count ?? 0;
   const inferenceCalls = byEndpoint['compute-infer']?.count ?? 0;
-
-  // Resources on-chain — sum of identities + email inboxes + phone numbers
   const totalResources = identityMints + inboxCount + phoneCount;
 
   return {
     headline: {
       wallets: distinctPayers.size,
       resources: totalResources,
-      volume_0g: weiToZG(totalVolumeWei.toString()),
+      volume: volumeByChain,
     },
     totals: {
       transactions: allPayments.length,
       wallets: distinctPayers.size,
-      volume_0g: weiToZG(totalVolumeWei.toString()),
+      volume: volumeByChain,
       identities_minted: identityMints,
       email_inboxes: inboxCount,
       emails_sent: emailsSent,
@@ -141,7 +144,7 @@ function getAggregates() {
     last_24h: {
       transactions: last24hPayments.length,
       wallets: last24hPayers.size,
-      volume_0g: weiToZG(last24hVolumeWei.toString()),
+      volume: last24hVolume,
     },
     by_endpoint: byEndpoint,
     updated_at: new Date().toISOString(),
@@ -176,7 +179,7 @@ router.get("/transactions", (req: Request, res: Response) => {
     // after normalizing. With small data this is fine; if used_payments grows
     // past ~10K rows, replace with a denormalized column or a CASE-WHEN query.
     const allRows = db.prepare(
-      `SELECT nonce, payer, amount, tx_hash, endpoint, verified_at
+      `SELECT nonce, payer, amount, tx_hash, endpoint, verified_at, chain
          FROM used_payments
          ORDER BY verified_at DESC`
     ).all() as PaymentRow[];
@@ -188,16 +191,21 @@ router.get("/transactions", (req: Request, res: Response) => {
     const rows = filtered.slice(offset, offset + limit);
 
     res.json({
-      transactions: rows.map(r => ({
-        nonce: r.nonce,
-        payer: r.payer,
-        amount_0g: weiToZG(r.amount),
-        amount_wei: r.amount,
-        tx_hash: r.tx_hash,
-        endpoint: normalizeEndpoint(r.endpoint),
-        endpoint_raw: r.endpoint,
-        timestamp: r.verified_at,
-      })),
+      transactions: rows.map(r => {
+        const ch = r.chain || '0g';
+        return {
+          nonce: r.nonce,
+          payer: r.payer,
+          amount: amountToHuman(r.amount, ch),
+          currency: chainCurrency(ch),
+          chain: ch,
+          explorer: chainExplorer(ch),
+          tx_hash: r.tx_hash,
+          endpoint: normalizeEndpoint(r.endpoint),
+          endpoint_raw: r.endpoint,
+          timestamp: r.verified_at,
+        };
+      }),
       pagination: { total, limit, offset, has_more: offset + rows.length < total },
     });
   } catch (err: any) {
@@ -211,20 +219,26 @@ router.get("/transactions/recent", (req: Request, res: Response) => {
   try {
     const limit = Math.max(1, Math.min(parseInt((req.query.limit as string) || "10", 10), 50));
     const rows = db.prepare(
-      `SELECT nonce, payer, amount, tx_hash, endpoint, verified_at
+      `SELECT nonce, payer, amount, tx_hash, endpoint, verified_at, chain
          FROM used_payments
          ORDER BY verified_at DESC
          LIMIT ?`
     ).all(limit) as PaymentRow[];
     res.json({
-      transactions: rows.map(r => ({
-        payer: r.payer,
-        amount_0g: weiToZG(r.amount),
-        tx_hash: r.tx_hash,
-        endpoint: normalizeEndpoint(r.endpoint),
-        endpoint_raw: r.endpoint,
-        timestamp: r.verified_at,
-      })),
+      transactions: rows.map(r => {
+        const ch = r.chain || '0g';
+        return {
+          payer: r.payer,
+          amount: amountToHuman(r.amount, ch),
+          currency: chainCurrency(ch),
+          chain: ch,
+          explorer: chainExplorer(ch),
+          tx_hash: r.tx_hash,
+          endpoint: normalizeEndpoint(r.endpoint),
+          endpoint_raw: r.endpoint,
+          timestamp: r.verified_at,
+        };
+      }),
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

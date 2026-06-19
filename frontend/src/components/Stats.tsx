@@ -32,22 +32,25 @@ const GREEN = '#7DEFB1';
 
 // ─── Types ────────────────────────────────────────────────────────────
 interface StatsResponse {
-  headline: { wallets: number; resources: number; volume_0g: number };
+  headline: { wallets: number; resources: number; volume?: Record<string, number>; volume_0g?: number };
   totals: {
-    transactions: number; wallets: number; volume_0g: number;
+    transactions: number; wallets: number; volume?: Record<string, number>; volume_0g?: number;
     identities_minted: number; email_inboxes: number;
     emails_sent: number; emails_received: number;
     phone_numbers: number; sms_sent: number;
     inference_calls: number; memory_entries: number;
     total_resources: number;
   };
-  last_24h: { transactions: number; wallets: number; volume_0g: number };
-  by_endpoint: Record<string, { count: number; volume_0g: number }>;
+  last_24h: { transactions: number; wallets: number; volume?: Record<string, number>; volume_0g?: number };
+  by_endpoint: Record<string, { count: number }>;
   updated_at: string;
 }
 
 interface Tx {
-  payer: string; amount_0g: number; tx_hash: string | null;
+  payer: string;
+  amount?: number; currency?: string; chain?: string; explorer?: string;
+  amount_0g?: number;
+  tx_hash: string | null;
   endpoint: string; timestamp: string; nonce?: string;
 }
 
@@ -85,12 +88,26 @@ function timeAgo(iso: string): string {
   const d = Math.floor(h / 24);
   return `${d}d ago`;
 }
-function fmt0G(n: number): string {
+function fmtAmount(n: number): string {
   if (n === 0) return '0';
   if (n < 0.0001) return n.toExponential(1);
   if (n < 1) return n.toFixed(4);
   if (n < 100) return n.toFixed(2);
   return n.toFixed(0);
+}
+
+const CURRENCY_LABELS: Record<string, string> = { celo: 'USDC', '0g': '0G' };
+
+function fmtVolume(vol?: Record<string, number>, fallback?: number): string {
+  if (vol && typeof vol === 'object') {
+    const parts: string[] = [];
+    for (const [chain, amount] of Object.entries(vol)) {
+      if (amount > 0) parts.push(`${fmtAmount(amount)} ${CURRENCY_LABELS[chain] || chain}`);
+    }
+    return parts.length > 0 ? parts.join(' + ') : '0';
+  }
+  if (typeof fallback === 'number') return `${fmtAmount(fallback)} 0G`;
+  return '0';
 }
 function fmtN(n: number): string {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
@@ -129,11 +146,11 @@ function StatRow({ label, icon, value }: { label: string; icon?: ReactNode; valu
   );
 }
 
-const EXPLORER_TX = 'https://chainscan.0g.ai/tx/';
-const EXPLORER_ADDR = 'https://chainscan.0g.ai/address/';
-
 function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
   const meta = ENDPOINT_META[tx.endpoint] || { label: tx.endpoint, icon: <PackageIcon size={14} color={LILAC} />, color: LILAC };
+  const base = tx.explorer || 'https://chainscan.0g.ai';
+  const explorerTx = base + '/tx/';
+  const explorerAddr = base + '/address/';
   const rowStyle: CSSProperties = {
     display: 'grid',
     gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
@@ -141,8 +158,6 @@ function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
     background: idx % 2 === 0 ? BG_ROW : 'transparent',
     fontSize: 12.5, fontFamily: 'JetBrains Mono, monospace',
   };
-  // Tiny prefix label, used on mobile to make payer-vs-tx-hash distinguishable.
-  // Hidden on desktop because column headers already do that job.
   const prefix = (label: string) => (
     <span className="stats-tx-prefix" style={{
       display: 'none',
@@ -161,16 +176,16 @@ function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
       </div>
       <div>
         {prefix('Payer')}
-        <a href={EXPLORER_ADDR + tx.payer} target="_blank" rel="noreferrer" style={{ color: TEXT, textDecoration: 'none' }}
+        <a href={explorerAddr + tx.payer} target="_blank" rel="noreferrer" style={{ color: TEXT, textDecoration: 'none' }}
            onMouseEnter={e => { e.currentTarget.style.color = LILAC; }}
            onMouseLeave={e => { e.currentTarget.style.color = TEXT; }}
         >{shortAddr(tx.payer)}</a>
       </div>
-      <div style={{ color: LILAC }}>{fmt0G(tx.amount_0g)} 0G</div>
+      <div style={{ color: LILAC }}>{fmtAmount(tx.amount ?? tx.amount_0g ?? 0)} {tx.currency || '0G'}</div>
       <div>
         {prefix('Tx')}
         {tx.tx_hash ? (
-          <a href={EXPLORER_TX + tx.tx_hash} target="_blank" rel="noreferrer" style={{ color: TEXT_FAINT, textDecoration: 'none' }}
+          <a href={explorerTx + tx.tx_hash} target="_blank" rel="noreferrer" style={{ color: TEXT_FAINT, textDecoration: 'none' }}
              onMouseEnter={e => { e.currentTarget.style.color = LILAC; }}
              onMouseLeave={e => { e.currentTarget.style.color = TEXT_FAINT; }}
           >{shortHash(tx.tx_hash)} ↗</a>
@@ -256,9 +271,9 @@ export function Stats() {
             What agents have done on 0GENT.
           </h1>
           <p style={{ fontSize: 17, color: TEXT_DIM, lineHeight: 1.7, maxWidth: 640 }}>
-            Every paid endpoint settles a real on-chain transaction. These numbers are aggregated from the payment log, same data
-            anyone can pull from{' '}
-            <a href="https://chainscan.0g.ai" target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline' }}>chainscan</a>.
+            Every paid endpoint settles a real on-chain transaction. These numbers are aggregated from the payment log — verifiable on{' '}
+            <a href="https://celoscan.io" target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline' }}>Celoscan</a>{' '}and{' '}
+            <a href="https://chainscan.0g.ai" target="_blank" rel="noreferrer" style={{ color: LILAC, textDecoration: 'underline' }}>0G Chainscan</a>.
           </p>
         </div>
 
@@ -281,9 +296,9 @@ export function Stats() {
             sub={stats ? `identities + emails + phones` : ''}
           />
           <HeadlineCard
-            value={stats ? fmt0G(stats.headline.volume_0g) : '…'}
-            label="0G processed in payments"
-            sub={stats ? `${fmt0G(stats.last_24h.volume_0g)} 0G in last 24h` : ''}
+            value={stats ? fmtVolume(stats.headline.volume, stats.headline.volume_0g) : '…'}
+            label="Processed in payments"
+            sub={stats ? `${fmtVolume(stats.last_24h.volume, stats.last_24h.volume_0g)} in last 24h` : ''}
           />
         </div>
 
@@ -295,7 +310,7 @@ export function Stats() {
             </div>
             <StatRow label="Total transactions"  value={stats ? fmtN(stats.totals.transactions) : '…'} />
             <StatRow label="Unique wallets"      value={stats ? fmtN(stats.totals.wallets)      : '…'} />
-            <StatRow label="0G volume processed" value={stats ? fmt0G(stats.totals.volume_0g) + ' 0G' : '…'} />
+            <StatRow label="Volume processed" value={stats ? fmtVolume(stats.totals.volume, stats.totals.volume_0g) : '…'} />
             <StatRow label="Total resources"     value={stats ? fmtN(stats.totals.total_resources) : '…'} />
           </div>
 
