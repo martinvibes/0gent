@@ -42,7 +42,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/martinvibes/0gent.git",
+    "url": "git+https://github.com/0GENT-Labs/0gent.git",
     "directory": "packages/core"
   },
   "engines": {

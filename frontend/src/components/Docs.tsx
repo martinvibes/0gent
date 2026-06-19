@@ -617,7 +617,7 @@ const resources = await z.listResources();`}</Code>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
             {([
               ['npm package',          'https://www.npmjs.com/package/@0gent/core'],
-              ['GitHub source',        'https://github.com/martinvibes/0gent'],
+              ['GitHub source',        'https://github.com/0GENT-Labs/0gent'],
               ['Skill manifest (LLM)', '/skill.md'],
               ['Live API health',      'https://api.0gent.xyz/health'],
               ['Live pricing',         'https://api.0gent.xyz/pricing'],

@@ -388,7 +388,7 @@ Yes. Use `0gent wallet create` to generate additional wallets and `0gent wallet 
 
 - 🌐 Site — [0gent.xyz](https://0gent.xyz)
 - 📘 Skill manifest (LLM-readable) — [api.0gent.xyz/skill.md](https://api.0gent.xyz/skill.md)
-- 📦 Source — [github.com/martinvibes/0gent](https://github.com/martinvibes/0gent)
+- 📦 Source — [github.com/0GENT-Labs/0gent](https://github.com/0GENT-Labs/0gent)
 - 🔗 Celo explorer — [celoscan.io](https://celoscan.io)
 - 🔗 0G explorer — [chainscan.0g.ai](https://chainscan.0g.ai)
 - 💧 Free testnet 0G — [faucet.0g.ai](https://faucet.0g.ai)

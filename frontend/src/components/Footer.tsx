@@ -64,7 +64,7 @@ export function Footer() {
               ['Docs',       '/docs',                                       false],
               ['skill.md',   '/skill.md',                                   false],
               ['npm',        'https://www.npmjs.com/package/@0gent/core',  true],
-              ['GitHub',     'https://github.com/martinvibes/0gent',        true],
+              ['GitHub',     'https://github.com/0GENT-Labs/0gent',        true],
               ['0G Docs',    'https://docs.0g.ai',                          true],
             ].map(([l, h, ext]) => (
               <a

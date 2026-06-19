@@ -303,7 +303,7 @@ Setup time: **under 10 minutes.**
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/martinvibes/0gent.git
+git clone https://github.com/0GENT-Labs/0gent.git
 cd 0gent
 
 cd contracts && forge install && cd ..
