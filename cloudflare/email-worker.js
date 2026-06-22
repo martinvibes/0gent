@@ -1,8 +1,8 @@
 /**
- * 0GENT inbound email worker.
+ * 0GENT inbound email worker — Cloudflare Email Routing.
  *
- * Cloudflare Email Routing receives a message at <local>@0gent.xyz, runs this
- * worker, which then POSTs the parsed message to our backend webhook.
+ * Receives messages at <local>@0gent.xyz, parses MIME via postal-mime,
+ * and POSTs the parsed message to our backend webhook.
  *
  * Setup:
  *   1. Cloudflare Dashboard → your domain → Email → Email Routing → Email Workers

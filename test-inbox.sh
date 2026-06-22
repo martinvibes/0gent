@@ -1,7 +1,7 @@
 #!/bin/bash
-# Read a prod inbox via the SDK. Usage:
+# Read a prod inbox via the SDK (pays 0.02 0G or $0.02 USDC). Usage:
 #   INBOX=<inbox-id> bash test-inbox.sh
-# or just: bash test-inbox.sh   (will use the last test inbox)
+# or just: bash test-inbox.sh   (uses the last test inbox)
 
 set -e
 cd "$(dirname "$0")"
